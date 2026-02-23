@@ -17,6 +17,7 @@
       }
     },
     "android": {
+      "package": "com.kaynicte.serena",
       "adaptiveIcon": {
         "backgroundColor": "#E6A8B4",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -25,11 +26,12 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -69,6 +71,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "696f32b8-a20a-40a2-8fee-d85366670bb1"
+      }
+    },
+    "owner": "kay-nicte"
   }
 }
