@@ -8,9 +8,17 @@ export interface Photo {
   id: string;
   user_id: string;
   storage_path: string;
-  url: string;
+  url: string; // computed from storage_path, not in DB
   position: number;
   created_at: string;
+}
+
+/** Add computed `url` field to raw DB rows */
+export function withPhotoUrls(rows: Omit<Photo, 'url'>[]): Photo[] {
+  return rows.map((row) => ({
+    ...row,
+    url: getPhotoUrl(row.storage_path),
+  }));
 }
 
 export function usePhotos(userId: string | undefined) {
@@ -28,7 +36,7 @@ export function usePhotos(userId: string | undefined) {
         .order('position', { ascending: true });
 
       if (error) throw error;
-      setPhotos((data as Photo[]) ?? []);
+      setPhotos(withPhotoUrls(data ?? []));
     } catch (error) {
       console.error('Error fetching photos:', error);
     } finally {
@@ -63,7 +71,6 @@ export function usePhotos(userId: string | undefined) {
         const { error } = await supabase.from('photos').insert({
           user_id: userId,
           storage_path: storagePath,
-          url,
           position,
         });
 
@@ -100,15 +107,17 @@ export function usePhotos(userId: string | undefined) {
         if (error) throw error;
 
         if (position === 0) {
-          // Check if there's another photo to promote as avatar
           const { data: remaining } = await supabase
             .from('photos')
-            .select('url')
+            .select('storage_path')
             .eq('user_id', userId)
             .order('position', { ascending: true })
             .limit(1);
 
-          await syncAvatar(remaining?.[0]?.url ?? null);
+          const newAvatar = remaining?.[0]
+            ? getPhotoUrl(remaining[0].storage_path)
+            : null;
+          await syncAvatar(newAvatar);
         }
 
         await fetchPhotos();

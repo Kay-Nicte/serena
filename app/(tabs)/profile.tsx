@@ -123,7 +123,9 @@ export default function ProfileScreen() {
               {profile?.birth_date && (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>{t('profile.birthDate')}</Text>
-                  <Text style={styles.infoValue}>{profile.birth_date}</Text>
+                  <Text style={styles.infoValue}>
+                    {profile.birth_date.split('-').reverse().join('-')}
+                  </Text>
                 </View>
               )}
               {profile?.orientation && (

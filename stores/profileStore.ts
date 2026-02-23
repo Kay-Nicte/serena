@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import type { Profile } from './authStore';
-import type { Photo } from '@/hooks/usePhotos';
+import { type Photo, withPhotoUrls } from '@/hooks/usePhotos';
 
 interface MatchResult {
   matched: boolean;
@@ -52,7 +52,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
           .order('position', { ascending: true });
 
         if (photosData) {
-          for (const photo of photosData as Photo[]) {
+          for (const photo of withPhotoUrls(photosData)) {
             if (!photosMap[photo.user_id]) {
               photosMap[photo.user_id] = [];
             }
