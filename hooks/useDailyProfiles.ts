@@ -4,6 +4,7 @@ import { useProfileStore } from '@/stores/profileStore';
 export function useDailyProfiles() {
   const {
     candidates,
+    candidatePhotos,
     currentIndex,
     isLoading,
     matchResult,
@@ -18,10 +19,14 @@ export function useDailyProfiles() {
   }, []);
 
   const currentProfile = candidates[currentIndex] ?? null;
+  const currentPhotos = currentProfile
+    ? candidatePhotos[currentProfile.id] ?? []
+    : [];
   const hasMore = currentIndex < candidates.length;
 
   return {
     currentProfile,
+    currentPhotos,
     hasMore,
     isLoading,
     matchResult,

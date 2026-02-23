@@ -14,6 +14,7 @@ export default function TodayScreen() {
   const router = useRouter();
   const {
     currentProfile,
+    currentPhotos,
     hasMore,
     isLoading,
     matchResult,
@@ -45,7 +46,7 @@ export default function TodayScreen() {
           </View>
         ) : currentProfile && hasMore ? (
           <>
-            <ProfileCard profile={currentProfile} />
+            <ProfileCard profile={currentProfile} photos={currentPhotos} />
             <View style={styles.actions}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.passButton]}

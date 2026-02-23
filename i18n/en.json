@@ -48,6 +48,11 @@
     "orientation": "Orientation",
     "lookingFor": "What are you looking for?",
     "save": "Save profile",
+    "mainPhoto": "Main",
+    "addPhotos": "Your photos",
+    "deletePhoto": "Delete photo",
+    "deletePhotoConfirm": "Delete this photo?",
+    "maxPhotos": "Maximum 6 photos",
     "signOut": "Sign out",
     "signOutConfirm": "Are you sure you want to sign out?"
   },

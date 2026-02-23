@@ -48,6 +48,11 @@
     "orientation": "Orientación",
     "lookingFor": "¿Qué buscas?",
     "save": "Guardar perfil",
+    "mainPhoto": "Principal",
+    "addPhotos": "Tus fotos",
+    "deletePhoto": "Eliminar foto",
+    "deletePhotoConfirm": "¿Eliminar esta foto?",
+    "maxPhotos": "Máximo 6 fotos",
     "signOut": "Cerrar sesión",
     "signOutConfirm": "¿Estás segura de que quieres cerrar sesión?"
   },

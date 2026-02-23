@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import type { Profile } from './authStore';
+import type { Photo } from '@/hooks/usePhotos';
 
 interface MatchResult {
   matched: boolean;
@@ -9,6 +10,7 @@ interface MatchResult {
 
 interface ProfileStoreState {
   candidates: Profile[];
+  candidatePhotos: Record<string, Photo[]>;
   currentIndex: number;
   isLoading: boolean;
   matchResult: MatchResult | null;
@@ -22,6 +24,7 @@ interface ProfileStoreState {
 
 export const useProfileStore = create<ProfileStoreState>((set, get) => ({
   candidates: [],
+  candidatePhotos: {},
   currentIndex: 0,
   isLoading: false,
   matchResult: null,
@@ -35,7 +38,30 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
 
       if (error) throw error;
 
-      set({ candidates: (data as Profile[]) ?? [], currentIndex: 0 });
+      const candidates = (data as Profile[]) ?? [];
+
+      // Fetch photos for all candidates
+      const candidateIds = candidates.map((c) => c.id);
+      const photosMap: Record<string, Photo[]> = {};
+
+      if (candidateIds.length > 0) {
+        const { data: photosData } = await supabase
+          .from('photos')
+          .select('*')
+          .in('user_id', candidateIds)
+          .order('position', { ascending: true });
+
+        if (photosData) {
+          for (const photo of photosData as Photo[]) {
+            if (!photosMap[photo.user_id]) {
+              photosMap[photo.user_id] = [];
+            }
+            photosMap[photo.user_id].push(photo);
+          }
+        }
+      }
+
+      set({ candidates, candidatePhotos: photosMap, currentIndex: 0 });
     } catch (error) {
       console.error('Error fetching candidates:', error);
     } finally {
@@ -85,6 +111,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
   reset: () =>
     set({
       candidates: [],
+      candidatePhotos: {},
       currentIndex: 0,
       isLoading: false,
       matchResult: null,

@@ -1,13 +1,24 @@
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { useState, useRef, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import type { Profile } from '@/stores/authStore';
+import type { Photo } from '@/hooks/usePhotos';
 
 interface ProfileCardProps {
   profile: Profile;
+  photos?: Photo[];
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -25,24 +36,84 @@ function calculateAge(birthDate: string | null): number | null {
   return age;
 }
 
-export function ProfileCard({ profile }: ProfileCardProps) {
+export function ProfileCard({ profile, photos }: ProfileCardProps) {
   const { t } = useTranslation();
   const age = calculateAge(profile.birth_date);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  return (
-    <View style={styles.card}>
-      {profile.avatar_url ? (
+  const imageUrls =
+    photos && photos.length > 0
+      ? photos.map((p) => p.url)
+      : profile.avatar_url
+        ? [profile.avatar_url]
+        : [];
+
+  const hasMultiple = imageUrls.length > 1;
+
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const offsetX = e.nativeEvent.contentOffset.x;
+      const index = Math.round(offsetX / CARD_WIDTH);
+      setActiveIndex(index);
+    },
+    []
+  );
+
+  const renderPhoto = () => {
+    if (imageUrls.length === 0) {
+      return (
+        <View style={[styles.photo, styles.photoPlaceholder]}>
+          <Ionicons name="person" size={80} color={Colors.primaryLight} />
+        </View>
+      );
+    }
+
+    if (!hasMultiple) {
+      return (
         <Image
-          source={{ uri: profile.avatar_url }}
+          source={{ uri: imageUrls[0] }}
           style={styles.photo}
           contentFit="cover"
           transition={200}
         />
-      ) : (
-        <View style={[styles.photo, styles.photoPlaceholder]}>
-          <Ionicons name="person" size={80} color={Colors.primaryLight} />
+      );
+    }
+
+    return (
+      <View>
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          style={styles.photoScroll}
+        >
+          {imageUrls.map((url, i) => (
+            <Image
+              key={i}
+              source={{ uri: url }}
+              style={[styles.photo, { width: CARD_WIDTH }]}
+              contentFit="cover"
+              transition={200}
+            />
+          ))}
+        </ScrollView>
+        <View style={styles.dots}>
+          {imageUrls.map((_, i) => (
+            <View
+              key={i}
+              style={[styles.dot, i === activeIndex && styles.dotActive]}
+            />
+          ))}
         </View>
-      )}
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.card}>
+      {renderPhoto()}
 
       <View style={styles.info}>
         <View style={styles.nameRow}>
@@ -89,6 +160,9 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 5,
   },
+  photoScroll: {
+    width: CARD_WIDTH,
+  },
   photo: {
     width: '100%',
     aspectRatio: 3 / 4,
@@ -97,6 +171,27 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceSecondary,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  dots: {
+    position: 'absolute',
+    bottom: 10,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  dot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  dotActive: {
+    backgroundColor: Colors.primary,
+    width: 9,
+    height: 9,
+    borderRadius: 4.5,
   },
   info: {
     padding: 20,

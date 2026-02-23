@@ -19,8 +19,9 @@ import { Config } from '@/constants/config';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Tag } from '@/components/ui/Tag';
+import { PhotoGrid } from '@/components/PhotoGrid';
 import { useAuthStore } from '@/stores/authStore';
-import { pickImage, uploadPhoto, getPhotoUrl } from '@/lib/storage';
+import { usePhotos } from '@/hooks/usePhotos';
 import { Ionicons } from '@expo/vector-icons';
 
 const ORIENTATIONS = ['lesbian', 'bisexual', 'pansexual', 'queer', 'other'] as const;
@@ -29,6 +30,7 @@ const LOOKING_FOR = ['friendship', 'dating', 'relationship', 'explore'] as const
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const { user, profile, updateProfile, signOut, fetchProfile } = useAuthStore();
+  const { photos, isLoading: photosLoading, fetchPhotos, addPhoto, removePhoto } = usePhotos(user?.id);
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -38,7 +40,6 @@ export default function ProfileScreen() {
   const [year, setYear] = useState('');
   const [orientation, setOrientation] = useState<string | null>(null);
   const [lookingFor, setLookingFor] = useState<string | null>(null);
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -47,7 +48,6 @@ export default function ProfileScreen() {
       setBio(profile.bio ?? '');
       setOrientation(profile.orientation);
       setLookingFor(profile.looking_for);
-      setPhotoUri(null);
       if (profile.birth_date) {
         const [y, m, d] = profile.birth_date.split('-');
         setYear(y);
@@ -57,23 +57,14 @@ export default function ProfileScreen() {
     }
   }, [profile, editing]);
 
-  const handlePickPhoto = async () => {
-    if (!editing) return;
-    const uri = await pickImage();
-    if (uri) setPhotoUri(uri);
-  };
+  useEffect(() => {
+    if (user?.id) fetchPhotos();
+  }, [user?.id, fetchPhotos]);
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
     try {
-      let avatarUrl = profile?.avatar_url ?? null;
-
-      if (photoUri && user) {
-        const path = await uploadPhoto(user.id, photoUri, 0);
-        avatarUrl = getPhotoUrl(path);
-      }
-
       const birthDateString =
         day && month && year
           ? `${year.padStart(4, '0')}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
@@ -85,7 +76,6 @@ export default function ProfileScreen() {
         birth_date: birthDateString,
         orientation: orientation as any,
         looking_for: lookingFor as any,
-        avatar_url: avatarUrl,
       });
       setEditing(false);
     } catch {
@@ -101,8 +91,6 @@ export default function ProfileScreen() {
       { text: t('profile.signOut'), style: 'destructive', onPress: signOut },
     ]);
   };
-
-  const avatarSource = photoUri ?? profile?.avatar_url;
 
   // --- VIEW MODE ---
   if (!editing) {
@@ -187,19 +175,13 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Photo */}
-          <TouchableOpacity style={styles.avatarEditContainer} onPress={handlePickPhoto}>
-            {avatarSource ? (
-              <Image source={{ uri: avatarSource }} style={styles.avatar} />
-            ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person" size={40} color={Colors.primary} />
-              </View>
-            )}
-            <View style={styles.editBadge}>
-              <Ionicons name="camera" size={14} color={Colors.textOnPrimary} />
-            </View>
-          </TouchableOpacity>
+          {/* Photos */}
+          <PhotoGrid
+            photos={photos}
+            isLoading={photosLoading}
+            onAddPhoto={addPhoto}
+            onRemovePhoto={removePhoto}
+          />
 
           {/* Name */}
           <Input
@@ -354,23 +336,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceSecondary,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  avatarEditContainer: {
-    alignSelf: 'center',
-    position: 'relative',
-  },
-  editBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: Colors.background,
   },
   name: {
     fontSize: 22,
