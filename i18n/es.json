@@ -1,0 +1,99 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "next": "Siguiente",
+    "back": "Volver",
+    "done": "Listo",
+    "or": "o"
+  },
+  "welcome": {
+    "title": "Serena",
+    "subtitle": "Conexiones reales para mujeres queer",
+    "login": "Iniciar sesión",
+    "register": "Crear cuenta"
+  },
+  "auth": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "login": "Iniciar sesión",
+    "register": "Crear cuenta",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "termsAgree": "Al crear tu cuenta, aceptas nuestros",
+    "termsLink": "Términos y Condiciones",
+    "privacyLink": "Política de Privacidad",
+    "and": "y",
+    "errorInvalidEmail": "Correo electrónico inválido",
+    "errorPasswordShort": "La contraseña debe tener al menos 6 caracteres",
+    "errorPasswordMismatch": "Las contraseñas no coinciden",
+    "errorGeneric": "Error de autenticación. Inténtalo de nuevo."
+  },
+  "profile": {
+    "completeTitle": "Completa tu perfil",
+    "completeSubtitle": "Cuéntanos sobre ti para encontrar mejores conexiones",
+    "photo": "Foto de perfil",
+    "addPhoto": "Agregar foto",
+    "changePhoto": "Cambiar foto",
+    "name": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "birthDate": "Fecha de nacimiento",
+    "bio": "Sobre ti",
+    "bioPlaceholder": "Cuéntanos algo sobre ti...",
+    "orientation": "Orientación",
+    "lookingFor": "¿Qué buscas?",
+    "save": "Guardar perfil",
+    "signOut": "Cerrar sesión",
+    "signOutConfirm": "¿Estás segura de que quieres cerrar sesión?"
+  },
+  "orientation": {
+    "lesbian": "Lesbiana",
+    "bisexual": "Bisexual",
+    "pansexual": "Pansexual",
+    "queer": "Queer",
+    "other": "Otra"
+  },
+  "lookingFor": {
+    "friendship": "Amistad",
+    "dating": "Citas",
+    "relationship": "Relación",
+    "explore": "Explorar"
+  },
+  "tabs": {
+    "today": "Hoy",
+    "matches": "Matches",
+    "chat": "Chat",
+    "profile": "Perfil"
+  },
+  "today": {
+    "title": "Hoy",
+    "empty": "No hay más perfiles por hoy. ¡Vuelve mañana!",
+    "placeholder": "Descubre personas increíbles cerca de ti",
+    "like": "Me gusta",
+    "pass": "Pasar",
+    "loading": "Buscando perfiles..."
+  },
+  "matches": {
+    "title": "Matches",
+    "empty": "Aún no tienes matches. ¡Sigue explorando!",
+    "placeholder": "Tus conexiones aparecerán aquí"
+  },
+  "match": {
+    "title": "¡Es un match!",
+    "subtitle": "Ambas se gustaron. ¿Por qué no empezar una conversación?",
+    "sendMessage": "Enviar mensaje",
+    "keepExploring": "Seguir explorando"
+  },
+  "chat": {
+    "title": "Chat",
+    "empty": "No tienes conversaciones aún",
+    "placeholder": "Escribe un mensaje...",
+    "send": "Enviar",
+    "noMessages": "Aún no hay mensajes. ¡Di hola!"
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "next": "Next",
+    "back": "Back",
+    "done": "Done",
+    "or": "or"
+  },
+  "welcome": {
+    "title": "Serena",
+    "subtitle": "Real connections for queer women",
+    "login": "Sign in",
+    "register": "Create account"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "login": "Sign in",
+    "register": "Create account",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "termsAgree": "By creating your account, you agree to our",
+    "termsLink": "Terms & Conditions",
+    "privacyLink": "Privacy Policy",
+    "and": "and",
+    "errorInvalidEmail": "Invalid email address",
+    "errorPasswordShort": "Password must be at least 6 characters",
+    "errorPasswordMismatch": "Passwords don't match",
+    "errorGeneric": "Authentication error. Please try again."
+  },
+  "profile": {
+    "completeTitle": "Complete your profile",
+    "completeSubtitle": "Tell us about yourself to find better connections",
+    "photo": "Profile photo",
+    "addPhoto": "Add photo",
+    "changePhoto": "Change photo",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "birthDate": "Date of birth",
+    "bio": "About you",
+    "bioPlaceholder": "Tell us something about yourself...",
+    "orientation": "Orientation",
+    "lookingFor": "What are you looking for?",
+    "save": "Save profile",
+    "signOut": "Sign out",
+    "signOutConfirm": "Are you sure you want to sign out?"
+  },
+  "orientation": {
+    "lesbian": "Lesbian",
+    "bisexual": "Bisexual",
+    "pansexual": "Pansexual",
+    "queer": "Queer",
+    "other": "Other"
+  },
+  "lookingFor": {
+    "friendship": "Friendship",
+    "dating": "Dating",
+    "relationship": "Relationship",
+    "explore": "Explore"
+  },
+  "tabs": {
+    "today": "Today",
+    "matches": "Matches",
+    "chat": "Chat",
+    "profile": "Profile"
+  },
+  "today": {
+    "title": "Today",
+    "empty": "No more profiles for today. Come back tomorrow!",
+    "placeholder": "Discover amazing people near you",
+    "like": "Like",
+    "pass": "Pass",
+    "loading": "Finding profiles..."
+  },
+  "matches": {
+    "title": "Matches",
+    "empty": "No matches yet. Keep exploring!",
+    "placeholder": "Your connections will appear here"
+  },
+  "match": {
+    "title": "It's a match!",
+    "subtitle": "You both liked each other. Why not start a conversation?",
+    "sendMessage": "Send message",
+    "keepExploring": "Keep exploring"
+  },
+  "chat": {
+    "title": "Chat",
+    "empty": "No conversations yet",
+    "placeholder": "Write a message...",
+    "send": "Send",
+    "noMessages": "No messages yet. Say hello!"
+  }
+}
