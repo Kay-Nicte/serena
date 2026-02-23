@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
+import { useLocation } from '@/hooks/useLocation';
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  useLocation();
 
   return (
     <Tabs

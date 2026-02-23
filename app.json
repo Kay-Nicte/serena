@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "Serena necesita acceso a tu cámara para tomar fotos de perfil.",
-        "NSPhotoLibraryUsageDescription": "Serena necesita acceso a tu galería para seleccionar fotos de perfil."
+        "NSPhotoLibraryUsageDescription": "Serena necesita acceso a tu galería para seleccionar fotos de perfil.",
+        "NSLocationWhenInUseUsageDescription": "Serena usa tu ubicación para mostrarte personas cerca de ti."
       }
     },
     "android": {
@@ -26,7 +27,9 @@
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
       ]
     },
     "web": {
@@ -55,7 +58,13 @@
           "cameraPermission": "Serena necesita acceso a tu cámara para tomar fotos de perfil."
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Serena usa tu ubicación para mostrarte personas cerca de ti."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

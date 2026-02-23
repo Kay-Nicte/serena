@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+import * as Location from 'expo-location';
 import { supabase } from '@/lib/supabase';
+import { Config } from '@/constants/config';
 import type { Profile } from './authStore';
 import { type Photo, withPhotoUrls } from '@/hooks/usePhotos';
 
@@ -14,8 +16,10 @@ interface ProfileStoreState {
   currentIndex: number;
   isLoading: boolean;
   matchResult: MatchResult | null;
+  maxDistanceKm: number;
 
   fetchCandidates: () => Promise<void>;
+  setMaxDistance: (km: number) => void;
   likeProfile: (targetId: string) => Promise<void>;
   passProfile: (targetId: string) => Promise<void>;
   clearMatchResult: () => void;
@@ -28,13 +32,33 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
   currentIndex: 0,
   isLoading: false,
   matchResult: null,
+  maxDistanceKm: Config.defaultMaxDistanceKm,
+
+  setMaxDistance: (km: number) => set({ maxDistanceKm: km }),
 
   fetchCandidates: async () => {
     set({ isLoading: true });
     try {
-      const { data, error } = await supabase.rpc('get_daily_candidates', {
+      // Try to get user's current location for distance filtering
+      const rpcParams: Record<string, unknown> = {
         candidate_limit: 10,
-      });
+        max_distance_km: get().maxDistanceKm,
+      };
+
+      try {
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const position = await Location.getLastKnownPositionAsync();
+          if (position) {
+            rpcParams.user_lat = position.coords.latitude;
+            rpcParams.user_lng = position.coords.longitude;
+          }
+        }
+      } catch {
+        // Location not available, proceed without it
+      }
+
+      const { data, error } = await supabase.rpc('get_daily_candidates', rpcParams);
 
       if (error) throw error;
 
@@ -115,5 +139,6 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       currentIndex: 0,
       isLoading: false,
       matchResult: null,
+      maxDistanceKm: Config.defaultMaxDistanceKm,
     }),
 }));

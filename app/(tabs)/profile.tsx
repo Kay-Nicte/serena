@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/Input';
 import { Tag } from '@/components/ui/Tag';
 import { PhotoGrid } from '@/components/PhotoGrid';
 import { useAuthStore } from '@/stores/authStore';
+import { useProfileStore } from '@/stores/profileStore';
 import { usePhotos } from '@/hooks/usePhotos';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -31,6 +32,7 @@ export default function ProfileScreen() {
   const { t } = useTranslation();
   const { user, profile, updateProfile, signOut, fetchProfile } = useAuthStore();
   const { photos, isLoading: photosLoading, fetchPhotos, addPhoto, removePhoto } = usePhotos(user?.id);
+  const { maxDistanceKm, setMaxDistance } = useProfileStore();
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -272,6 +274,21 @@ export default function ProfileScreen() {
                   label={t(`lookingFor.${lf}`)}
                   selected={lookingFor === lf}
                   onPress={() => setLookingFor(lf)}
+                />
+              ))}
+            </View>
+          </View>
+
+          {/* Max Distance */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('location.maxDistance')}</Text>
+            <View style={styles.tags}>
+              {Config.distanceOptions.map((km) => (
+                <Tag
+                  key={km}
+                  label={`${km} ${t('location.km')}`}
+                  selected={maxDistanceKm === km}
+                  onPress={() => setMaxDistance(km)}
                 />
               ))}
             </View>

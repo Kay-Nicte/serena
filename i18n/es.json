@@ -100,5 +100,10 @@
     "placeholder": "Escribe un mensaje...",
     "send": "Enviar",
     "noMessages": "Aún no hay mensajes. ¡Di hola!"
+  },
+  "location": {
+    "maxDistance": "Distancia máxima",
+    "km": "km",
+    "lessThan1km": "Menos de 1 km"
   }
 }

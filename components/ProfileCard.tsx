@@ -123,6 +123,17 @@ export function ProfileCard({ profile, photos }: ProfileCardProps) {
           {age !== null && <Text style={styles.age}>{age}</Text>}
         </View>
 
+        {profile.distance_km != null && (
+          <View style={styles.distanceRow}>
+            <Ionicons name="location-outline" size={14} color={Colors.textTertiary} />
+            <Text style={styles.distanceText}>
+              {profile.distance_km < 1
+                ? t('location.lessThan1km')
+                : `${Math.round(profile.distance_km)} ${t('location.km')}`}
+            </Text>
+          </View>
+        )}
+
         {profile.bio ? (
           <Text style={styles.bio}>{profile.bio}</Text>
         ) : null}
@@ -212,6 +223,16 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
+  },
+  distanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  distanceText: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    color: Colors.textTertiary,
   },
   bio: {
     fontSize: 15,
