@@ -408,6 +408,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 12,
   },
   infoLabel: {
     fontSize: 14,
@@ -418,6 +419,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.bodySemiBold,
     color: Colors.text,
+    flexShrink: 1,
+    textAlign: 'right',
   },
   section: {
     gap: 10,
