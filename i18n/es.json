@@ -118,5 +118,19 @@
   "notifications": {
     "permissionTitle": "Activar notificaciones",
     "permissionMessage": "Recibe notificaciones sobre nuevos matches y mensajes"
+  },
+  "discovery": {
+    "title": "Descubrimiento",
+    "subtitle": "Personaliza qué perfiles ves",
+    "ageRange": "Rango de edad",
+    "minAge": "Mín",
+    "maxAge": "Máx",
+    "orientations": "Orientaciones",
+    "orientationsAll": "Todas",
+    "lookingFor": "Qué buscan",
+    "lookingForAll": "Todos",
+    "edit": "Editar preferencias",
+    "saved": "Preferencias guardadas",
+    "years": "años"
   }
 }

@@ -22,15 +22,19 @@ import { Tag } from '@/components/ui/Tag';
 import { PhotoGrid } from '@/components/PhotoGrid';
 import { useAuthStore } from '@/stores/authStore';
 import { usePhotos } from '@/hooks/usePhotos';
+import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
 import { pickImage } from '@/lib/storage';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { user, profile, updateProfile, signOut, fetchProfile } = useAuthStore();
   const { photos, addPhoto, removePhoto } = usePhotos(user?.id);
+  const { preferences } = useDiscoveryPreferences();
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -152,6 +156,42 @@ export default function ProfileScreen() {
                 </View>
               )}
             </View>
+          </View>
+
+          {/* Discovery Preferences */}
+          <View style={styles.discoveryCard}>
+            <View style={styles.discoveryHeader}>
+              <Text style={styles.discoveryTitle}>{t('discovery.title')}</Text>
+            </View>
+            <View style={styles.info}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t('discovery.ageRange')}</Text>
+                <Text style={styles.infoValue}>
+                  {preferences?.min_age ?? Config.minAge} — {preferences?.max_age ?? Config.maxAge} {t('discovery.years')}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t('discovery.orientations')}</Text>
+                <Text style={styles.infoValue}>
+                  {preferences?.orientations?.length
+                    ? preferences.orientations.map((o) => t(`orientation.${o}`)).join(', ')
+                    : t('discovery.orientationsAll')}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t('discovery.lookingFor')}</Text>
+                <Text style={styles.infoValue}>
+                  {preferences?.looking_for?.length
+                    ? preferences.looking_for.map((lf) => t(`lookingFor.${lf}`)).join(', ')
+                    : t('discovery.lookingForAll')}
+                </Text>
+              </View>
+            </View>
+            <Button
+              title={t('discovery.edit')}
+              onPress={() => router.push('/discovery-preferences')}
+              variant="outline"
+            />
           </View>
 
           <View style={styles.bottom}>
@@ -429,6 +469,27 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: 4,
+  },
+  discoveryCard: {
+    padding: 20,
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    gap: 14,
+    shadowColor: Colors.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  discoveryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  discoveryTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.heading,
+    color: Colors.text,
   },
   bottom: {
     paddingTop: 12,

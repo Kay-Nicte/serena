@@ -14,4 +14,8 @@ export const Config = {
   photoMaxSizeMB: 5,
   photoAllowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
   storageBucket: 'profile-photos',
+  discoveryDefaults: {
+    minAge: 18,
+    maxAge: 99,
+  },
 } as const;

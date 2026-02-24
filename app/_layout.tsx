@@ -83,6 +83,7 @@ export default function RootLayout() {
           <Stack.Screen name="complete-profile" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="reset-password" />
+          <Stack.Screen name="discovery-preferences" />
         </Stack>
         <StatusBar style="dark" />
       </AuthGuard>
