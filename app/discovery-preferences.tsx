@@ -32,6 +32,8 @@ export default function DiscoveryPreferencesScreen() {
   const [maxAge, setMaxAge] = useState(String(Config.discoveryDefaults.maxAge));
   const [orientations, setOrientations] = useState<string[]>([]);
   const [lookingFor, setLookingFor] = useState<string[]>([]);
+  const [maxDistance, setMaxDistance] = useState(String(Config.discoveryDefaults.maxDistance));
+  const [distanceEnabled, setDistanceEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -40,6 +42,13 @@ export default function DiscoveryPreferencesScreen() {
       setMaxAge(String(preferences.max_age));
       setOrientations(preferences.orientations ?? []);
       setLookingFor(preferences.looking_for ?? []);
+      if (preferences.max_distance !== null) {
+        setDistanceEnabled(true);
+        setMaxDistance(String(preferences.max_distance));
+      } else {
+        setDistanceEnabled(false);
+        setMaxDistance(String(Config.discoveryDefaults.maxDistance));
+      }
     }
   }, [preferences]);
 
@@ -71,6 +80,7 @@ export default function DiscoveryPreferencesScreen() {
         max_age: max,
         orientations: orientations.length > 0 ? orientations : null,
         looking_for: lookingFor.length > 0 ? lookingFor : null,
+        max_distance: distanceEnabled ? (parseInt(maxDistance, 10) || Config.discoveryDefaults.maxDistance) : null,
       });
       await fetchCandidates();
       router.back();
@@ -135,6 +145,36 @@ export default function DiscoveryPreferencesScreen() {
                 </View>
               </View>
             </View>
+          </View>
+
+          {/* Distance */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('discovery.distance')}</Text>
+            <View style={styles.ageRow}>
+              <View style={[styles.ageField, { flex: 2 }]}>
+                <View style={[styles.ageInputWrap, !distanceEnabled && styles.inputDisabled]}>
+                  <TextInput
+                    style={styles.ageInput}
+                    keyboardType="number-pad"
+                    maxLength={3}
+                    value={distanceEnabled ? maxDistance : ''}
+                    onChangeText={(v) => {
+                      setDistanceEnabled(true);
+                      setMaxDistance(v);
+                    }}
+                    placeholder={String(Config.discoveryDefaults.maxDistance)}
+                    placeholderTextColor={Colors.textTertiary}
+                    editable={distanceEnabled}
+                  />
+                </View>
+              </View>
+              <Text style={styles.ageSeparator}>km</Text>
+            </View>
+            <TouchableOpacity onPress={() => setDistanceEnabled(!distanceEnabled)}>
+              <Text style={styles.hintLink}>
+                {distanceEnabled ? t('discovery.distanceClear') : t('discovery.distanceAll')}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Orientations */}
@@ -268,6 +308,15 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     color: Colors.textTertiary,
     marginLeft: 4,
+  },
+  hintLink: {
+    fontSize: 12,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.primaryDark,
+    marginLeft: 4,
+  },
+  inputDisabled: {
+    opacity: 0.4,
   },
   saveButton: {
     marginTop: 4,

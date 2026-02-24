@@ -8,6 +8,7 @@ export interface DiscoveryPreferences {
   max_age: number;
   orientations: string[] | null;
   looking_for: string[] | null;
+  max_distance: number | null;
 }
 
 interface DiscoveryStoreState {
@@ -58,6 +59,7 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set, get) => ({
         max_age: updates.max_age ?? current?.max_age ?? Config.maxAge,
         orientations: updates.orientations !== undefined ? updates.orientations : (current?.orientations ?? null),
         looking_for: updates.looking_for !== undefined ? updates.looking_for : (current?.looking_for ?? null),
+        max_distance: updates.max_distance !== undefined ? updates.max_distance : (current?.max_distance ?? null),
       };
 
       const { data, error } = await supabase

@@ -9,6 +9,7 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/hooks/useAuth';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useLocation } from '@/hooks/useLocation';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import '@/i18n';
@@ -22,6 +23,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
   useNotifications();
+  useLocation();
 
   useEffect(() => {
     if (isLoading) return;

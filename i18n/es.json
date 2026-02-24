@@ -131,6 +131,9 @@
     "lookingForAll": "Todos",
     "edit": "Editar preferencias",
     "saved": "Preferencias guardadas",
-    "years": "años"
+    "years": "años",
+    "distance": "Distancia máxima",
+    "distanceAll": "Sin límite de distancia",
+    "distanceClear": "Quitar límite"
   }
 }

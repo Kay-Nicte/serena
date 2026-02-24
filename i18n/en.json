@@ -131,6 +131,9 @@
     "lookingForAll": "All",
     "edit": "Edit preferences",
     "saved": "Preferences saved",
-    "years": "years"
+    "years": "years",
+    "distance": "Maximum distance",
+    "distanceAll": "No distance limit",
+    "distanceClear": "Remove limit"
   }
 }

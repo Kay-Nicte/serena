@@ -171,6 +171,14 @@ export default function ProfileScreen() {
                 </Text>
               </View>
               <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t('discovery.distance')}</Text>
+                <Text style={styles.infoValue}>
+                  {preferences?.max_distance
+                    ? `${preferences.max_distance} km`
+                    : t('discovery.distanceAll')}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>{t('discovery.orientations')}</Text>
                 <Text style={styles.infoValue}>
                   {preferences?.orientations?.length

@@ -17,6 +17,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         'Serena necesita acceso a tu cámara para tomar fotos de perfil.',
       NSPhotoLibraryUsageDescription:
         'Serena necesita acceso a tu galería para seleccionar fotos de perfil.',
+      NSLocationWhenInUseUsageDescription:
+        'Serena usa tu ubicación para mostrarte personas cerca de ti.',
     },
   },
   android: {
@@ -31,6 +33,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'CAMERA',
       'READ_EXTERNAL_STORAGE',
       'WRITE_EXTERNAL_STORAGE',
+      'ACCESS_FINE_LOCATION',
+      'ACCESS_COARSE_LOCATION',
     ],
   },
   web: {
@@ -66,6 +70,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-notifications',
       {
         color: '#E6A8B4',
+      },
+    ],
+    [
+      'expo-location',
+      {
+        locationWhenInUsePermission:
+          'Serena usa tu ubicación para mostrarte personas cerca de ti.',
       },
     ],
   ],

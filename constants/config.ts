@@ -17,5 +17,7 @@ export const Config = {
   discoveryDefaults: {
     minAge: 18,
     maxAge: 99,
+    maxDistance: 50,
   },
+  maxDistanceLimit: 200,
 } as const;
