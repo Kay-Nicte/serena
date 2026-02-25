@@ -8,6 +8,7 @@ interface PhotoCarouselProps {
   photos: { uri: string }[];
   fallbackUri?: string | null;
   width: number;
+  height?: number;
   aspectRatio?: number;
 }
 
@@ -15,11 +16,12 @@ export function PhotoCarousel({
   photos,
   fallbackUri,
   width,
+  height: heightProp,
   aspectRatio = 3 / 4,
 }: PhotoCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
-  const height = width / aspectRatio;
+  const height = heightProp ?? width / aspectRatio;
 
   const displayPhotos =
     photos.length > 0

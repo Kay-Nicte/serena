@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, type LayoutChangeEvent } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,10 +11,14 @@ import { ProfileCard } from '@/components/ProfileCard';
 import { MatchOverlay } from '@/components/MatchOverlay';
 import { supabase } from '@/lib/supabase';
 import { getPhotoUrl } from '@/lib/storage';
+import { useResponsive } from '@/hooks/useResponsive';
+
+const ACTIONS_HEIGHT = 100; // 72px button + 20px paddingTop + 8px paddingBottom
 
 export default function TodayScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { cardWidth, isTablet, contentMaxWidth } = useResponsive();
   const {
     currentProfile,
     hasMore,
@@ -26,6 +30,14 @@ export default function TodayScreen() {
   } = useDailyProfiles();
 
   const [candidatePhotos, setCandidatePhotos] = useState<{ uri: string }[]>([]);
+  const [containerHeight, setContainerHeight] = useState(0);
+
+  const handleContainerLayout = (e: LayoutChangeEvent) => {
+    setContainerHeight(e.nativeEvent.layout.height);
+  };
+
+  // Available height for the card = container height minus the action buttons area
+  const availableCardHeight = containerHeight > 0 ? containerHeight - ACTIONS_HEIGHT : 0;
 
   useEffect(() => {
     if (currentProfile) {
@@ -61,7 +73,7 @@ export default function TodayScreen() {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>{t('today.title')}</Text>
 
-      <View style={styles.cardContainer}>
+      <View style={[styles.cardContainer, isTablet && { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as const }]} onLayout={handleContainerLayout}>
         {isLoading ? (
           <View style={styles.centered}>
             <ActivityIndicator size="large" color={Colors.primary} />
@@ -69,7 +81,12 @@ export default function TodayScreen() {
           </View>
         ) : currentProfile && hasMore ? (
           <>
-            <ProfileCard profile={currentProfile} photos={candidatePhotos} />
+            <ProfileCard
+              profile={currentProfile}
+              photos={candidatePhotos}
+              cardWidth={cardWidth}
+              maxHeight={availableCardHeight > 0 ? availableCardHeight : undefined}
+            />
             <View style={styles.actions}>
               <TouchableOpacity
                 style={[styles.actionButton, styles.passButton]}
@@ -77,7 +94,6 @@ export default function TodayScreen() {
                 activeOpacity={0.7}
               >
                 <Ionicons name="close" size={32} color={Colors.textSecondary} />
-                <Text style={styles.passText}>{t('today.pass')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -86,7 +102,6 @@ export default function TodayScreen() {
                 activeOpacity={0.7}
               >
                 <Ionicons name="heart" size={32} color={Colors.primary} />
-                <Text style={styles.likeText}>{t('today.like')}</Text>
               </TouchableOpacity>
             </View>
           </>
@@ -170,17 +185,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryPastel,
     borderWidth: 1,
     borderColor: Colors.primaryLight,
-  },
-  passText: {
-    fontSize: 10,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  likeText: {
-    fontSize: 10,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primaryDark,
-    marginTop: 2,
   },
 });

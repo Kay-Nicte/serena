@@ -7,6 +7,7 @@ export interface Message {
   match_id: string;
   sender_id: string;
   content: string;
+  image_url: string | null;
   read_at: string | null;
   created_at: string;
 }
@@ -19,7 +20,7 @@ interface ChatStoreState {
   subscription: RealtimeChannel | null;
 
   fetchMessages: (matchId: string) => Promise<void>;
-  sendMessage: (matchId: string, content: string) => Promise<void>;
+  sendMessage: (matchId: string, content: string, imageUrl?: string) => Promise<void>;
   markAsRead: (matchId: string) => Promise<void>;
   subscribe: (matchId: string) => void;
   unsubscribe: () => void;
@@ -53,7 +54,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     }
   },
 
-  sendMessage: async (matchId: string, content: string) => {
+  sendMessage: async (matchId: string, content: string, imageUrl?: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -61,7 +62,8 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       const { error } = await supabase.from('messages').insert({
         match_id: matchId,
         sender_id: user.id,
-        content,
+        content: content || '',
+        image_url: imageUrl ?? null,
       });
 
       if (error) throw error;
@@ -107,6 +109,23 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
           const newMessage = payload.new as Message;
           set((state) => ({
             messages: [...state.messages, newMessage],
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `match_id=eq.${matchId}`,
+        },
+        (payload) => {
+          const updated = payload.new as Message;
+          set((state) => ({
+            messages: state.messages.map((msg) =>
+              msg.id === updated.id ? { ...msg, read_at: updated.read_at } : msg
+            ),
           }));
         }
       )

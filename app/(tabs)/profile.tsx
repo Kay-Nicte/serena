@@ -26,6 +26,7 @@ import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
 import { pickImage } from '@/lib/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useResponsive } from '@/hooks/useResponsive';
 
 const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
@@ -35,6 +36,7 @@ export default function ProfileScreen() {
   const { user, profile, updateProfile, signOut, fetchProfile } = useAuthStore();
   const { photos, addPhoto, removePhoto } = usePhotos(user?.id);
   const { preferences } = useDiscoveryPreferences();
+  const { isTablet, contentMaxWidth, horizontalPadding } = useResponsive();
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -109,7 +111,7 @@ export default function ProfileScreen() {
   if (!editing) {
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={[styles.scrollContent, { paddingHorizontal: horizontalPadding }, isTablet && { maxWidth: contentMaxWidth, alignSelf: 'center', width: '100%' }]}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>{t('tabs.profile')}</Text>
             <TouchableOpacity onPress={() => setEditing(true)} hitSlop={8}>
@@ -222,7 +224,7 @@ export default function ProfileScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingHorizontal: horizontalPadding }, isTablet && { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as const }]}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headerRow}>
@@ -354,7 +356,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 24,
     paddingBottom: 40,
     gap: 20,
   },

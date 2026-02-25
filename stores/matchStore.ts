@@ -11,6 +11,7 @@ export interface Match {
   id: string;
   otherUser: MatchUser;
   lastMessage: string | null;
+  lastMessageImageUrl: string | null;
   lastMessageAt: string | null;
   unreadCount: number;
   created_at: string;
@@ -71,7 +72,7 @@ export const useMatchStore = create<MatchStoreState>((set) => ({
           // Get last message
           const { data: lastMsg } = await supabase
             .from('messages')
-            .select('content, created_at')
+            .select('content, image_url, created_at')
             .eq('match_id', match.id)
             .order('created_at', { ascending: false })
             .limit(1)
@@ -89,6 +90,7 @@ export const useMatchStore = create<MatchStoreState>((set) => ({
             id: match.id,
             otherUser,
             lastMessage: lastMsg?.content ?? null,
+            lastMessageImageUrl: lastMsg?.image_url ?? null,
             lastMessageAt: lastMsg?.created_at ?? null,
             unreadCount: count ?? 0,
             created_at: match.created_at,

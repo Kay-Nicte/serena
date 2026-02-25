@@ -53,3 +53,30 @@ export async function deletePhoto(path: string): Promise<void> {
     .remove([path]);
   if (error) throw error;
 }
+
+export async function uploadChatImage(
+  matchId: string,
+  uri: string
+): Promise<string> {
+  const timestamp = Date.now();
+  const extension = uri.split('.').pop() ?? 'jpg';
+  const path = `${matchId}/${timestamp}.${extension}`;
+
+  const base64 = await readAsStringAsync(uri, {
+    encoding: 'base64',
+  });
+
+  const { error } = await supabase.storage
+    .from('chat-images')
+    .upload(path, decode(base64), {
+      contentType: `image/${extension === 'jpg' ? 'jpeg' : extension}`,
+    });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage
+    .from('chat-images')
+    .getPublicUrl(path);
+
+  return data.publicUrl;
+}

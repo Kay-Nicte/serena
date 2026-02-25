@@ -113,7 +113,17 @@
     "send": "Enviar",
     "noMessages": "Aún no hay mensajes. ¡Di hola!",
     "errorFetching": "No se pudieron cargar los mensajes.",
-    "errorSending": "No se pudo enviar el mensaje. Inténtalo de nuevo."
+    "errorSending": "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+    "typing": "Escribiendo",
+    "online": "En línea",
+    "lastSeenNow": "Última vez hace un momento",
+    "lastSeenMinutes": "Última vez hace {{n}} min",
+    "lastSeenHours": "Última vez hace {{n}} h",
+    "lastSeenLong": "Hace tiempo",
+    "photoMessage": "📷 Foto",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "matchedOn": "Match el {{date}}"
   },
   "notifications": {
     "permissionTitle": "Activar notificaciones",

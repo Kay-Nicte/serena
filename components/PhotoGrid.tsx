@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,6 +6,7 @@ import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Config } from '@/constants/config';
 import { getPhotoUrl } from '@/lib/storage';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { Photo } from '@/stores/photoStore';
 
 interface PhotoGridProps {
@@ -20,9 +21,10 @@ const GRID_GAP = 8;
 
 export function PhotoGrid({ photos, onAdd, onRemove, editable = true }: PhotoGridProps) {
   const { t } = useTranslation();
-  const screenWidth = Dimensions.get('window').width;
+  const { width: screenWidth, isTablet, contentMaxWidth } = useResponsive();
+  const effectiveWidth = isTablet ? Math.min(screenWidth, contentMaxWidth) : screenWidth;
   const containerPadding = 32 * 2;
-  const itemWidth = (screenWidth - containerPadding - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
+  const itemWidth = (effectiveWidth - containerPadding - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
   const itemHeight = itemWidth * (4 / 3);
 
   const photoByPosition = new Map(photos.map((p) => [p.position, p]));

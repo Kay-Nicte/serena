@@ -1,37 +1,108 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
   TextInput,
   TouchableOpacity,
   StyleSheet,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
+import { updatePresence } from '@/lib/presence';
+import { pickImage, uploadChatImage } from '@/lib/storage';
 
 interface ChatInputProps {
-  onSend: (content: string) => void;
+  onSend: (content: string, imageUrl?: string) => void;
+  matchId: string;
 }
 
-export function ChatInput({ onSend }: ChatInputProps) {
+export function ChatInput({ onSend, matchId }: ChatInputProps) {
   const { t } = useTranslation();
   const [text, setText] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTypingRef = useRef(false);
+
+  const stopTyping = useCallback(() => {
+    if (isTypingRef.current) {
+      isTypingRef.current = false;
+      updatePresence(true, null);
+    }
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      stopTyping();
+    };
+  }, [stopTyping]);
+
+  const handleChangeText = (value: string) => {
+    setText(value);
+
+    if (value.trim()) {
+      if (!isTypingRef.current) {
+        isTypingRef.current = true;
+        updatePresence(true, matchId);
+      }
+
+      // Reset debounce timer
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        stopTyping();
+      }, 2000);
+    } else {
+      stopTyping();
+    }
+  };
 
   const handleSend = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    stopTyping();
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     onSend(trimmed);
     setText('');
   };
 
+  const handleImagePick = async () => {
+    try {
+      const uri = await pickImage();
+      if (!uri) return;
+
+      setIsUploading(true);
+      const imageUrl = await uploadChatImage(matchId, uri);
+      onSend('', imageUrl);
+    } catch (error) {
+      console.error('Error sending image:', error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.imageButton}
+        onPress={handleImagePick}
+        disabled={isUploading}
+        activeOpacity={0.7}
+      >
+        {isUploading ? (
+          <ActivityIndicator size="small" color={Colors.primary} />
+        ) : (
+          <Ionicons name="image-outline" size={24} color={Colors.primary} />
+        )}
+      </TouchableOpacity>
+
       <TextInput
         style={styles.input}
         value={text}
-        onChangeText={setText}
+        onChangeText={handleChangeText}
         placeholder={t('chat.placeholder')}
         placeholderTextColor={Colors.textTertiary}
         multiline
@@ -66,6 +137,12 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.borderLight,
     gap: 8,
+  },
+  imageButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input: {
     flex: 1,

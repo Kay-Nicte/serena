@@ -113,7 +113,17 @@
     "send": "Send",
     "noMessages": "No messages yet. Say hello!",
     "errorFetching": "Could not load messages.",
-    "errorSending": "Message could not be sent. Try again."
+    "errorSending": "Message could not be sent. Try again.",
+    "typing": "Typing",
+    "online": "Online",
+    "lastSeenNow": "Last seen just now",
+    "lastSeenMinutes": "Last seen {{n}} min ago",
+    "lastSeenHours": "Last seen {{n}}h ago",
+    "lastSeenLong": "A while ago",
+    "photoMessage": "📷 Photo",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "matchedOn": "Matched on {{date}}"
   },
   "notifications": {
     "permissionTitle": "Enable notifications",

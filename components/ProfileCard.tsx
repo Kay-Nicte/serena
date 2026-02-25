@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
@@ -8,10 +8,11 @@ import type { Profile } from '@/stores/authStore';
 interface ProfileCardProps {
   profile: Profile;
   photos?: { uri: string }[];
+  cardWidth: number;
+  maxHeight?: number;
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - 48;
+const INFO_HEIGHT_ESTIMATE = 120;
 
 function calculateAge(birthDate: string | null): number | null {
   if (!birthDate) return null;
@@ -25,16 +26,23 @@ function calculateAge(birthDate: string | null): number | null {
   return age;
 }
 
-export function ProfileCard({ profile, photos }: ProfileCardProps) {
+export function ProfileCard({ profile, photos, cardWidth, maxHeight }: ProfileCardProps) {
   const { t } = useTranslation();
   const age = calculateAge(profile.birth_date);
 
+  const naturalPhotoHeight = cardWidth / (3 / 4);
+  let photoHeight = naturalPhotoHeight;
+  if (maxHeight) {
+    photoHeight = Math.min(naturalPhotoHeight, maxHeight - INFO_HEIGHT_ESTIMATE);
+  }
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { width: cardWidth }]}>
       <PhotoCarousel
         photos={photos ?? []}
         fallbackUri={profile.avatar_url}
-        width={CARD_WIDTH}
+        width={cardWidth}
+        height={photoHeight}
       />
 
       <View style={styles.info}>
@@ -72,7 +80,6 @@ export function ProfileCard({ profile, photos }: ProfileCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    width: CARD_WIDTH,
     backgroundColor: Colors.surface,
     borderRadius: 20,
     overflow: 'hidden',

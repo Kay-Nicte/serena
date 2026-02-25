@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,7 +15,10 @@ import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useMatches } from '@/hooks/useMatches';
+import { useResponsive } from '@/hooks/useResponsive';
+import { supabase } from '@/lib/supabase';
 import type { Match } from '@/stores/matchStore';
+import type { UserPresence } from '@/lib/presence';
 
 function formatRelativeTime(isoDate: string): string {
   const date = new Date(isoDate);
@@ -31,10 +35,17 @@ function formatRelativeTime(isoDate: string): string {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-function ConversationItem({ match, onPress }: { match: Match; onPress: () => void }) {
+function ConversationItem({ match, onPress, isOnline }: { match: Match; onPress: () => void; isOnline: boolean }) {
+  const { t } = useTranslation();
   const timeStr = match.lastMessageAt
     ? formatRelativeTime(match.lastMessageAt)
     : formatRelativeTime(match.created_at);
+
+  const previewText = match.lastMessage
+    ? match.lastMessage
+    : match.lastMessageImageUrl
+      ? t('chat.photoMessage')
+      : '';
 
   return (
     <TouchableOpacity
@@ -42,18 +53,21 @@ function ConversationItem({ match, onPress }: { match: Match; onPress: () => voi
       onPress={onPress}
       activeOpacity={0.7}
     >
-      {match.otherUser.avatar_url ? (
-        <Image
-          source={{ uri: match.otherUser.avatar_url }}
-          style={styles.avatar}
-          contentFit="cover"
-          transition={200}
-        />
-      ) : (
-        <View style={[styles.avatar, styles.avatarPlaceholder]}>
-          <Ionicons name="person" size={24} color={Colors.primaryLight} />
-        </View>
-      )}
+      <View style={styles.avatarContainer}>
+        {match.otherUser.avatar_url ? (
+          <Image
+            source={{ uri: match.otherUser.avatar_url }}
+            style={styles.avatar}
+            contentFit="cover"
+            transition={200}
+          />
+        ) : (
+          <View style={[styles.avatar, styles.avatarPlaceholder]}>
+            <Ionicons name="person" size={24} color={Colors.primaryLight} />
+          </View>
+        )}
+        {isOnline && <View style={styles.onlineDot} />}
+      </View>
 
       <View style={styles.conversationContent}>
         <View style={styles.conversationHeader}>
@@ -76,7 +90,7 @@ function ConversationItem({ match, onPress }: { match: Match; onPress: () => voi
             ]}
             numberOfLines={1}
           >
-            {match.lastMessage ?? ''}
+            {previewText}
           </Text>
           {match.unreadCount > 0 && (
             <View style={styles.unreadBadge}>
@@ -93,8 +107,60 @@ export default function ChatListScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { matches, isLoading, refresh } = useMatches();
+  const { isTablet, chatMaxWidth } = useResponsive();
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
 
-  // Only show conversations that have messages or were recently matched
+  // Fetch online status for all matched users
+  useEffect(() => {
+    if (matches.length === 0) return;
+
+    const userIds = matches.map((m) => m.otherUser.id).filter(Boolean);
+    if (userIds.length === 0) return;
+
+    const fetchPresence = async () => {
+      const { data } = await supabase
+        .from('user_presence')
+        .select('user_id, is_online')
+        .in('user_id', userIds)
+        .eq('is_online', true);
+
+      if (data) {
+        setOnlineUserIds(new Set(data.map((p: { user_id: string }) => p.user_id)));
+      }
+    };
+
+    fetchPresence();
+
+    // Subscribe to presence changes
+    const channel = supabase
+      .channel('chat-list-presence')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_presence',
+        },
+        (payload) => {
+          const updated = payload.new as UserPresence;
+          setOnlineUserIds((prev) => {
+            const next = new Set(prev);
+            if (updated.is_online) {
+              next.add(updated.user_id);
+            } else {
+              next.delete(updated.user_id);
+            }
+            return next;
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [matches]);
+
   const conversations = matches;
 
   const handleConversationPress = (match: Match) => {
@@ -122,10 +188,12 @@ export default function ChatListScreen() {
             <ConversationItem
               match={item}
               onPress={() => handleConversationPress(item)}
+              isOnline={onlineUserIds.has(item.otherUser.id)}
             />
           )}
           onRefresh={refresh}
           refreshing={isLoading}
+          style={isTablet ? { maxWidth: chatMaxWidth, alignSelf: 'center', width: '100%' } : undefined}
           contentContainerStyle={styles.list}
         />
       )}
@@ -170,6 +238,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 14,
   },
+  avatarContainer: {
+    position: 'relative',
+  },
   avatar: {
     width: 54,
     height: 54,
@@ -179,6 +250,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceSecondary,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  onlineDot: {
+    position: 'absolute',
+    bottom: 1,
+    right: 1,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: Colors.success,
+    borderWidth: 2,
+    borderColor: Colors.surface,
   },
   conversationContent: {
     flex: 1,

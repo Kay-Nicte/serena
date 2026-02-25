@@ -5,7 +5,6 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  Dimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
@@ -15,17 +14,15 @@ import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useMatches } from '@/hooks/useMatches';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { Match } from '@/stores/matchStore';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const GRID_GAP = 12;
-const GRID_PADDING = 24;
-const ITEM_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
 
-function MatchCard({ match, onPress }: { match: Match; onPress: () => void }) {
+function MatchCard({ match, onPress, itemWidth }: { match: Match; onPress: () => void; itemWidth: number }) {
   return (
     <TouchableOpacity
-      style={styles.matchCard}
+      style={[styles.matchCard, { width: itemWidth }]}
       onPress={onPress}
       activeOpacity={0.7}
     >
@@ -57,6 +54,10 @@ export default function MatchesScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { matches, isLoading, refresh } = useMatches();
+  const { width: screenWidth, matchColumns, isTablet, horizontalPadding } = useResponsive();
+
+  const effectiveWidth = isTablet ? Math.min(screenWidth, 700) : screenWidth;
+  const itemWidth = (effectiveWidth - horizontalPadding * 2 - GRID_GAP * (matchColumns - 1)) / matchColumns;
 
   const handleMatchPress = (match: Match) => {
     router.push(`/(tabs)/chat/${match.id}`);
@@ -64,7 +65,7 @@ export default function MatchesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>{t('matches.title')}</Text>
+      <Text style={[styles.title, { paddingHorizontal: horizontalPadding }]}>{t('matches.title')}</Text>
 
       {isLoading && matches.length === 0 ? (
         <View style={styles.centered}>
@@ -77,13 +78,18 @@ export default function MatchesScreen() {
         </View>
       ) : (
         <FlatList
+          key={`matches-${matchColumns}`}
           data={matches}
           keyExtractor={(item) => item.id}
-          numColumns={2}
+          numColumns={matchColumns}
           columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.grid}
+          contentContainerStyle={[
+            styles.grid,
+            { paddingHorizontal: horizontalPadding },
+            isTablet && { maxWidth: 700, alignSelf: 'center' as const, width: '100%' as const },
+          ]}
           renderItem={({ item }) => (
-            <MatchCard match={item} onPress={() => handleMatchPress(item)} />
+            <MatchCard match={item} onPress={() => handleMatchPress(item)} itemWidth={itemWidth} />
           )}
           onRefresh={refresh}
           refreshing={isLoading}
@@ -102,7 +108,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontFamily: Fonts.heading,
     color: Colors.text,
-    paddingHorizontal: GRID_PADDING,
     paddingTop: 16,
     paddingBottom: 12,
   },
@@ -121,7 +126,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   grid: {
-    paddingHorizontal: GRID_PADDING,
     paddingBottom: 24,
   },
   row: {
@@ -129,7 +133,6 @@ const styles = StyleSheet.create({
     marginBottom: GRID_GAP,
   },
   matchCard: {
-    width: ITEM_WIDTH,
     backgroundColor: Colors.surface,
     borderRadius: 16,
     overflow: 'hidden',
