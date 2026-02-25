@@ -7,6 +7,7 @@ import { useMatchStore } from './matchStore';
 import { useChatStore } from './chatStore';
 import { usePhotoStore } from './photoStore';
 import { useDiscoveryStore } from './discoveryStore';
+import { useBlockStore } from './blockStore';
 import type { Orientation, LookingFor } from '@/constants/config';
 
 export interface Profile {
@@ -18,6 +19,7 @@ export interface Profile {
   looking_for: LookingFor | null;
   avatar_url: string | null;
   is_profile_complete: boolean;
+  is_admin: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -110,6 +112,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     useChatStore.getState().reset();
     usePhotoStore.getState().reset();
     useDiscoveryStore.getState().reset();
+    useBlockStore.getState().reset();
     set({
       session: null,
       user: null,

@@ -86,6 +86,8 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="reset-password" />
           <Stack.Screen name="discovery-preferences" />
+          <Stack.Screen name="blocked-users" />
+          <Stack.Screen name="admin-profile" />
         </Stack>
         <StatusBar style="dark" />
       </AuthGuard>

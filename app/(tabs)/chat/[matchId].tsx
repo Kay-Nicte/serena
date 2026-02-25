@@ -9,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
   Keyboard,
+  Alert,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -20,6 +21,11 @@ import { useChat } from '@/hooks/useChat';
 import { ChatBubble } from '@/components/ChatBubble';
 import { ChatInput } from '@/components/ChatInput';
 import { TypingIndicator } from '@/components/TypingIndicator';
+import { ReportModal, type ReportReason } from '@/components/ReportModal';
+import { ActionSheet, type ActionSheetOption } from '@/components/ActionSheet';
+import { Toast, useToast } from '@/components/Toast';
+import { useBlockStore } from '@/stores/blockStore';
+import { useMatchStore } from '@/stores/matchStore';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { subscribeToPresence, getPresence, type UserPresence } from '@/lib/presence';
@@ -73,6 +79,10 @@ export default function ChatScreen() {
   const [otherUserAvatar, setOtherUserAvatar] = useState<string | null>(null);
   const [matchCreatedAt, setMatchCreatedAt] = useState<string | null>(null);
   const [otherPresence, setOtherPresence] = useState<UserPresence | null>(null);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     const loadUser = async () => {
@@ -102,6 +112,12 @@ export default function ChatScreen() {
         : match.user_a_id;
 
       setOtherUserId(otherId);
+
+      // Block guard: if user is blocked, navigate back
+      if (useBlockStore.getState().isBlocked(otherId)) {
+        router.navigate('/(tabs)/chat');
+        return;
+      }
 
       const { data: profile } = await supabase
         .from('profiles')
@@ -153,6 +169,92 @@ export default function ChatScreen() {
   const handleSend = useCallback(async (content: string, imageUrl?: string) => {
     await sendMessage(content, imageUrl);
   }, [sendMessage]);
+
+  const handleShowMenu = () => {
+    setMenuVisible(true);
+  };
+
+  const menuOptions: ActionSheetOption[] = [
+    {
+      label: t('report.report'),
+      icon: 'flag-outline',
+      onPress: () => setReportModalVisible(true),
+    },
+    {
+      label: t('block.block'),
+      icon: 'ban',
+      destructive: true,
+      onPress: () => {
+        Alert.alert(
+          t('block.confirmTitle'),
+          t('block.confirmMessage', { name: otherUserName }),
+          [
+            { text: t('common.cancel'), style: 'cancel' },
+            {
+              text: t('block.block'),
+              style: 'destructive',
+              onPress: async () => {
+                try {
+                  await useBlockStore.getState().blockUser(otherUserId!);
+                  await useMatchStore.getState().fetchMatches();
+                  router.navigate('/(tabs)/chat');
+                } catch {
+                  toast.show(t('block.errorBlocking'), 'error');
+                }
+              },
+            },
+          ],
+        );
+      },
+    },
+  ];
+
+  const handleChatReport = async (reason: ReportReason, description: string, alsoBlock: boolean) => {
+    if (!otherUserId) return;
+    setReportLoading(true);
+    try {
+      await useBlockStore.getState().reportUser(otherUserId, reason, description);
+      if (alsoBlock) {
+        await useBlockStore.getState().blockUser(otherUserId);
+        await useMatchStore.getState().fetchMatches();
+        setReportModalVisible(false);
+        toast.show(t('report.successMessage'));
+        router.navigate('/(tabs)/chat');
+      } else {
+        setReportModalVisible(false);
+        toast.show(t('report.successMessage'));
+      }
+    } catch (err: any) {
+      toast.show(t(err?.message === 'DUPLICATE_REPORT' ? 'report.alreadyReported' : 'report.errorSubmitting'), 'error');
+    } finally {
+      setReportLoading(false);
+    }
+  };
+
+  const handleChatBlockOnly = () => {
+    if (!otherUserId) return;
+    setReportModalVisible(false);
+    Alert.alert(
+      t('block.confirmTitle'),
+      t('block.confirmMessage', { name: otherUserName }),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('block.block'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await useBlockStore.getState().blockUser(otherUserId);
+              await useMatchStore.getState().fetchMatches();
+              router.navigate('/(tabs)/chat');
+            } catch {
+              toast.show(t('block.errorBlocking'), 'error');
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const isTyping = otherPresence?.typing_in_match === matchId;
   const isOnline = otherPresence?.is_online ?? false;
@@ -223,9 +325,7 @@ export default function ChatScreen() {
           </View>
         )}
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {otherUserName}
-          </Text>
+          <Text style={styles.headerTitle} numberOfLines={1}>{otherUserName}</Text>
           {subtitleText ? (
             <View style={styles.statusRow}>
               {isOnline && <View style={styles.onlineDot} />}
@@ -236,6 +336,13 @@ export default function ChatScreen() {
             <Text style={styles.matchDateHeader}>{matchDateText}</Text>
           ) : null}
         </View>
+        <TouchableOpacity
+          onPress={handleShowMenu}
+          style={styles.menuButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="ellipsis-vertical" size={20} color={Colors.text} />
+        </TouchableOpacity>
       </View>
 
       <KeyboardAvoidingView
@@ -303,6 +410,26 @@ export default function ChatScreen() {
 
         <ChatInput onSend={handleSend} matchId={matchId!} />
       </KeyboardAvoidingView>
+
+      <Toast visible={toast.visible} message={toast.message} variant={toast.variant} onDismiss={toast.dismiss} />
+
+      <ActionSheet
+        visible={menuVisible}
+        title={otherUserName}
+        options={menuOptions}
+        onClose={() => setMenuVisible(false)}
+      />
+
+      {otherUserId && (
+        <ReportModal
+          visible={reportModalVisible}
+          targetUserName={otherUserName}
+          onReport={handleChatReport}
+          onBlockOnly={handleChatBlockOnly}
+          onClose={() => setReportModalVisible(false)}
+          loading={reportLoading}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -340,6 +467,12 @@ const styles = StyleSheet.create({
   headerCenter: {
     flex: 1,
     marginLeft: 10,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 17,

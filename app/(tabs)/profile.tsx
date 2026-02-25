@@ -23,6 +23,7 @@ import { PhotoGrid } from '@/components/PhotoGrid';
 import { useAuthStore } from '@/stores/authStore';
 import { usePhotos } from '@/hooks/usePhotos';
 import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
+import { useBlock } from '@/hooks/useBlock';
 import { pickImage } from '@/lib/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -36,6 +37,7 @@ export default function ProfileScreen() {
   const { user, profile, updateProfile, signOut, fetchProfile } = useAuthStore();
   const { photos, addPhoto, removePhoto } = usePhotos(user?.id);
   const { preferences } = useDiscoveryPreferences();
+  const { blockedUsers } = useBlock();
   const { isTablet, contentMaxWidth, horizontalPadding } = useResponsive();
 
   const [editing, setEditing] = useState(false);
@@ -203,6 +205,23 @@ export default function ProfileScreen() {
               variant="outline"
             />
           </View>
+
+          {/* Blocked Users */}
+          <TouchableOpacity
+            style={styles.discoveryCard}
+            onPress={() => router.push('/blocked-users')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.discoveryHeader}>
+              <Text style={styles.discoveryTitle}>{t('block.blockedUsers')}</Text>
+              <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+            </View>
+            {blockedUsers.length > 0 && (
+              <Text style={styles.infoValue}>
+                {blockedUsers.length}
+              </Text>
+            )}
+          </TouchableOpacity>
 
           <View style={styles.bottom}>
             <Button
