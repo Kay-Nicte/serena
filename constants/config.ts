@@ -21,4 +21,6 @@ export const Config = {
   },
   maxDistanceLimit: 200,
   defaultMaxDistanceKm: 50,
+  freeDailyLikes: 5,
+  premiumDailyLikes: 10,
 } as const;

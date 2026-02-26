@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
@@ -6,6 +7,10 @@ import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useDailyProfiles } from '@/hooks/useDailyProfiles';
+import { useStreak } from '@/hooks/useStreak';
+import { usePremium } from '@/hooks/usePremium';
+import { useProfileStore, computeActivityLevel } from '@/stores/profileStore';
+import { showToast } from '@/stores/toastStore';
 import { ProfileCard } from '@/components/ProfileCard';
 import { MatchOverlay } from '@/components/MatchOverlay';
 
@@ -20,11 +25,25 @@ export default function TodayScreen() {
     error,
     matchResult,
     like,
+    superlike,
     pass,
     clearMatchResult,
     refresh,
     resetPasses,
   } = useDailyProfiles();
+
+  const { availableSuperlikes, reward } = useStreak();
+  const { isPremium } = usePremium();
+  const candidatePresence = useProfileStore((s) => s.candidatePresence);
+  const shownRewardRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (reward && reward !== shownRewardRef.current) {
+      shownRewardRef.current = reward;
+      const msg = reward === 'superlike' ? t('streak.rewardSuperlike') : t('streak.rewardIceBreaker');
+      showToast(msg, 'success');
+    }
+  }, [reward]);
 
   const handleChat = () => {
     if (matchResult?.match_id) {
@@ -66,7 +85,12 @@ export default function TodayScreen() {
             </TouchableOpacity>
           </View>
         ) : currentProfile && hasMore ? (
-            <ProfileCard profile={currentProfile} photos={photos} />
+            <ProfileCard
+              profile={currentProfile}
+              photos={photos}
+              activityLevel={computeActivityLevel(candidatePresence[currentProfile.id])}
+              showActivityLevel={isPremium}
+            />
         ) : (
           <View style={styles.centered}>
             <Ionicons name="heart" size={64} color={Colors.primaryLight} />
@@ -88,6 +112,21 @@ export default function TodayScreen() {
           >
             <Ionicons name="close" size={32} color={Colors.textSecondary} />
           </TouchableOpacity>
+
+          {availableSuperlikes > 0 && (
+            <TouchableOpacity
+              style={[styles.actionButton, styles.superlikeButton]}
+              onPress={superlike}
+              activeOpacity={0.7}
+            >
+              <View>
+                <Ionicons name="star" size={32} color="#E0A800" />
+                <View style={styles.superlikeBadge}>
+                  <Text style={styles.superlikeBadgeText}>{availableSuperlikes}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={[styles.actionButton, styles.likeButton]}
@@ -221,5 +260,27 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryPastel,
     borderWidth: 1,
     borderColor: Colors.primaryLight,
+  },
+  superlikeButton: {
+    backgroundColor: '#FFF8E1',
+    borderWidth: 1,
+    borderColor: '#FFE082',
+  },
+  superlikeBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    backgroundColor: '#E0A800',
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  superlikeBadgeText: {
+    fontSize: 9,
+    fontFamily: Fonts.bodySemiBold,
+    color: '#FFFFFF',
   },
 });

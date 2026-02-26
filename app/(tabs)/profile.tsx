@@ -27,6 +27,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showToast } from '@/stores/toastStore';
+import { useStreak } from '@/hooks/useStreak';
 
 const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
@@ -37,6 +38,7 @@ export default function ProfileScreen() {
   const { photos, addPhoto, removePhoto } = usePhotos(user?.id);
   const { preferences } = useDiscoveryPreferences();
   const { isTablet, contentMaxWidth, horizontalPadding } = useResponsive();
+  const { currentStreak, availableSuperlikes, availableIceBreakers } = useStreak();
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -164,6 +166,35 @@ export default function ProfileScreen() {
                   </Text>
                 </View>
               )}
+            </View>
+          </View>
+
+          {/* Streak Card */}
+          <View style={styles.streakCard}>
+            <View style={styles.streakHeader}>
+              <Ionicons name="flame" size={22} color={Colors.warning} />
+              <Text style={styles.streakTitle}>{t('streak.title')}</Text>
+            </View>
+            {currentStreak > 0 ? (
+              <Text style={styles.streakValue}>
+                {currentStreak === 1 ? t('streak.day') : t('streak.days', { count: currentStreak })}
+              </Text>
+            ) : (
+              <Text style={styles.streakEmpty}>{t('streak.noStreak')}</Text>
+            )}
+            <View style={styles.streakItems}>
+              <View style={styles.streakItem}>
+                <Ionicons name="star" size={16} color={Colors.warning} />
+                <Text style={styles.streakItemText}>
+                  {t('streak.availableSuperlikes', { count: availableSuperlikes })}
+                </Text>
+              </View>
+              <View style={styles.streakItem}>
+                <Ionicons name="chatbubble" size={16} color={Colors.primary} />
+                <Text style={styles.streakItemText}>
+                  {t('streak.availableIceBreakers', { count: availableIceBreakers })}
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -486,6 +517,53 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: 4,
+  },
+  streakCard: {
+    padding: 20,
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    gap: 12,
+    shadowColor: Colors.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  streakHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  streakTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.heading,
+    color: Colors.text,
+  },
+  streakValue: {
+    fontSize: 16,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.text,
+  },
+  streakEmpty: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+  },
+  streakItems: {
+    gap: 8,
+    paddingTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderLight,
+  },
+  streakItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  streakItemText: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
   },
   discoveryCard: {
     padding: 20,

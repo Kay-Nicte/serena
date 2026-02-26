@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,20 +17,39 @@ import { Fonts } from '@/constants/fonts';
 import { useChat } from '@/hooks/useChat';
 import { ChatBubble } from '@/components/ChatBubble';
 import { ChatInput } from '@/components/ChatInput';
+import { TypingIndicator } from '@/components/TypingIndicator';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
-import { useMatchStore } from '@/stores/matchStore';
+import { subscribeToPresence, getPresence } from '@/lib/presence';
+import { usePremium } from '@/hooks/usePremium';
+import type { TFunction } from 'i18next';
+
+function formatLastSeen(lastSeen: string, t: TFunction): string {
+  const diff = Date.now() - new Date(lastSeen).getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+
+  if (minutes < 2) return t('chat.lastSeenNow');
+  if (minutes < 60) return t('chat.lastSeenMinutes', { n: minutes });
+  if (hours < 24) return t('chat.lastSeenHours', { n: hours });
+  return t('chat.lastSeenLong');
+}
 
 export default function ChatScreen() {
   const { matchId } = useLocalSearchParams<{ matchId: string }>();
   const router = useRouter();
   const { t } = useTranslation();
+  const { isPremium } = usePremium();
   const { messages, isLoading, sendMessage, markAsRead } = useChat(matchId!);
   const flatListRef = useRef<FlatList>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [otherUserId, setOtherUserId] = useState<string | null>(null);
   const [otherUserName, setOtherUserName] = useState<string>('');
-  const unmatchUser = useMatchStore((s) => s.unmatchUser);
+  const [otherUserId, setOtherUserId] = useState<string | null>(null);
+  const [otherPresence, setOtherPresence] = useState<{
+    is_online: boolean;
+    last_seen: string;
+    typing_in_match: string | null;
+  } | null>(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -71,6 +89,16 @@ export default function ChatScreen() {
     loadMatchInfo();
   }, [matchId]);
 
+  // Subscribe to other user's presence
+  useEffect(() => {
+    if (!otherUserId) return;
+    getPresence(otherUserId).then(setOtherPresence);
+    const channel = subscribeToPresence(otherUserId, setOtherPresence);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [otherUserId]);
+
   // Mark messages as read when new messages arrive
   useEffect(() => {
     if (messages.length > 0) {
@@ -82,62 +110,27 @@ export default function ChatScreen() {
     await sendMessage(content);
   };
 
-  const handleHeaderPress = () => {
-    if (otherUserId) {
-      router.push(`/match-profile?userId=${otherUserId}`);
+  const renderPresenceSubtitle = () => {
+    if (!otherPresence) return null;
+
+    if (otherPresence.is_online) {
+      return (
+        <View style={styles.presenceRow}>
+          <View style={styles.onlineDot} />
+          <Text style={styles.presenceText}>{t('chat.online')}</Text>
+        </View>
+      );
     }
-  };
 
-  const handleMorePress = () => {
-    Alert.alert(
-      otherUserName,
-      undefined,
-      [
-        {
-          text: t('matches.viewProfile'),
-          onPress: () => {
-            if (otherUserId) {
-              router.push(`/match-profile?userId=${otherUserId}`);
-            }
-          },
-        },
-        {
-          text: t('matches.unmatch'),
-          style: 'destructive',
-          onPress: () => confirmUnmatch(),
-        },
-        {
-          text: t('common.cancel'),
-          style: 'cancel',
-        },
-      ]
-    );
-  };
+    if (otherPresence.last_seen) {
+      return (
+        <Text style={styles.presenceText}>
+          {formatLastSeen(otherPresence.last_seen, t)}
+        </Text>
+      );
+    }
 
-  const confirmUnmatch = () => {
-    Alert.alert(
-      t('matches.unmatchConfirmTitle'),
-      t('matches.unmatchConfirmMessage', { name: otherUserName }),
-      [
-        {
-          text: t('common.cancel'),
-          style: 'cancel',
-        },
-        {
-          text: t('matches.unmatch'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await unmatchUser(matchId!);
-              router.back();
-            } catch (error) {
-              console.error('Error unmatching:', error);
-              Alert.alert(t('common.error'), t('common.error'));
-            }
-          },
-        },
-      ]
-    );
+    return null;
   };
 
   return (
@@ -150,22 +143,13 @@ export default function ChatScreen() {
         >
           <Ionicons name="chevron-back" size={24} color={Colors.text} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.headerCenter}
-          onPress={handleHeaderPress}
-          activeOpacity={0.7}
-        >
+        <View style={styles.headerCenter}>
           <Text style={styles.headerTitle} numberOfLines={1}>
             {otherUserName}
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleMorePress}
-          style={styles.moreButton}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="ellipsis-vertical" size={20} color={Colors.text} />
-        </TouchableOpacity>
+          {renderPresenceSubtitle()}
+        </View>
+        <View style={styles.headerSpacer} />
       </View>
 
       <KeyboardAvoidingView
@@ -192,7 +176,7 @@ export default function ChatScreen() {
                 isMine={item.sender_id === userId}
                 timestamp={item.created_at}
                 readAt={item.read_at}
-                showReadReceipt={false} // TODO: true for premium users
+                showReadReceipt={isPremium}
               />
             )}
             contentContainerStyle={styles.messagesList}
@@ -204,6 +188,8 @@ export default function ChatScreen() {
             }
           />
         )}
+
+        {otherPresence?.typing_in_match === matchId && <TypingIndicator />}
 
         <ChatInput onSend={handleSend} matchId={matchId!} />
       </KeyboardAvoidingView>
@@ -234,6 +220,7 @@ const styles = StyleSheet.create({
   headerCenter: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 18,
@@ -241,11 +228,25 @@ const styles = StyleSheet.create({
     color: Colors.text,
     textAlign: 'center',
   },
-  moreButton: {
+  headerSpacer: {
     width: 40,
-    height: 40,
-    justifyContent: 'center',
+  },
+  presenceRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  onlineDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.success,
+  },
+  presenceText: {
+    fontSize: 12,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
   },
   keyboardView: {
     flex: 1,

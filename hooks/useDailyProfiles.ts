@@ -18,6 +18,7 @@ export function useDailyProfiles() {
     fetchCandidates,
     resetPasses,
     likeProfile,
+    superlikeProfile,
     passProfile,
     clearMatchResult,
   } = useProfileStore();
@@ -65,6 +66,11 @@ export function useDailyProfiles() {
     like: async () => {
       if (currentProfile) {
         await likeProfile(currentProfile.id);
+      }
+    },
+    superlike: async () => {
+      if (currentProfile) {
+        await superlikeProfile(currentProfile.id);
       }
     },
     pass: async () => {

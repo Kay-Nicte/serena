@@ -1,14 +1,14 @@
 import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
-import { useAuthStore } from '@/stores/authStore';
+import { useIceBreakerStore } from '@/stores/iceBreakerStore';
 
 export default function TabLayout() {
   const { t } = useTranslation();
-  const profile = useAuthStore((s) => s.profile);
-  const isAdmin = (profile as any)?.is_admin === true;
+  const pendingCount = useIceBreakerStore((s) => s.pendingIceBreakers.length);
 
   return (
     <Tabs
@@ -40,7 +40,16 @@ export default function TabLayout() {
         options={{
           title: t('tabs.matches'),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="sparkles-outline" size={size} color={color} />
+            <View>
+              <Ionicons name="sparkles-outline" size={size} color={color} />
+              {pendingCount > 0 && (
+                <View style={tabStyles.badge}>
+                  <Text style={tabStyles.badgeText}>
+                    {pendingCount > 9 ? '9+' : pendingCount}
+                  </Text>
+                </View>
+              )}
+            </View>
           ),
         }}
       />
@@ -62,16 +71,26 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="admin"
-        options={{
-          title: t('tabs.admin'),
-          href: isAdmin ? '/(tabs)/admin' : null,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="shield-outline" size={size} color={color} />
-          ),
-        }}
-      />
     </Tabs>
   );
 }
+
+const tabStyles = StyleSheet.create({
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -10,
+    backgroundColor: Colors.primary,
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontFamily: Fonts.bodyBold,
+    color: Colors.textOnPrimary,
+  },
+});

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
+  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
@@ -17,28 +18,20 @@ import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useMatches } from '@/hooks/useMatches';
-import { useMatchStore } from '@/stores/matchStore';
+import { useIceBreakerStore } from '@/stores/iceBreakerStore';
 import type { Match } from '@/stores/matchStore';
+import type { IceBreaker } from '@/stores/iceBreakerStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const GRID_GAP = 12;
 const GRID_PADDING = 24;
 const ITEM_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
 
-function MatchCard({
-  match,
-  onPress,
-  onLongPress,
-}: {
-  match: Match;
-  onPress: () => void;
-  onLongPress: () => void;
-}) {
+function MatchCard({ match, onPress }: { match: Match; onPress: () => void }) {
   return (
     <TouchableOpacity
       style={styles.matchCard}
       onPress={onPress}
-      onLongPress={onLongPress}
       activeOpacity={0.7}
     >
       {match.otherUser.avatar_url ? (
@@ -65,85 +58,143 @@ function MatchCard({
   );
 }
 
+function IceBreakerCard({
+  iceBreaker,
+  onAccept,
+  onDecline,
+}: {
+  iceBreaker: IceBreaker;
+  onAccept: () => void;
+  onDecline: () => void;
+}) {
+  return (
+    <View style={styles.ibCard}>
+      {iceBreaker.sender.avatar_url ? (
+        <Image
+          source={{ uri: iceBreaker.sender.avatar_url }}
+          style={styles.ibAvatar}
+          contentFit="cover"
+          transition={200}
+        />
+      ) : (
+        <View style={[styles.ibAvatar, styles.ibAvatarPlaceholder]}>
+          <Ionicons name="person" size={24} color={Colors.primaryLight} />
+        </View>
+      )}
+      <Text style={styles.ibName} numberOfLines={1}>
+        {iceBreaker.sender.name ?? ''}
+      </Text>
+      <Text style={styles.ibMessage} numberOfLines={2}>
+        {iceBreaker.message}
+      </Text>
+      <View style={styles.ibActions}>
+        <TouchableOpacity
+          style={[styles.ibActionButton, styles.ibDeclineButton]}
+          onPress={onDecline}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="close" size={18} color={Colors.error} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.ibActionButton, styles.ibAcceptButton]}
+          onPress={onAccept}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="checkmark" size={18} color={Colors.textOnPrimary} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 export default function MatchesScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { matches, isLoading, refresh } = useMatches();
-  const unmatchUser = useMatchStore((s) => s.unmatchUser);
-  const [isUnmatching, setIsUnmatching] = useState(false);
+  const {
+    pendingIceBreakers,
+    isLoading: ibLoading,
+    fetchPending,
+    respondToIceBreaker,
+  } = useIceBreakerStore();
+
+  useEffect(() => {
+    fetchPending();
+  }, []);
 
   const handleMatchPress = (match: Match) => {
     router.push(`/(tabs)/chat/${match.id}`);
   };
 
-  const handleLongPress = (match: Match) => {
-    const name = match.otherUser.name ?? '';
+  const handleAcceptIceBreaker = useCallback(
+    async (iceBreaker: IceBreaker) => {
+      const result = await respondToIceBreaker(iceBreaker.id, true);
+      if (result.matchId) {
+        refresh();
+        router.push(`/(tabs)/chat/${result.matchId}`);
+      }
+    },
+    [respondToIceBreaker, refresh, router]
+  );
 
-    Alert.alert(
-      name,
-      undefined,
-      [
-        {
-          text: t('matches.chat'),
-          onPress: () => router.push(`/(tabs)/chat/${match.id}`),
-        },
-        {
-          text: t('matches.viewProfile'),
-          onPress: () =>
-            router.push(`/match-profile?userId=${match.otherUser.id}`),
-        },
-        {
-          text: t('matches.unmatch'),
-          style: 'destructive',
-          onPress: () => confirmUnmatch(match),
-        },
-        {
-          text: t('common.cancel'),
-          style: 'cancel',
-        },
-      ]
-    );
-  };
-
-  const confirmUnmatch = (match: Match) => {
-    const name = match.otherUser.name ?? '';
-
-    Alert.alert(
-      t('matches.unmatchConfirmTitle'),
-      t('matches.unmatchConfirmMessage', { name }),
-      [
-        {
-          text: t('common.cancel'),
-          style: 'cancel',
-        },
-        {
-          text: t('matches.unmatch'),
-          style: 'destructive',
-          onPress: async () => {
-            setIsUnmatching(true);
-            try {
-              await unmatchUser(match.id);
-            } catch (error) {
-              console.error('Error unmatching:', error);
-              Alert.alert(t('common.error'), t('common.error'));
-            } finally {
-              setIsUnmatching(false);
-            }
+  const handleDeclineIceBreaker = useCallback(
+    (iceBreaker: IceBreaker) => {
+      Alert.alert(
+        t('iceBreaker.decline'),
+        '',
+        [
+          { text: t('common.cancel'), style: 'cancel' },
+          {
+            text: t('iceBreaker.decline'),
+            style: 'destructive',
+            onPress: () => respondToIceBreaker(iceBreaker.id, false),
           },
-        },
-      ]
+        ]
+      );
+    },
+    [respondToIceBreaker, t]
+  );
+
+  const handleRefresh = useCallback(() => {
+    refresh();
+    fetchPending();
+  }, [refresh, fetchPending]);
+
+  const renderIceBreakersHeader = useCallback(() => {
+    if (pendingIceBreakers.length === 0) return null;
+
+    return (
+      <View style={styles.ibSection}>
+        <Text style={styles.ibSectionTitle}>{t('iceBreaker.title')}</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.ibScrollContent}
+        >
+          {pendingIceBreakers.map((ib) => (
+            <IceBreakerCard
+              key={ib.id}
+              iceBreaker={ib}
+              onAccept={() => handleAcceptIceBreaker(ib)}
+              onDecline={() => handleDeclineIceBreaker(ib)}
+            />
+          ))}
+        </ScrollView>
+      </View>
     );
-  };
+  }, [pendingIceBreakers, t, handleAcceptIceBreaker, handleDeclineIceBreaker]);
+
+  const hasContent = matches.length > 0 || pendingIceBreakers.length > 0;
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>{t('matches.title')}</Text>
 
-      {isLoading && matches.length === 0 ? (
+      {isLoading && ibLoading && !hasContent ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={Colors.primary} />
         </View>
-      ) : matches.length === 0 ? (
+      ) : !hasContent ? (
         <View style={styles.centered}>
           <Ionicons name="sparkles" size={64} color={Colors.primaryLight} />
           <Text style={styles.emptyText}>{t('matches.empty')}</Text>
@@ -155,22 +206,13 @@ export default function MatchesScreen() {
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.grid}
+          ListHeaderComponent={renderIceBreakersHeader}
           renderItem={({ item }) => (
-            <MatchCard
-              match={item}
-              onPress={() => handleMatchPress(item)}
-              onLongPress={() => handleLongPress(item)}
-            />
+            <MatchCard match={item} onPress={() => handleMatchPress(item)} />
           )}
-          onRefresh={refresh}
+          onRefresh={handleRefresh}
           refreshing={isLoading}
         />
-      )}
-
-      {isUnmatching && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={Colors.primary} />
-        </View>
       )}
     </SafeAreaView>
   );
@@ -255,10 +297,77 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.bodyBold,
     color: Colors.textOnPrimary,
   },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.overlay,
+  // Ice Breaker styles
+  ibSection: {
+    marginBottom: 16,
+    marginHorizontal: -GRID_PADDING,
+  },
+  ibSectionTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.heading,
+    color: Colors.text,
+    paddingHorizontal: GRID_PADDING,
+    marginBottom: 12,
+  },
+  ibScrollContent: {
+    paddingHorizontal: GRID_PADDING,
+    gap: 12,
+  },
+  ibCard: {
+    width: 160,
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  ibAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignSelf: 'center',
+    marginBottom: 8,
+  },
+  ibAvatarPlaceholder: {
+    backgroundColor: Colors.surfaceSecondary,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  ibName: {
+    fontSize: 14,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.text,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  ibMessage: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 10,
+    minHeight: 36,
+  },
+  ibActions: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  ibActionButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ibDeclineButton: {
+    backgroundColor: Colors.surfaceSecondary,
+  },
+  ibAcceptButton: {
+    backgroundColor: Colors.primary,
   },
 });

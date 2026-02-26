@@ -21,6 +21,8 @@ import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, type Orientation, type Looki
 import { useAuthStore } from '@/stores/authStore';
 import { usePhotoStore, type Photo } from '@/stores/photoStore';
 import { pickImage } from '@/lib/storage';
+import { supabase } from '@/lib/supabase';
+import { showToast } from '@/stores/toastStore';
 
 const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
@@ -70,6 +72,16 @@ export default function CompleteProfileScreen() {
         looking_for: lookingFor as LookingFor,
         is_profile_complete: true,
       });
+
+      // Activate 7-day premium free trial for new users
+      try {
+        const { data } = await supabase.rpc('activate_premium_trial');
+        if (data?.granted) {
+          showToast(t('premium.trialActivated'));
+        }
+      } catch {
+        // Non-critical: trial activation failure should not block profile completion
+      }
     } catch {
       Alert.alert(t('common.error'), t('common.error'));
     } finally {

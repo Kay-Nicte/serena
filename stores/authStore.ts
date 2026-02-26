@@ -21,6 +21,8 @@ export interface Profile {
   avatar_url: string | null;
   is_profile_complete: boolean;
   is_admin: boolean;
+  is_premium: boolean;
+  premium_until: string | null;
   language_preference: string | null;
   created_at: string;
   updated_at: string;

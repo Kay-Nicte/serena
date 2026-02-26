@@ -107,7 +107,11 @@
     "errorFetching": "Could not load profiles. Try again.",
     "dailyLimitReached": "You've reached the daily like limit. Come back tomorrow.",
     "refresh": "Refresh",
-    "secondChance": "Give them another chance"
+    "secondChance": "Give them another chance",
+    "activityToday": "Active today",
+    "activityThisWeek": "Active this week",
+    "activityThisMonth": "Active this month",
+    "activityInactive": "Inactive"
   },
   "matches": {
     "title": "Matches",
@@ -277,5 +281,40 @@
     "privacyTitle": "Privacy Policy",
     "termsContent": "Welcome to Serena. By using our application, you agree to these Terms of Service.\n\n1. Acceptance of Terms\nBy accessing or using Serena, you agree to be bound by these Terms. If you do not agree, do not use the app.\n\n2. Eligibility\nYou must be at least 18 years old to use Serena. By creating an account, you confirm that you meet this age requirement.\n\n3. Account\nYou are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.\n\n4. User Conduct\nYou agree not to:\n- Post false, misleading, or deceptive content\n- Harass, threaten, or intimidate other users\n- Use the app for any illegal purpose\n- Create multiple accounts\n- Impersonate another person\n\n5. Content\nYou retain ownership of content you post but grant Serena a license to use it within the app. We may remove content that violates these terms.\n\n6. Privacy\nYour use of Serena is also governed by our Privacy Policy.\n\n7. Termination\nWe reserve the right to suspend or terminate accounts that violate these terms. You may delete your account at any time from Settings.\n\n8. Disclaimers\nSerena is provided \"as is\" without warranties of any kind. We are not responsible for interactions between users.\n\n9. Changes\nWe may update these Terms from time to time. Continued use of the app constitutes acceptance of changes.\n\n10. Contact\nFor questions about these Terms, contact us through the app.",
     "privacyContent": "Serena Privacy Policy\n\nLast updated: 2025\n\n1. Information We Collect\n- Account information: email address, name, date of birth\n- Profile information: photos, bio, orientation, preferences\n- Usage data: interactions, matches, messages\n- Device information: device type, operating system\n- Location data: approximate location (if enabled)\n\n2. How We Use Your Information\n- To provide and improve our services\n- To match you with other users based on your preferences\n- To send you notifications about matches and messages\n- To ensure safety and prevent abuse\n\n3. Information Sharing\nWe do not sell your personal information. We may share data with:\n- Other users: your profile information is visible to potential matches\n- Service providers: who help us operate the app\n- Law enforcement: when required by law\n\n4. Data Storage and Security\nYour data is stored securely using industry-standard encryption. We take reasonable measures to protect your information.\n\n5. Your Rights\nYou have the right to:\n- Access your personal data\n- Correct inaccurate data\n- Delete your account and data\n- Export your data\n- Withdraw consent for data processing\n\n6. Data Retention\nWe retain your data while your account is active. When you delete your account, all your data is permanently removed.\n\n7. Cookies and Tracking\nWe use minimal tracking necessary for app functionality.\n\n8. Children's Privacy\nSerena is not intended for users under 18. We do not knowingly collect data from minors.\n\n9. Changes to This Policy\nWe may update this policy periodically. We will notify you of significant changes.\n\n10. Contact\nFor privacy-related questions, contact us through the app."
+  },
+  "premium": {
+    "trialTitle": "Welcome to Premium!",
+    "trialDescription": "Enjoy 7 days of premium features for free: more likes, read receipts, and activity indicators.",
+    "trialActivated": "Your 7-day free trial has started!",
+    "badge": "Premium",
+    "expiresOn": "Expires {{date}}"
+  },
+  "streak": {
+    "title": "Daily Streak",
+    "days": "{{count}} days",
+    "day": "1 day",
+    "bonusLike": "+1 bonus like today",
+    "rewardSuperlike": "Day 5: you earned a superlike!",
+    "rewardIceBreaker": "Day 10: you earned an ice breaker!",
+    "availableSuperlikes": "{{count}} superlikes",
+    "availableIceBreakers": "{{count}} ice breakers",
+    "noStreak": "Open the app daily to build your streak!"
+  },
+  "superlike": {
+    "noSuperlikes": "No superlikes available",
+    "sent": "Superlike sent!",
+    "received": "Someone sent you a superlike!"
+  },
+  "iceBreaker": {
+    "title": "Ice Breakers",
+    "send": "Send ice breaker",
+    "messagePlaceholder": "Write a message to break the ice...",
+    "sent": "Ice breaker sent!",
+    "noIceBreakers": "No ice breakers available",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "Ice breaker accepted!",
+    "alreadyMatched": "You're already matched",
+    "charCount": "{{current}}/{{max}}"
   }
 }

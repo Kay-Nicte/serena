@@ -12,9 +12,22 @@ interface MatchResult {
   match_id?: string;
 }
 
+export function computeActivityLevel(
+  lastSeen: string | undefined,
+): 'today' | 'this_week' | 'this_month' | 'inactive' | null {
+  if (!lastSeen) return null;
+  const diff = Date.now() - new Date(lastSeen).getTime();
+  const hours = diff / 3600000;
+  if (hours < 24) return 'today';
+  if (hours < 168) return 'this_week';
+  if (hours < 720) return 'this_month';
+  return 'inactive';
+}
+
 interface ProfileStoreState {
   candidates: Profile[];
   candidatePhotos: Record<string, Photo[]>;
+  candidatePresence: Record<string, string>;
   currentIndex: number;
   isLoading: boolean;
   error: string | null;
@@ -25,6 +38,7 @@ interface ProfileStoreState {
   resetPasses: () => Promise<void>;
   setMaxDistance: (km: number) => void;
   likeProfile: (targetId: string) => Promise<void>;
+  superlikeProfile: (targetId: string) => Promise<void>;
   passProfile: (targetId: string) => Promise<void>;
   clearMatchResult: () => void;
   reset: () => void;
@@ -33,6 +47,7 @@ interface ProfileStoreState {
 export const useProfileStore = create<ProfileStoreState>((set, get) => ({
   candidates: [],
   candidatePhotos: {},
+  candidatePresence: {},
   currentIndex: 0,
   isLoading: false,
   error: null,
@@ -75,7 +90,21 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
         }
       }
 
-      set({ candidates, candidatePhotos: photosMap, currentIndex: 0 });
+      // Fetch presence data for activity level
+      const presenceMap: Record<string, string> = {};
+      if (candidateIds.length > 0) {
+        const { data: presenceData } = await supabase
+          .from('user_presence')
+          .select('user_id, last_seen')
+          .in('user_id', candidateIds);
+        if (presenceData) {
+          for (const p of presenceData) {
+            presenceMap[p.user_id] = p.last_seen;
+          }
+        }
+      }
+
+      set({ candidates, candidatePhotos: photosMap, candidatePresence: presenceMap, currentIndex: 0 });
     } catch (error) {
       reportError(error, { source: 'profileStore.fetchCandidates' });
       set({ error: 'today.errorFetching' });
@@ -124,6 +153,34 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
     }
   },
 
+  superlikeProfile: async (targetId: string) => {
+    try {
+      const { data, error } = await supabase.rpc('superlike_profile', {
+        target_user_id: targetId,
+      });
+
+      if (error) throw error;
+
+      const result = data as MatchResult & { error?: string };
+
+      if (result.error) {
+        if (result.error === 'no_superlikes_available') {
+          showToast(i18n.t('superlike.noSuperlikes'), 'error');
+        }
+        return;
+      }
+
+      if (result.matched) {
+        set({ matchResult: result });
+      }
+
+      set((state) => ({ currentIndex: state.currentIndex + 1 }));
+    } catch (error) {
+      reportError(error, { source: 'profileStore.superlikeProfile' });
+      set({ error: 'today.errorFetching' });
+    }
+  },
+
   passProfile: async (targetId: string) => {
     try {
       const { error } = await supabase.rpc('pass_profile', {
@@ -145,6 +202,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
     set({
       candidates: [],
       candidatePhotos: {},
+      candidatePresence: {},
       currentIndex: 0,
       isLoading: false,
       error: null,

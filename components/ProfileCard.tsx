@@ -5,16 +5,17 @@ import { Fonts } from '@/constants/fonts';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import type { Profile } from '@/stores/authStore';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+type ActivityLevel = 'today' | 'this_week' | 'this_month' | 'inactive';
 
-export interface ProfileCardProps {
+interface ProfileCardProps {
   profile: Profile;
   photos?: { uri: string }[];
-  cardWidth?: number;
-  maxHeight?: number;
+  activityLevel?: ActivityLevel | null;
+  showActivityLevel?: boolean;
 }
 
-const INFO_HEIGHT_ESTIMATE = 120;
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_WIDTH = SCREEN_WIDTH - 48;
 
 function calculateAge(birthDate: string | null): number | null {
   if (!birthDate) return null;
@@ -28,23 +29,23 @@ function calculateAge(birthDate: string | null): number | null {
   return age;
 }
 
-export function ProfileCard({ profile, photos, cardWidth = SCREEN_WIDTH - 48, maxHeight }: ProfileCardProps) {
+const ACTIVITY_CONFIG: Record<ActivityLevel, { color: string; i18nKey: string }> = {
+  today: { color: Colors.success, i18nKey: 'today.activityToday' },
+  this_week: { color: Colors.warning, i18nKey: 'today.activityThisWeek' },
+  this_month: { color: '#E0A050', i18nKey: 'today.activityThisMonth' },
+  inactive: { color: Colors.textTertiary, i18nKey: 'today.activityInactive' },
+};
+
+export function ProfileCard({ profile, photos, activityLevel, showActivityLevel }: ProfileCardProps) {
   const { t } = useTranslation();
   const age = calculateAge(profile.birth_date);
 
-  const naturalPhotoHeight = cardWidth / (3 / 4);
-  let photoHeight = naturalPhotoHeight;
-  if (maxHeight) {
-    photoHeight = Math.min(naturalPhotoHeight, maxHeight - INFO_HEIGHT_ESTIMATE);
-  }
-
   return (
-    <View style={[styles.card, { width: cardWidth }]}>
+    <View style={styles.card}>
       <PhotoCarousel
         photos={photos ?? []}
         fallbackUri={profile.avatar_url}
-        width={cardWidth}
-        height={photoHeight}
+        width={CARD_WIDTH}
       />
 
       <View style={styles.info}>
@@ -54,6 +55,20 @@ export function ProfileCard({ profile, photos, cardWidth = SCREEN_WIDTH - 48, ma
           </Text>
           {age !== null && <Text style={styles.age}>{age}</Text>}
         </View>
+
+        {showActivityLevel && activityLevel && (
+          <View style={styles.activityRow}>
+            <View
+              style={[
+                styles.activityDot,
+                { backgroundColor: ACTIVITY_CONFIG[activityLevel].color },
+              ]}
+            />
+            <Text style={styles.activityText}>
+              {t(ACTIVITY_CONFIG[activityLevel].i18nKey)}
+            </Text>
+          </View>
+        )}
 
         {profile.bio ? (
           <Text style={styles.bio}>{profile.bio}</Text>
@@ -82,6 +97,7 @@ export function ProfileCard({ profile, photos, cardWidth = SCREEN_WIDTH - 48, ma
 
 const styles = StyleSheet.create({
   card: {
+    width: CARD_WIDTH,
     backgroundColor: Colors.surface,
     borderRadius: 20,
     overflow: 'hidden',
@@ -117,6 +133,21 @@ const styles = StyleSheet.create({
   },
   age: {
     fontSize: 22,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+  },
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  activityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  activityText: {
+    fontSize: 13,
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
   },

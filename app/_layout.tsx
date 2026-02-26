@@ -11,6 +11,7 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useLocation } from '@/hooks/useLocation';
 import { usePresence } from '@/hooks/usePresence';
+import { useStreak } from '@/hooks/useStreak';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { Toast } from '@/components/Toast';
@@ -30,6 +31,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   useNotifications();
   useLocation();
   usePresence();
+  useStreak();
 
   useEffect(() => {
     if (isLoading) return;
