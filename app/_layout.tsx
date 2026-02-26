@@ -7,6 +7,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/hooks/useAuth';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useLocation } from '@/hooks/useLocation';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { OfflineBanner } from '@/components/OfflineBanner';
 import '@/i18n';
 
 SplashScreen.preventAutoHideAsync();
@@ -16,6 +21,9 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const segments = useSegments();
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+
+  useNotifications();
+  useLocation();
 
   useEffect(() => {
     if (isLoading) return;
@@ -27,15 +35,17 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
     const inAuthGroup = segments[0] === '(auth)';
     const inCompleteProfile = segments[0] === 'complete-profile';
+    const inPublicScreen =
+      segments[0] === 'terms-of-service' || segments[0] === 'privacy-policy';
 
-    if (!isAuthenticated && !inAuthGroup) {
+    if (!isAuthenticated && !inAuthGroup && !inPublicScreen) {
       router.replace('/(auth)/welcome');
     } else if (isAuthenticated && !isProfileComplete && !inCompleteProfile) {
       router.replace('/complete-profile');
     } else if (isAuthenticated && isProfileComplete && (inAuthGroup || inCompleteProfile)) {
       router.replace('/(tabs)');
     }
-  }, [isLoading, isAuthenticated, isProfileComplete, segments, isReady]);
+  }, [isLoading, isAuthenticated, isProfileComplete, segments, isReady, router]);
 
   if (isLoading) {
     return (
@@ -64,17 +74,30 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
+  const { isConnected } = useNetworkStatus();
+
   if (!fontsLoaded) return null;
 
   return (
-    <AuthGuard>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="complete-profile" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-      <StatusBar style="dark" />
-    </AuthGuard>
+    <ErrorBoundary>
+      {!isConnected && <OfflineBanner />}
+      <AuthGuard>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="complete-profile" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="reset-password" />
+          <Stack.Screen name="discovery-preferences" />
+          <Stack.Screen name="blocked-users" />
+          <Stack.Screen name="admin-profile" />
+          <Stack.Screen name="settings" />
+          <Stack.Screen name="change-password" />
+          <Stack.Screen name="terms-of-service" />
+          <Stack.Screen name="privacy-policy" />
+        </Stack>
+        <StatusBar style="dark" />
+      </AuthGuard>
+    </ErrorBoundary>
   );
 }
 

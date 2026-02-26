@@ -1,115 +1,114 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
-import type { Photo } from '@/hooks/usePhotos';
-
-const SLOTS = [0, 1, 2, 3, 4, 5];
+import { Config } from '@/constants/config';
+import { getPhotoUrl } from '@/lib/storage';
+import { useResponsive } from '@/hooks/useResponsive';
+import type { Photo } from '@/stores/photoStore';
 
 interface PhotoGridProps {
   photos: Photo[];
-  isLoading: boolean;
-  onAddPhoto: (position: number) => void;
-  onRemovePhoto: (photoId: string, storagePath: string, position: number) => void;
+  onAdd: (position: number) => void;
+  onRemove: (photo: Photo) => void;
+  editable?: boolean;
 }
 
-export function PhotoGrid({ photos, isLoading, onAddPhoto, onRemovePhoto }: PhotoGridProps) {
+const GRID_COLUMNS = 3;
+const GRID_GAP = 8;
+
+export function PhotoGrid({ photos, onAdd, onRemove, editable = true }: PhotoGridProps) {
   const { t } = useTranslation();
+  const { width: screenWidth, isTablet, contentMaxWidth } = useResponsive();
+  const effectiveWidth = isTablet ? Math.min(screenWidth, contentMaxWidth) : screenWidth;
+  const containerPadding = 32 * 2;
+  const itemWidth = (effectiveWidth - containerPadding - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
+  const itemHeight = itemWidth * (4 / 3);
 
   const photoByPosition = new Map(photos.map((p) => [p.position, p]));
 
   const handleRemove = (photo: Photo) => {
-    Alert.alert(t('profile.deletePhoto'), t('profile.deletePhotoConfirm'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('profile.deletePhoto'),
-        style: 'destructive',
-        onPress: () => onRemovePhoto(photo.id, photo.storage_path, photo.position),
-      },
-    ]);
+    Alert.alert(
+      t('profile.removePhoto'),
+      t('profile.removePhotoConfirm'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.done'), style: 'destructive', onPress: () => onRemove(photo) },
+      ]
+    );
   };
 
+  const slots = Array.from({ length: Config.maxPhotos }, (_, i) => i);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{t('profile.addPhotos')}</Text>
-      <View style={styles.grid}>
-        {SLOTS.map((position) => {
-          const photo = photoByPosition.get(position);
+    <View style={styles.grid}>
+      {slots.map((position) => {
+        const photo = photoByPosition.get(position);
+
+        if (photo) {
           return (
-            <View key={position} style={styles.slotWrapper}>
-              {photo ? (
-                <View style={styles.slot}>
-                  <Image source={{ uri: photo.url }} style={styles.image} contentFit="cover" />
-                  <TouchableOpacity
-                    style={styles.removeButton}
-                    onPress={() => handleRemove(photo)}
-                    hitSlop={4}
-                  >
-                    <Ionicons name="close-circle" size={22} color={Colors.error} />
-                  </TouchableOpacity>
-                  {position === 0 && (
-                    <View style={styles.mainBadge}>
-                      <Text style={styles.mainBadgeText}>{t('profile.mainPhoto')}</Text>
-                    </View>
-                  )}
+            <View key={position} style={[styles.slot, { width: itemWidth, height: itemHeight }]}>
+              <Image
+                source={{ uri: getPhotoUrl(photo.storage_path) }}
+                style={styles.image}
+                contentFit="cover"
+                transition={200}
+              />
+              {position === 0 && (
+                <View style={styles.primaryBadge}>
+                  <Text style={styles.primaryBadgeText}>{t('profile.primaryPhoto')}</Text>
                 </View>
-              ) : (
+              )}
+              {editable && (
                 <TouchableOpacity
-                  style={[styles.slot, styles.emptySlot]}
-                  onPress={() => onAddPhoto(position)}
-                  disabled={isLoading}
+                  style={styles.removeButton}
+                  onPress={() => handleRemove(photo)}
+                  hitSlop={4}
                 >
-                  {isLoading ? (
-                    <ActivityIndicator size="small" color={Colors.primary} />
-                  ) : (
-                    <Ionicons name="add" size={28} color={Colors.primary} />
-                  )}
-                  {position === 0 && (
-                    <Text style={styles.mainLabel}>{t('profile.mainPhoto')}</Text>
-                  )}
+                  <Ionicons name="close-circle" size={22} color={Colors.error} />
                 </TouchableOpacity>
               )}
             </View>
           );
-        })}
-      </View>
-      <Text style={styles.hint}>{t('profile.maxPhotos')}</Text>
+        }
+
+        return (
+          <TouchableOpacity
+            key={position}
+            style={[styles.slot, styles.emptySlot, { width: itemWidth, height: itemHeight }]}
+            onPress={() => editable && onAdd(position)}
+            disabled={!editable}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="add" size={28} color={Colors.primary} />
+            {position === 0 && (
+              <Text style={styles.addLabel}>{t('profile.primaryPhoto')}</Text>
+            )}
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-    marginLeft: 4,
-  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-  },
-  slotWrapper: {
-    width: '31.5%',
-    aspectRatio: 3 / 4,
+    gap: GRID_GAP,
   },
   slot: {
-    flex: 1,
     borderRadius: 12,
     overflow: 'hidden',
     position: 'relative',
   },
   emptySlot: {
-    borderWidth: 1.5,
+    backgroundColor: Colors.surfaceSecondary,
+    borderWidth: 2,
     borderColor: Colors.border,
     borderStyle: 'dashed',
-    backgroundColor: Colors.surfaceSecondary,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 4,
@@ -125,7 +124,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderRadius: 11,
   },
-  mainBadge: {
+  primaryBadge: {
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -134,20 +133,14 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     alignItems: 'center',
   },
-  mainBadgeText: {
+  primaryBadgeText: {
     fontSize: 10,
     fontFamily: Fonts.bodySemiBold,
     color: Colors.textOnPrimary,
   },
-  mainLabel: {
+  addLabel: {
     fontSize: 10,
     fontFamily: Fonts.bodyMedium,
-    color: Colors.textTertiary,
-  },
-  hint: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    marginLeft: 4,
+    color: Colors.primary,
   },
 });

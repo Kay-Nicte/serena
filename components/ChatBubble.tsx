@@ -1,10 +1,14 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
+import { ImageViewer } from './ImageViewer';
 
 interface ChatBubbleProps {
   content: string;
+  imageUrl?: string | null;
   isMine: boolean;
   timestamp: string;
   readAt?: string | null;
@@ -16,13 +20,34 @@ function formatTime(isoDate: string): string {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export function ChatBubble({ content, isMine, timestamp, readAt, showReadReceipt = false }: ChatBubbleProps) {
+export function ChatBubble({ content, imageUrl, isMine, timestamp, readAt, showReadReceipt = false }: ChatBubbleProps) {
+  const [viewerVisible, setViewerVisible] = useState(false);
+
   return (
     <View style={[styles.container, isMine ? styles.mine : styles.theirs]}>
-      <View style={[styles.bubble, isMine ? styles.bubbleMine : styles.bubbleTheirs]}>
-        <Text style={[styles.text, isMine ? styles.textMine : styles.textTheirs]}>
-          {content}
-        </Text>
+      <View style={[styles.bubble, isMine ? styles.bubbleMine : styles.bubbleTheirs, imageUrl ? styles.bubbleImage : undefined]}>
+        {imageUrl ? (
+          <>
+            <TouchableOpacity onPress={() => setViewerVisible(true)} activeOpacity={0.9}>
+              <Image
+                source={{ uri: imageUrl }}
+                style={styles.image}
+                contentFit="cover"
+                transition={200}
+              />
+            </TouchableOpacity>
+            <ImageViewer
+              uri={imageUrl}
+              visible={viewerVisible}
+              onClose={() => setViewerVisible(false)}
+            />
+          </>
+        ) : null}
+        {content ? (
+          <Text style={[styles.text, isMine ? styles.textMine : styles.textTheirs]}>
+            {content}
+          </Text>
+        ) : null}
         <View style={styles.meta}>
           <Text style={[styles.time, isMine ? styles.timeMine : styles.timeTheirs]}>
             {formatTime(timestamp)}
@@ -65,6 +90,16 @@ const styles = StyleSheet.create({
   bubbleTheirs: {
     backgroundColor: Colors.surfaceSecondary,
     borderBottomLeftRadius: 4,
+  },
+  bubbleImage: {
+    paddingHorizontal: 4,
+    paddingTop: 4,
+    overflow: 'hidden',
+  },
+  image: {
+    width: 200,
+    height: 260,
+    borderRadius: 14,
   },
   text: {
     fontSize: 15,

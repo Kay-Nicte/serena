@@ -1,3 +1,9 @@
+export const ORIENTATIONS = ['lesbian', 'bisexual', 'pansexual', 'queer', 'other'] as const;
+export const LOOKING_FOR_OPTIONS = ['friendship', 'dating', 'relationship', 'explore'] as const;
+
+export type Orientation = (typeof ORIENTATIONS)[number];
+export type LookingFor = (typeof LOOKING_FOR_OPTIONS)[number];
+
 export const Config = {
   maxPhotos: 6,
   maxBioLength: 500,
@@ -8,6 +14,10 @@ export const Config = {
   photoMaxSizeMB: 5,
   photoAllowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
   storageBucket: 'profile-photos',
-  defaultMaxDistanceKm: 50,
-  distanceOptions: [10, 25, 50, 100] as readonly number[],
+  discoveryDefaults: {
+    minAge: 18,
+    maxAge: 99,
+    maxDistance: 50,
+  },
+  maxDistanceLimit: 200,
 } as const;

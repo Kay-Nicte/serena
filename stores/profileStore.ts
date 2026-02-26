@@ -15,6 +15,7 @@ interface ProfileStoreState {
   candidatePhotos: Record<string, Photo[]>;
   currentIndex: number;
   isLoading: boolean;
+  error: string | null;
   matchResult: MatchResult | null;
   maxDistanceKm: number;
 
@@ -31,13 +32,14 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
   candidatePhotos: {},
   currentIndex: 0,
   isLoading: false,
+  error: null,
   matchResult: null,
   maxDistanceKm: Config.defaultMaxDistanceKm,
 
   setMaxDistance: (km: number) => set({ maxDistanceKm: km }),
 
   fetchCandidates: async () => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
       // Try to get user's current location for distance filtering
       const rpcParams: Record<string, unknown> = {
@@ -88,6 +90,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       set({ candidates, candidatePhotos: photosMap, currentIndex: 0 });
     } catch (error) {
       console.error('Error fetching candidates:', error);
+      set({ error: 'today.errorFetching' });
     } finally {
       set({ isLoading: false });
     }
@@ -138,6 +141,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       candidatePhotos: {},
       currentIndex: 0,
       isLoading: false,
+      error: null,
       matchResult: null,
       maxDistanceKm: Config.defaultMaxDistanceKm,
     }),

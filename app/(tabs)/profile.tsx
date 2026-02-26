@@ -15,24 +15,28 @@ import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
-import { Config } from '@/constants/config';
+import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, type Orientation, type LookingFor } from '@/constants/config';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Tag } from '@/components/ui/Tag';
 import { PhotoGrid } from '@/components/PhotoGrid';
 import { useAuthStore } from '@/stores/authStore';
-import { useProfileStore } from '@/stores/profileStore';
 import { usePhotos } from '@/hooks/usePhotos';
+import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
+import { pickImage } from '@/lib/storage';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useResponsive } from '@/hooks/useResponsive';
 
-const ORIENTATIONS = ['lesbian', 'bisexual', 'pansexual', 'queer', 'other'] as const;
-const LOOKING_FOR = ['friendship', 'dating', 'relationship', 'explore'] as const;
+const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
-  const { user, profile, updateProfile, signOut, fetchProfile } = useAuthStore();
-  const { photos, isLoading: photosLoading, fetchPhotos, addPhoto, removePhoto } = usePhotos(user?.id);
-  const { maxDistanceKm, setMaxDistance } = useProfileStore();
+  const router = useRouter();
+  const { user, profile, updateProfile, fetchProfile } = useAuthStore();
+  const { photos, addPhoto, removePhoto } = usePhotos(user?.id);
+  const { preferences } = useDiscoveryPreferences();
+  const { isTablet, contentMaxWidth, horizontalPadding } = useResponsive();
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -59,9 +63,18 @@ export default function ProfileScreen() {
     }
   }, [profile, editing]);
 
-  useEffect(() => {
-    if (user?.id) fetchPhotos();
-  }, [user?.id, fetchPhotos]);
+  const handleAddPhoto = async (position: number) => {
+    const uri = await pickImage();
+    if (uri && user) {
+      await addPhoto(user.id, uri, position);
+      await fetchProfile();
+    }
+  };
+
+  const handleRemovePhoto = async (photo: Parameters<typeof removePhoto>[0]) => {
+    await removePhoto(photo);
+    await fetchProfile();
+  };
 
   const handleSave = async () => {
     if (!name.trim()) return;
@@ -76,8 +89,8 @@ export default function ProfileScreen() {
         name: name.trim(),
         bio: bio.trim() || null,
         birth_date: birthDateString,
-        orientation: orientation as any,
-        looking_for: lookingFor as any,
+        orientation: orientation as Orientation,
+        looking_for: lookingFor as LookingFor,
       });
       setEditing(false);
     } catch {
@@ -87,23 +100,21 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleSignOut = () => {
-    Alert.alert(t('profile.signOut'), t('profile.signOutConfirm'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      { text: t('profile.signOut'), style: 'destructive', onPress: signOut },
-    ]);
-  };
-
   // --- VIEW MODE ---
   if (!editing) {
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={[styles.scrollContent, { paddingHorizontal: horizontalPadding }, isTablet && { maxWidth: contentMaxWidth, alignSelf: 'center', width: '100%' }]}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>{t('tabs.profile')}</Text>
-            <TouchableOpacity onPress={() => setEditing(true)} hitSlop={8}>
-              <Ionicons name="create-outline" size={24} color={Colors.primary} />
-            </TouchableOpacity>
+            <View style={styles.headerIcons}>
+              <TouchableOpacity onPress={() => setEditing(true)} hitSlop={8}>
+                <Ionicons name="create-outline" size={24} color={Colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/settings')} hitSlop={8}>
+                <Ionicons name="settings-outline" size={24} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.card}>
@@ -125,9 +136,7 @@ export default function ProfileScreen() {
               {profile?.birth_date && (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>{t('profile.birthDate')}</Text>
-                  <Text style={styles.infoValue}>
-                    {profile.birth_date.split('-').reverse().join('-')}
-                  </Text>
+                  <Text style={styles.infoValue}>{profile.birth_date}</Text>
                 </View>
               )}
               {profile?.orientation && (
@@ -149,13 +158,50 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <View style={styles.bottom}>
+          {/* Discovery Preferences */}
+          <View style={styles.discoveryCard}>
+            <View style={styles.discoveryHeader}>
+              <Text style={styles.discoveryTitle}>{t('discovery.title')}</Text>
+            </View>
+            <View style={styles.info}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t('discovery.ageRange')}</Text>
+                <Text style={styles.infoValue}>
+                  {preferences?.min_age ?? Config.minAge} — {preferences?.max_age ?? Config.maxAge} {t('discovery.years')}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t('discovery.distance')}</Text>
+                <Text style={styles.infoValue}>
+                  {preferences?.max_distance
+                    ? `${preferences.max_distance} km`
+                    : t('discovery.distanceAll')}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t('discovery.orientations')}</Text>
+                <Text style={styles.infoValue}>
+                  {preferences?.orientations?.length
+                    ? preferences.orientations.map((o) => t(`orientation.${o}`)).join(', ')
+                    : t('discovery.orientationsAll')}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>{t('discovery.lookingFor')}</Text>
+                <Text style={styles.infoValue}>
+                  {preferences?.looking_for?.length
+                    ? preferences.looking_for.map((lf) => t(`lookingFor.${lf}`)).join(', ')
+                    : t('discovery.lookingForAll')}
+                </Text>
+              </View>
+            </View>
             <Button
-              title={t('profile.signOut')}
-              onPress={handleSignOut}
+              title={t('discovery.edit')}
+              onPress={() => router.push('/discovery-preferences')}
               variant="outline"
             />
           </View>
+
         </ScrollView>
       </SafeAreaView>
     );
@@ -169,7 +215,7 @@ export default function ProfileScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingHorizontal: horizontalPadding }, isTablet && { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as const }]}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headerRow}>
@@ -182,9 +228,9 @@ export default function ProfileScreen() {
           {/* Photos */}
           <PhotoGrid
             photos={photos}
-            isLoading={photosLoading}
-            onAddPhoto={addPhoto}
-            onRemovePhoto={removePhoto}
+            onAdd={handleAddPhoto}
+            onRemove={handleRemovePhoto}
+            editable
           />
 
           {/* Name */}
@@ -279,21 +325,6 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Max Distance */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('location.maxDistance')}</Text>
-            <View style={styles.tags}>
-              {Config.distanceOptions.map((km) => (
-                <Tag
-                  key={km}
-                  label={`${km} ${t('location.km')}`}
-                  selected={maxDistanceKm === km}
-                  onPress={() => setMaxDistance(km)}
-                />
-              ))}
-            </View>
-          </View>
-
           <Button
             title={t('common.save')}
             onPress={handleSave}
@@ -316,7 +347,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 24,
     paddingBottom: 40,
     gap: 20,
   },
@@ -325,6 +355,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 16,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
   },
   title: {
     fontSize: 28,
@@ -378,6 +413,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 12,
   },
   infoLabel: {
     fontSize: 14,
@@ -388,6 +424,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.bodySemiBold,
     color: Colors.text,
+    flexShrink: 1,
+    textAlign: 'right',
   },
   section: {
     gap: 10,
@@ -440,7 +478,25 @@ const styles = StyleSheet.create({
   saveButton: {
     marginTop: 4,
   },
-  bottom: {
-    paddingTop: 12,
+  discoveryCard: {
+    padding: 20,
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    gap: 14,
+    shadowColor: Colors.text,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  discoveryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  discoveryTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.heading,
+    color: Colors.text,
   },
 });

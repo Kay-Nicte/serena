@@ -5,16 +5,22 @@ import * as auth from '@/lib/auth';
 import { useProfileStore } from './profileStore';
 import { useMatchStore } from './matchStore';
 import { useChatStore } from './chatStore';
+import { usePhotoStore } from './photoStore';
+import { useDiscoveryStore } from './discoveryStore';
+import { useBlockStore } from './blockStore';
+import type { Orientation, LookingFor } from '@/constants/config';
 
 export interface Profile {
   id: string;
   name: string | null;
   birth_date: string | null;
   bio: string | null;
-  orientation: string | null;
-  looking_for: string | null;
+  orientation: Orientation | null;
+  looking_for: LookingFor | null;
   avatar_url: string | null;
   is_profile_complete: boolean;
+  is_admin: boolean;
+  language_preference: string | null;
   created_at: string;
   updated_at: string;
   distance_km?: number | null;
@@ -79,6 +85,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return;
     }
 
+    if (data?.language_preference) {
+      const i18n = (await import('@/i18n')).default;
+      await i18n.changeLanguage(data.language_preference);
+    }
+
     set({
       profile: data as Profile,
       isProfileComplete: data?.is_profile_complete ?? false,
@@ -100,10 +111,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signOut: async () => {
+    const { removePushTokenFromServer } = await import('@/lib/notifications');
+    await removePushTokenFromServer();
     await auth.signOut();
     useProfileStore.getState().reset();
     useMatchStore.getState().reset();
     useChatStore.getState().reset();
+    usePhotoStore.getState().reset();
+    useDiscoveryStore.getState().reset();
+    useBlockStore.getState().reset();
     set({
       session: null,
       user: null,

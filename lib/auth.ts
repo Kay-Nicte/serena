@@ -25,3 +25,19 @@ export async function getSession() {
   if (error) throw error;
   return data.session;
 }
+
+export async function changePassword(newPassword: string) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw error;
+}
+
+export async function reauthenticate(email: string, password: string) {
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+}
+
+export async function deleteAccount() {
+  const { data, error } = await supabase.rpc('delete_own_account');
+  if (error) throw error;
+  return data;
+}

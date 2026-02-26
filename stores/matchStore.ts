@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { useBlockStore } from './blockStore';
 
 export interface MatchUser {
   id: string;
@@ -11,14 +12,25 @@ export interface Match {
   id: string;
   otherUser: MatchUser;
   lastMessage: string | null;
+  lastMessageImageUrl: string | null;
   lastMessageAt: string | null;
   unreadCount: number;
   created_at: string;
 }
 
+interface MatchQueryRow {
+  id: string;
+  user_a_id: string;
+  user_b_id: string;
+  created_at: string;
+  user_a: MatchUser | MatchUser[] | null;
+  user_b: MatchUser | MatchUser[] | null;
+}
+
 interface MatchStoreState {
   matches: Match[];
   isLoading: boolean;
+  error: string | null;
 
   fetchMatches: () => Promise<void>;
   reset: () => void;
@@ -27,9 +39,10 @@ interface MatchStoreState {
 export const useMatchStore = create<MatchStoreState>((set) => ({
   matches: [],
   isLoading: false,
+  error: null,
 
   fetchMatches: async () => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -50,16 +63,17 @@ export const useMatchStore = create<MatchStoreState>((set) => ({
       if (error) throw error;
 
       const matches: Match[] = await Promise.all(
-        (matchesData ?? []).map(async (match: any) => {
-          const otherUser: MatchUser =
-            match.user_a_id === user.id
-              ? match.user_b
-              : match.user_a;
+        (matchesData ?? []).map(async (match: MatchQueryRow) => {
+          const rawOther =
+            match.user_a_id === user.id ? match.user_b : match.user_a;
+          const otherUser: MatchUser = Array.isArray(rawOther)
+            ? rawOther[0] ?? { id: '', name: null, avatar_url: null }
+            : rawOther ?? { id: '', name: null, avatar_url: null };
 
           // Get last message
           const { data: lastMsg } = await supabase
             .from('messages')
-            .select('content, created_at')
+            .select('content, image_url, created_at')
             .eq('match_id', match.id)
             .order('created_at', { ascending: false })
             .limit(1)
@@ -77,6 +91,7 @@ export const useMatchStore = create<MatchStoreState>((set) => ({
             id: match.id,
             otherUser,
             lastMessage: lastMsg?.content ?? null,
+            lastMessageImageUrl: lastMsg?.image_url ?? null,
             lastMessageAt: lastMsg?.created_at ?? null,
             unreadCount: count ?? 0,
             created_at: match.created_at,
@@ -91,13 +106,18 @@ export const useMatchStore = create<MatchStoreState>((set) => ({
         return new Date(bDate).getTime() - new Date(aDate).getTime();
       });
 
-      set({ matches });
+      // Filter out blocked users
+      const blockedIds = useBlockStore.getState().blockedIds;
+      const filteredMatches = matches.filter(m => !blockedIds.has(m.otherUser.id));
+
+      set({ matches: filteredMatches });
     } catch (error) {
       console.error('Error fetching matches:', error);
+      set({ error: 'matches.errorFetching' });
     } finally {
       set({ isLoading: false });
     }
   },
 
-  reset: () => set({ matches: [], isLoading: false }),
+  reset: () => set({ matches: [], isLoading: false, error: null }),
 }));

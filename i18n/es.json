@@ -8,7 +8,8 @@
     "next": "Siguiente",
     "back": "Volver",
     "done": "Listo",
-    "or": "o"
+    "or": "o",
+    "offline": "Sin conexión a internet"
   },
   "welcome": {
     "title": "Serena",
@@ -32,7 +33,18 @@
     "errorInvalidEmail": "Correo electrónico inválido",
     "errorPasswordShort": "La contraseña debe tener al menos 6 caracteres",
     "errorPasswordMismatch": "Las contraseñas no coinciden",
-    "errorGeneric": "Error de autenticación. Inténtalo de nuevo."
+    "errorGeneric": "Error de autenticación. Inténtalo de nuevo.",
+    "forgotPasswordTitle": "Recuperar contraseña",
+    "forgotPasswordSubtitle": "Introduce tu correo y te enviaremos un enlace para restablecer tu contraseña",
+    "sendResetLink": "Enviar enlace",
+    "resetLinkSent": "¡Enlace enviado!",
+    "resetLinkSentMessage": "Revisa tu correo y haz clic en el enlace para restablecer tu contraseña.",
+    "backToLogin": "Volver a iniciar sesión",
+    "newPassword": "Nueva contraseña",
+    "newPasswordSubtitle": "Introduce tu nueva contraseña",
+    "updatePassword": "Actualizar contraseña",
+    "passwordUpdated": "Contraseña actualizada",
+    "passwordUpdatedMessage": "Tu contraseña se ha actualizado correctamente."
   },
   "profile": {
     "completeTitle": "Completa tu perfil",
@@ -48,13 +60,11 @@
     "orientation": "Orientación",
     "lookingFor": "¿Qué buscas?",
     "save": "Guardar perfil",
-    "mainPhoto": "Principal",
-    "addPhotos": "Tus fotos",
-    "deletePhoto": "Eliminar foto",
-    "deletePhotoConfirm": "¿Eliminar esta foto?",
-    "maxPhotos": "Máximo 6 fotos",
     "signOut": "Cerrar sesión",
-    "signOutConfirm": "¿Estás segura de que quieres cerrar sesión?"
+    "signOutConfirm": "¿Estás segura de que quieres cerrar sesión?",
+    "primaryPhoto": "Principal",
+    "removePhoto": "Eliminar foto",
+    "removePhotoConfirm": "¿Estás segura de que quieres eliminar esta foto?"
   },
   "orientation": {
     "lesbian": "Lesbiana",
@@ -73,7 +83,8 @@
     "today": "Hoy",
     "matches": "Matches",
     "chat": "Chat",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "admin": "Admin"
   },
   "today": {
     "title": "Hoy",
@@ -81,12 +92,14 @@
     "placeholder": "Descubre personas increíbles cerca de ti",
     "like": "Me gusta",
     "pass": "Pasar",
-    "loading": "Buscando perfiles..."
+    "loading": "Buscando perfiles...",
+    "errorFetching": "No se pudieron cargar los perfiles. Inténtalo de nuevo."
   },
   "matches": {
     "title": "Matches",
     "empty": "Aún no tienes matches. ¡Sigue explorando!",
-    "placeholder": "Tus conexiones aparecerán aquí"
+    "placeholder": "Tus conexiones aparecerán aquí",
+    "errorFetching": "No se pudieron cargar los matches. Desliza para reintentar."
   },
   "match": {
     "title": "¡Es un match!",
@@ -99,11 +112,146 @@
     "empty": "No tienes conversaciones aún",
     "placeholder": "Escribe un mensaje...",
     "send": "Enviar",
-    "noMessages": "Aún no hay mensajes. ¡Di hola!"
+    "noMessages": "Aún no hay mensajes. ¡Di hola!",
+    "errorFetching": "No se pudieron cargar los mensajes.",
+    "errorSending": "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+    "typing": "Escribiendo",
+    "online": "En línea",
+    "lastSeenNow": "Última vez hace un momento",
+    "lastSeenMinutes": "Última vez hace {{n}} min",
+    "lastSeenHours": "Última vez hace {{n}} h",
+    "lastSeenLong": "Hace tiempo",
+    "photoMessage": "📷 Foto",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "matchedOn": "Match el {{date}}"
   },
-  "location": {
-    "maxDistance": "Distancia máxima",
-    "km": "km",
-    "lessThan1km": "Menos de 1 km"
+  "notifications": {
+    "permissionTitle": "Activar notificaciones",
+    "permissionMessage": "Recibe notificaciones sobre nuevos matches y mensajes"
+  },
+  "report": {
+    "title": "Reportar a {{name}}",
+    "selectReason": "¿Por qué reportas a esta persona?",
+    "reason_inappropriate_content": "Contenido inapropiado",
+    "reason_fake_profile": "Perfil falso",
+    "reason_harassment": "Acoso",
+    "reason_spam": "Spam",
+    "reason_other": "Otro",
+    "descriptionPlaceholder": "Agrega más detalles (opcional)...",
+    "alsoBlock": "También bloquear a esta persona",
+    "submit": "Enviar reporte",
+    "blockOnly": "Bloquear sin reportar",
+    "report": "Reportar",
+    "successTitle": "Reporte enviado",
+    "successMessage": "Gracias. Revisaremos este reporte pronto.",
+    "errorSubmitting": "No se pudo enviar el reporte. Inténtalo de nuevo.",
+    "privacyNotice": "Al enviar un reporte, nuestro equipo de moderación podrá ver los últimos mensajes de tu conversación para evaluar la situación.",
+    "alreadyReported": "Ya has reportado a esta usuaria. Estamos revisándolo."
+  },
+  "block": {
+    "block": "Bloquear",
+    "unblock": "Desbloquear",
+    "confirmTitle": "¿Bloquear usuario?",
+    "confirmMessage": "{{name}} no podrá ver tu perfil ni contactarte. Puedes desbloquearla después desde Ajustes → Usuarios bloqueados.",
+    "blocked": "Usuario bloqueado",
+    "unblockConfirmTitle": "¿Desbloquear usuario?",
+    "unblockConfirmMessage": "{{name}} podrá ver tu perfil de nuevo.",
+    "blockedUsers": "Usuarios bloqueados",
+    "noBlockedUsers": "No hay usuarios bloqueados",
+    "errorFetching": "No se pudieron cargar los usuarios bloqueados.",
+    "errorBlocking": "No se pudo bloquear al usuario.",
+    "errorUnblocking": "No se pudo desbloquear al usuario."
+  },
+  "admin": {
+    "title": "Reportes",
+    "all": "Todos",
+    "status_pending": "Pendiente",
+    "status_reviewed": "Revisado",
+    "status_resolved": "Resuelto",
+    "status_dismissed": "Descartado",
+    "reporter": "Reportó",
+    "reported": "Reportada",
+    "reason": "Razón",
+    "actions": "Acciones",
+    "markReviewed": "Marcar como revisado",
+    "dismiss": "Descartar",
+    "resolve": "Resolver",
+    "banUser": "Banear usuaria",
+    "unbanUser": "Desbanear usuaria",
+    "banConfirmTitle": "¿Banear usuaria?",
+    "banConfirmMessage": "{{name}} será baneada y eliminada del descubrimiento.",
+    "unbanConfirmTitle": "¿Desbanear usuaria?",
+    "unbanConfirmMessage": "{{name}} será desbaneada y visible de nuevo.",
+    "noReports": "No hay reportes por revisar",
+    "viewProfile": "Ver perfil",
+    "profileDetails": "Detalles de la cuenta",
+    "createdAt": "Registro",
+    "photosCount": "Fotos",
+    "profileComplete": "Perfil completo",
+    "noBio": "Sin biografía",
+    "conversation": "Conversación",
+    "conversationBetween": "Entre {{reporter}} (reportó) y {{reported}} (reportada)",
+    "noConversation": "No se encontró conversación entre estas usuarias",
+    "reportHistory": "Historial de reportes",
+    "noReportHistory": "Sin reportes previos",
+    "reportedNTimes": "Reportada {{count}} veces en total"
+  },
+  "discovery": {
+    "title": "Descubrimiento",
+    "subtitle": "Personaliza qué perfiles ves",
+    "ageRange": "Rango de edad",
+    "minAge": "Mín",
+    "maxAge": "Máx",
+    "orientations": "Orientaciones",
+    "orientationsAll": "Todas",
+    "lookingFor": "Qué buscan",
+    "lookingForAll": "Todos",
+    "edit": "Editar preferencias",
+    "saved": "Preferencias guardadas",
+    "years": "años",
+    "distance": "Distancia máxima",
+    "distanceAll": "Sin límite de distancia",
+    "distanceClear": "Quitar límite"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "account": "Cuenta",
+    "changePassword": "Cambiar contraseña",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteAccountWarning": "Esta acción es permanente y no se puede deshacer. Todos tus datos, fotos, matches y mensajes se eliminarán permanentemente.",
+    "deleteAccountConfirmLabel": "Escribe ELIMINAR para confirmar",
+    "deleteAccountConfirmWord": "ELIMINAR",
+    "deleteAccountSuccess": "Cuenta eliminada",
+    "deleteAccountError": "No se pudo eliminar la cuenta. Inténtalo de nuevo.",
+    "notifications": "Notificaciones",
+    "pushNotifications": "Notificaciones push",
+    "language": "Idioma",
+    "languageEn": "English",
+    "languageEs": "Español",
+    "legal": "Legal",
+    "termsOfService": "Términos de Servicio",
+    "privacyPolicy": "Política de Privacidad",
+    "about": "Acerca de",
+    "version": "Versión",
+    "blockedUsers": "Usuarios bloqueados",
+    "signOut": "Cerrar sesión",
+    "signOutConfirm": "¿Estás segura de que quieres cerrar sesión?"
+  },
+  "changePassword": {
+    "title": "Cambiar contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar nueva contraseña",
+    "submit": "Actualizar contraseña",
+    "success": "Contraseña actualizada correctamente",
+    "errorCurrentPassword": "La contraseña actual es incorrecta",
+    "errorGeneric": "No se pudo actualizar la contraseña. Inténtalo de nuevo."
+  },
+  "legal": {
+    "termsTitle": "Términos de Servicio",
+    "privacyTitle": "Política de Privacidad",
+    "termsContent": "Bienvenida a Serena. Al usar nuestra aplicación, aceptas estos Términos de Servicio.\n\n1. Aceptación de los Términos\nAl acceder o usar Serena, aceptas estar sujeta a estos Términos. Si no estás de acuerdo, no uses la app.\n\n2. Elegibilidad\nDebes tener al menos 18 años para usar Serena. Al crear una cuenta, confirmas que cumples con este requisito de edad.\n\n3. Cuenta\nEres responsable de mantener la confidencialidad de las credenciales de tu cuenta y de todas las actividades que ocurran en ella.\n\n4. Conducta del Usuario\nAceptas no:\n- Publicar contenido falso, engañoso o fraudulento\n- Acosar, amenazar o intimidar a otras usuarias\n- Usar la app para cualquier propósito ilegal\n- Crear múltiples cuentas\n- Suplantar la identidad de otra persona\n\n5. Contenido\nConservas la propiedad del contenido que publicas pero otorgas a Serena una licencia para usarlo dentro de la app. Podemos eliminar contenido que viole estos términos.\n\n6. Privacidad\nTu uso de Serena también se rige por nuestra Política de Privacidad.\n\n7. Terminación\nNos reservamos el derecho de suspender o terminar cuentas que violen estos términos. Puedes eliminar tu cuenta en cualquier momento desde Ajustes.\n\n8. Descargo de Responsabilidad\nSerena se proporciona \"tal cual\" sin garantías de ningún tipo. No somos responsables de las interacciones entre usuarias.\n\n9. Cambios\nPodemos actualizar estos Términos periódicamente. El uso continuado de la app constituye la aceptación de los cambios.\n\n10. Contacto\nPara preguntas sobre estos Términos, contáctanos a través de la app.",
+    "privacyContent": "Política de Privacidad de Serena\n\nÚltima actualización: 2025\n\n1. Información que Recopilamos\n- Información de cuenta: correo electrónico, nombre, fecha de nacimiento\n- Información de perfil: fotos, biografía, orientación, preferencias\n- Datos de uso: interacciones, matches, mensajes\n- Información del dispositivo: tipo de dispositivo, sistema operativo\n- Datos de ubicación: ubicación aproximada (si está habilitada)\n\n2. Cómo Usamos tu Información\n- Para proporcionar y mejorar nuestros servicios\n- Para conectarte con otras usuarias según tus preferencias\n- Para enviarte notificaciones sobre matches y mensajes\n- Para garantizar la seguridad y prevenir abusos\n\n3. Compartir Información\nNo vendemos tu información personal. Podemos compartir datos con:\n- Otras usuarias: tu información de perfil es visible para posibles matches\n- Proveedores de servicios: que nos ayudan a operar la app\n- Autoridades: cuando lo requiera la ley\n\n4. Almacenamiento y Seguridad\nTus datos se almacenan de forma segura usando cifrado estándar de la industria. Tomamos medidas razonables para proteger tu información.\n\n5. Tus Derechos\nTienes derecho a:\n- Acceder a tus datos personales\n- Corregir datos inexactos\n- Eliminar tu cuenta y datos\n- Exportar tus datos\n- Retirar el consentimiento para el procesamiento de datos\n\n6. Retención de Datos\nConservamos tus datos mientras tu cuenta esté activa. Cuando eliminas tu cuenta, todos tus datos se eliminan permanentemente.\n\n7. Cookies y Seguimiento\nUsamos el seguimiento mínimo necesario para la funcionalidad de la app.\n\n8. Privacidad de Menores\nSerena no está destinada a usuarias menores de 18 años. No recopilamos datos de menores a sabiendas.\n\n9. Cambios a esta Política\nPodemos actualizar esta política periódicamente. Te notificaremos sobre cambios significativos.\n\n10. Contacto\nPara preguntas relacionadas con la privacidad, contáctanos a través de la app."
   }
 }

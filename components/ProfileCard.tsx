@@ -1,28 +1,18 @@
-import { useState, useRef, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-} from 'react-native';
-import { Image } from 'expo-image';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
-import { Ionicons } from '@expo/vector-icons';
+import { PhotoCarousel } from '@/components/PhotoCarousel';
 import type { Profile } from '@/stores/authStore';
-import type { Photo } from '@/hooks/usePhotos';
 
 interface ProfileCardProps {
   profile: Profile;
-  photos?: Photo[];
+  photos?: { uri: string }[];
+  cardWidth: number;
+  maxHeight?: number;
 }
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - 48;
+const INFO_HEIGHT_ESTIMATE = 120;
 
 function calculateAge(birthDate: string | null): number | null {
   if (!birthDate) return null;
@@ -36,84 +26,24 @@ function calculateAge(birthDate: string | null): number | null {
   return age;
 }
 
-export function ProfileCard({ profile, photos }: ProfileCardProps) {
+export function ProfileCard({ profile, photos, cardWidth, maxHeight }: ProfileCardProps) {
   const { t } = useTranslation();
   const age = calculateAge(profile.birth_date);
-  const [activeIndex, setActiveIndex] = useState(0);
 
-  const imageUrls =
-    photos && photos.length > 0
-      ? photos.map((p) => p.url)
-      : profile.avatar_url
-        ? [profile.avatar_url]
-        : [];
-
-  const hasMultiple = imageUrls.length > 1;
-
-  const handleScroll = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const offsetX = e.nativeEvent.contentOffset.x;
-      const index = Math.round(offsetX / CARD_WIDTH);
-      setActiveIndex(index);
-    },
-    []
-  );
-
-  const renderPhoto = () => {
-    if (imageUrls.length === 0) {
-      return (
-        <View style={[styles.photo, styles.photoPlaceholder]}>
-          <Ionicons name="person" size={80} color={Colors.primaryLight} />
-        </View>
-      );
-    }
-
-    if (!hasMultiple) {
-      return (
-        <Image
-          source={{ uri: imageUrls[0] }}
-          style={styles.photo}
-          contentFit="cover"
-          transition={200}
-        />
-      );
-    }
-
-    return (
-      <View>
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          style={styles.photoScroll}
-        >
-          {imageUrls.map((url, i) => (
-            <Image
-              key={i}
-              source={{ uri: url }}
-              style={[styles.photo, { width: CARD_WIDTH }]}
-              contentFit="cover"
-              transition={200}
-            />
-          ))}
-        </ScrollView>
-        <View style={styles.dots}>
-          {imageUrls.map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, i === activeIndex && styles.dotActive]}
-            />
-          ))}
-        </View>
-      </View>
-    );
-  };
+  const naturalPhotoHeight = cardWidth / (3 / 4);
+  let photoHeight = naturalPhotoHeight;
+  if (maxHeight) {
+    photoHeight = Math.min(naturalPhotoHeight, maxHeight - INFO_HEIGHT_ESTIMATE);
+  }
 
   return (
-    <View style={styles.card}>
-      {renderPhoto()}
+    <View style={[styles.card, { width: cardWidth }]}>
+      <PhotoCarousel
+        photos={photos ?? []}
+        fallbackUri={profile.avatar_url}
+        width={cardWidth}
+        height={photoHeight}
+      />
 
       <View style={styles.info}>
         <View style={styles.nameRow}>
@@ -122,17 +52,6 @@ export function ProfileCard({ profile, photos }: ProfileCardProps) {
           </Text>
           {age !== null && <Text style={styles.age}>{age}</Text>}
         </View>
-
-        {profile.distance_km != null && (
-          <View style={styles.distanceRow}>
-            <Ionicons name="location-outline" size={14} color={Colors.textTertiary} />
-            <Text style={styles.distanceText}>
-              {profile.distance_km < 1
-                ? t('location.lessThan1km')
-                : `${Math.round(profile.distance_km)} ${t('location.km')}`}
-            </Text>
-          </View>
-        )}
 
         {profile.bio ? (
           <Text style={styles.bio}>{profile.bio}</Text>
@@ -161,7 +80,6 @@ export function ProfileCard({ profile, photos }: ProfileCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    width: CARD_WIDTH,
     backgroundColor: Colors.surface,
     borderRadius: 20,
     overflow: 'hidden',
@@ -171,9 +89,6 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 5,
   },
-  photoScroll: {
-    width: CARD_WIDTH,
-  },
   photo: {
     width: '100%',
     aspectRatio: 3 / 4,
@@ -182,27 +97,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceSecondary,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  dots: {
-    position: 'absolute',
-    bottom: 10,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: 'rgba(255,255,255,0.5)',
-  },
-  dotActive: {
-    backgroundColor: Colors.primary,
-    width: 9,
-    height: 9,
-    borderRadius: 4.5,
   },
   info: {
     padding: 20,
@@ -223,16 +117,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-  },
-  distanceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  distanceText: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
   },
   bio: {
     fontSize: 15,
