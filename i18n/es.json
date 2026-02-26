@@ -153,7 +153,7 @@
     "block": "Bloquear",
     "unblock": "Desbloquear",
     "confirmTitle": "¿Bloquear usuario?",
-    "confirmMessage": "{{name}} no podrá ver tu perfil ni contactarte. Puedes desbloquearla después desde Perfil → Usuarios bloqueados.",
+    "confirmMessage": "{{name}} no podrá ver tu perfil ni contactarte. Puedes desbloquearla después desde Ajustes → Usuarios bloqueados.",
     "blocked": "Usuario bloqueado",
     "unblockConfirmTitle": "¿Desbloquear usuario?",
     "unblockConfirmMessage": "{{name}} podrá ver tu perfil de nuevo.",
@@ -233,7 +233,10 @@
     "termsOfService": "Términos de Servicio",
     "privacyPolicy": "Política de Privacidad",
     "about": "Acerca de",
-    "version": "Versión"
+    "version": "Versión",
+    "blockedUsers": "Usuarios bloqueados",
+    "signOut": "Cerrar sesión",
+    "signOutConfirm": "¿Estás segura de que quieres cerrar sesión?"
   },
   "changePassword": {
     "title": "Cambiar contraseña",

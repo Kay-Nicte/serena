@@ -25,11 +25,13 @@ import {
 } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase';
 import i18n from '@/i18n';
+import { useBlock } from '@/hooks/useBlock';
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user, profile, updateProfile, signOut } = useAuthStore();
+  const { blockedUsers } = useBlock();
 
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
@@ -86,6 +88,13 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleSignOut = () => {
+    Alert.alert(t('settings.signOut'), t('settings.signOutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('settings.signOut'), style: 'destructive', onPress: signOut },
+    ]);
+  };
+
   const handleDeleteAccount = () => {
     setShowDeleteConfirm(true);
   };
@@ -134,6 +143,21 @@ export default function SettingsScreen() {
             >
               <Ionicons name="lock-closed-outline" size={20} color={Colors.text} />
               <Text style={styles.rowLabel}>{t('settings.changePassword')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={Colors.textTertiary} />
+            </TouchableOpacity>
+
+            <View style={styles.separator} />
+
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => router.push('/blocked-users')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="ban-outline" size={20} color={Colors.text} />
+              <Text style={styles.rowLabel}>{t('settings.blockedUsers')}</Text>
+              {blockedUsers.length > 0 && (
+                <Text style={styles.rowValue}>{blockedUsers.length}</Text>
+              )}
               <Ionicons name="chevron-forward" size={18} color={Colors.textTertiary} />
             </TouchableOpacity>
 
@@ -284,6 +308,22 @@ export default function SettingsScreen() {
               <Text style={styles.rowLabel}>{t('settings.version')}</Text>
               <Text style={styles.rowValue}>{appVersion}</Text>
             </View>
+          </View>
+        </View>
+
+        {/* Sign Out */}
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={handleSignOut}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
+              <Text style={[styles.rowLabel, { color: Colors.error }]}>
+                {t('settings.signOut')}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

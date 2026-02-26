@@ -153,7 +153,7 @@
     "block": "Block",
     "unblock": "Unblock",
     "confirmTitle": "Block user?",
-    "confirmMessage": "{{name}} won't be able to see your profile or contact you. You can unblock them later from Profile → Blocked users.",
+    "confirmMessage": "{{name}} won't be able to see your profile or contact you. You can unblock them later from Settings → Blocked users.",
     "blocked": "User blocked",
     "unblockConfirmTitle": "Unblock user?",
     "unblockConfirmMessage": "{{name}} will be able to see your profile again.",
@@ -233,7 +233,10 @@
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
     "about": "About",
-    "version": "Version"
+    "version": "Version",
+    "blockedUsers": "Blocked users",
+    "signOut": "Sign out",
+    "signOutConfirm": "Are you sure you want to sign out?"
   },
   "changePassword": {
     "title": "Change password",

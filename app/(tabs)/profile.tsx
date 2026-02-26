@@ -23,7 +23,6 @@ import { PhotoGrid } from '@/components/PhotoGrid';
 import { useAuthStore } from '@/stores/authStore';
 import { usePhotos } from '@/hooks/usePhotos';
 import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
-import { useBlock } from '@/hooks/useBlock';
 import { pickImage } from '@/lib/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -34,10 +33,9 @@ const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { user, profile, updateProfile, signOut, fetchProfile } = useAuthStore();
+  const { user, profile, updateProfile, fetchProfile } = useAuthStore();
   const { photos, addPhoto, removePhoto } = usePhotos(user?.id);
   const { preferences } = useDiscoveryPreferences();
-  const { blockedUsers } = useBlock();
   const { isTablet, contentMaxWidth, horizontalPadding } = useResponsive();
 
   const [editing, setEditing] = useState(false);
@@ -102,13 +100,6 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleSignOut = () => {
-    Alert.alert(t('profile.signOut'), t('profile.signOutConfirm'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      { text: t('profile.signOut'), style: 'destructive', onPress: signOut },
-    ]);
-  };
-
   // --- VIEW MODE ---
   if (!editing) {
     return (
@@ -116,9 +107,14 @@ export default function ProfileScreen() {
         <ScrollView contentContainerStyle={[styles.scrollContent, { paddingHorizontal: horizontalPadding }, isTablet && { maxWidth: contentMaxWidth, alignSelf: 'center', width: '100%' }]}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>{t('tabs.profile')}</Text>
-            <TouchableOpacity onPress={() => setEditing(true)} hitSlop={8}>
-              <Ionicons name="create-outline" size={24} color={Colors.primary} />
-            </TouchableOpacity>
+            <View style={styles.headerIcons}>
+              <TouchableOpacity onPress={() => setEditing(true)} hitSlop={8}>
+                <Ionicons name="create-outline" size={24} color={Colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/settings')} hitSlop={8}>
+                <Ionicons name="settings-outline" size={24} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.card}>
@@ -206,43 +202,6 @@ export default function ProfileScreen() {
             />
           </View>
 
-          {/* Blocked Users */}
-          <TouchableOpacity
-            style={styles.discoveryCard}
-            onPress={() => router.push('/blocked-users')}
-            activeOpacity={0.7}
-          >
-            <View style={styles.discoveryHeader}>
-              <Text style={styles.discoveryTitle}>{t('block.blockedUsers')}</Text>
-              <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
-            </View>
-            {blockedUsers.length > 0 && (
-              <Text style={styles.infoValue}>
-                {blockedUsers.length}
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          {/* Settings */}
-          <TouchableOpacity
-            style={styles.discoveryCard}
-            onPress={() => router.push('/settings')}
-            activeOpacity={0.7}
-          >
-            <View style={styles.discoveryHeader}>
-              <Ionicons name="settings-outline" size={20} color={Colors.text} />
-              <Text style={[styles.discoveryTitle, { flex: 1, marginLeft: 8 }]}>{t('settings.title')}</Text>
-              <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
-            </View>
-          </TouchableOpacity>
-
-          <View style={styles.bottom}>
-            <Button
-              title={t('profile.signOut')}
-              onPress={handleSignOut}
-              variant="outline"
-            />
-          </View>
         </ScrollView>
       </SafeAreaView>
     );
@@ -397,6 +356,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 16,
   },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
   title: {
     fontSize: 28,
     fontFamily: Fonts.heading,
@@ -534,8 +498,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: Fonts.heading,
     color: Colors.text,
-  },
-  bottom: {
-    paddingTop: 12,
   },
 });
