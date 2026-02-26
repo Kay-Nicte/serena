@@ -106,7 +106,8 @@
     "loading": "Buscando perfiles...",
     "errorFetching": "No se pudieron cargar los perfiles. Inténtalo de nuevo.",
     "dailyLimitReached": "Has alcanzado el límite diario de likes. ¡Vuelve mañana!",
-    "refresh": "Actualizar"
+    "refresh": "Actualizar",
+    "secondChance": "Dar otra oportunidad"
   },
   "matches": {
     "title": "Matches",

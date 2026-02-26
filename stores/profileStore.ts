@@ -22,6 +22,7 @@ interface ProfileStoreState {
   maxDistanceKm: number;
 
   fetchCandidates: () => Promise<void>;
+  resetPasses: () => Promise<void>;
   setMaxDistance: (km: number) => void;
   likeProfile: (targetId: string) => Promise<void>;
   passProfile: (targetId: string) => Promise<void>;
@@ -80,6 +81,17 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       set({ error: 'today.errorFetching' });
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  resetPasses: async () => {
+    try {
+      const { error } = await supabase.rpc('reset_daily_passes');
+      if (error) throw error;
+      await get().fetchCandidates();
+    } catch (error) {
+      reportError(error, { source: 'profileStore.resetPasses' });
+      showToast(i18n.t('common.error'), 'error');
     }
   },
 

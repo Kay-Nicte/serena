@@ -106,7 +106,8 @@
     "loading": "Finding profiles...",
     "errorFetching": "Could not load profiles. Try again.",
     "dailyLimitReached": "You've reached the daily like limit. Come back tomorrow.",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "secondChance": "Give them another chance"
   },
   "matches": {
     "title": "Matches",

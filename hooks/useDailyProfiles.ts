@@ -16,6 +16,7 @@ export function useDailyProfiles() {
     error,
     matchResult,
     fetchCandidates,
+    resetPasses,
     likeProfile,
     passProfile,
     clearMatchResult,
@@ -73,5 +74,6 @@ export function useDailyProfiles() {
     },
     clearMatchResult,
     refresh: fetchCandidates,
+    resetPasses,
   };
 }

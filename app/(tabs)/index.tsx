@@ -23,6 +23,7 @@ export default function TodayScreen() {
     pass,
     clearMatchResult,
     refresh,
+    resetPasses,
   } = useDailyProfiles();
 
   const handleChat = () => {
@@ -65,35 +66,38 @@ export default function TodayScreen() {
             </TouchableOpacity>
           </View>
         ) : currentProfile && hasMore ? (
-          <>
             <ProfileCard profile={currentProfile} photos={photos} />
-            <View style={styles.actions}>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.passButton]}
-                onPress={pass}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="close" size={32} color={Colors.textSecondary} />
-                <Text style={styles.passText}>{t('today.pass')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.actionButton, styles.likeButton]}
-                onPress={like}
-                activeOpacity={0.7}
-              >
-                <Ionicons name="heart" size={32} color={Colors.primary} />
-                <Text style={styles.likeText}>{t('today.like')}</Text>
-              </TouchableOpacity>
-            </View>
-          </>
         ) : (
           <View style={styles.centered}>
             <Ionicons name="heart" size={64} color={Colors.primaryLight} />
             <Text style={styles.emptyText}>{t('today.empty')}</Text>
+            <TouchableOpacity style={styles.secondChanceButton} onPress={resetPasses} activeOpacity={0.7}>
+              <Ionicons name="refresh-circle-outline" size={22} color={Colors.primary} />
+              <Text style={styles.secondChanceText}>{t('today.secondChance')}</Text>
+            </TouchableOpacity>
           </View>
         )}
       </View>
+
+      {currentProfile && hasMore && !isLoading && !error && (
+        <View style={styles.actions}>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.passButton]}
+            onPress={pass}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="close" size={32} color={Colors.textSecondary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.likeButton]}
+            onPress={like}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="heart" size={32} color={Colors.primary} />
+          </TouchableOpacity>
+        </View>
+      )}
 
       <MatchOverlay
         visible={matchResult?.matched === true}
@@ -157,6 +161,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
+  secondChanceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.primaryPastel,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    marginTop: 8,
+  },
+  secondChanceText: {
+    fontSize: 15,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.primary,
+  },
   retryButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -176,8 +197,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 32,
-    paddingTop: 20,
-    paddingBottom: 8,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
   actionButton: {
     alignItems: 'center',
@@ -200,17 +221,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryPastel,
     borderWidth: 1,
     borderColor: Colors.primaryLight,
-  },
-  passText: {
-    fontSize: 10,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  likeText: {
-    fontSize: 10,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primaryDark,
-    marginTop: 2,
   },
 });
