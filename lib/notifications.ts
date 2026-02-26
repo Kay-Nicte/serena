@@ -112,19 +112,41 @@ export async function removePushTokenFromServer(): Promise<void> {
   await supabase.from('push_tokens').delete().eq('user_id', user.id);
 }
 
+function handleNotificationNavigation(data: Record<string, unknown>): void {
+  if (!data?.type) return;
+
+  switch (data.type) {
+    case 'new_match':
+    case 'new_message':
+      if (data.match_id) {
+        router.push(`/(tabs)/chat/${data.match_id}`);
+      }
+      break;
+    case 'new_report':
+      router.push('/(tabs)/admin' as never);
+      break;
+  }
+}
+
 export async function setupNotificationResponseListener(): Promise<{
   remove: () => void;
 } | null> {
   try {
     const Notifications = await import('expo-notifications');
 
+    // Handle cold start: check if the app was opened via a notification tap
+    const lastResponse =
+      await Notifications.getLastNotificationResponseAsync();
+    if (lastResponse) {
+      const data = lastResponse.notification.request.content.data;
+      handleNotificationNavigation(data);
+    }
+
+    // Handle warm/background notification taps
     return Notifications.addNotificationResponseReceivedListener(
       (response) => {
         const data = response.notification.request.content.data;
-
-        if (data?.match_id) {
-          router.push(`/(tabs)/chat/${data.match_id}`);
-        }
+        handleNotificationNavigation(data);
       }
     );
   } catch {

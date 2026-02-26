@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Keyboard,
   Alert,
 } from 'react-native';
-import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,69 +18,20 @@ import { Fonts } from '@/constants/fonts';
 import { useChat } from '@/hooks/useChat';
 import { ChatBubble } from '@/components/ChatBubble';
 import { ChatInput } from '@/components/ChatInput';
-import { TypingIndicator } from '@/components/TypingIndicator';
-import { ReportModal, type ReportReason } from '@/components/ReportModal';
-import { ActionSheet, type ActionSheetOption } from '@/components/ActionSheet';
-import { Toast, useToast } from '@/components/Toast';
-import { useBlockStore } from '@/stores/blockStore';
-import { useMatchStore } from '@/stores/matchStore';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
-import { subscribeToPresence, getPresence, type UserPresence } from '@/lib/presence';
-import { useResponsive } from '@/hooks/useResponsive';
-import type { Message } from '@/stores/chatStore';
-
-type ChatItem =
-  | { type: 'match-separator'; id: string; label: string }
-  | { type: 'date-separator'; id: string; label: string }
-  | { type: 'message'; id: string; data: Message };
-
-function formatLastSeen(isoDate: string, t: (key: string) => string): string {
-  const date = new Date(isoDate);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-
-  if (diffMins < 1) return t('chat.lastSeenNow');
-  if (diffMins < 60) return t('chat.lastSeenMinutes').replace('{{n}}', String(diffMins));
-  if (diffHours < 24) return t('chat.lastSeenHours').replace('{{n}}', String(diffHours));
-  return t('chat.lastSeenLong');
-}
-
-function formatDateSeparator(isoDate: string, t: (key: string) => string): string {
-  const date = new Date(isoDate);
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  if (date.toDateString() === today.toDateString()) return t('chat.today');
-  if (date.toDateString() === yesterday.toDateString()) return t('chat.yesterday');
-  return date.toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-function formatMatchDate(isoDate: string): string {
-  const date = new Date(isoDate);
-  return date.toLocaleDateString([], { day: 'numeric', month: 'long' });
-}
+import { useMatchStore } from '@/stores/matchStore';
 
 export default function ChatScreen() {
   const { matchId } = useLocalSearchParams<{ matchId: string }>();
   const router = useRouter();
   const { t } = useTranslation();
   const { messages, isLoading, sendMessage, markAsRead } = useChat(matchId!);
-  const { isTablet, chatMaxWidth } = useResponsive();
   const flatListRef = useRef<FlatList>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [otherUserId, setOtherUserId] = useState<string | null>(null);
   const [otherUserName, setOtherUserName] = useState<string>('');
-  const [otherUserAvatar, setOtherUserAvatar] = useState<string | null>(null);
-  const [matchCreatedAt, setMatchCreatedAt] = useState<string | null>(null);
-  const [otherPresence, setOtherPresence] = useState<UserPresence | null>(null);
-  const [reportModalVisible, setReportModalVisible] = useState(false);
-  const [reportLoading, setReportLoading] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const toast = useToast();
+  const unmatchUser = useMatchStore((s) => s.unmatchUser);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -99,13 +48,11 @@ export default function ChatScreen() {
 
       const { data: match } = await supabase
         .from('matches')
-        .select('user_a_id, user_b_id, created_at')
+        .select('user_a_id, user_b_id')
         .eq('id', matchId)
         .single();
 
       if (!match) return;
-
-      setMatchCreatedAt(match.created_at);
 
       const otherId = match.user_a_id === user.id
         ? match.user_b_id
@@ -113,40 +60,16 @@ export default function ChatScreen() {
 
       setOtherUserId(otherId);
 
-      // Block guard: if user is blocked, navigate back
-      if (useBlockStore.getState().isBlocked(otherId)) {
-        router.navigate('/(tabs)/chat');
-        return;
-      }
-
       const { data: profile } = await supabase
         .from('profiles')
-        .select('name, avatar_url')
+        .select('name')
         .eq('id', otherId)
         .single();
 
       setOtherUserName(profile?.name ?? '');
-      setOtherUserAvatar(profile?.avatar_url ?? null);
-
-      // Fetch initial presence
-      const presence = await getPresence(otherId);
-      if (presence) setOtherPresence(presence);
     };
     loadMatchInfo();
   }, [matchId]);
-
-  // Subscribe to other user's presence
-  useEffect(() => {
-    if (!otherUserId) return;
-
-    const channel = subscribeToPresence(otherUserId, (presence) => {
-      setOtherPresence(presence);
-    });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [otherUserId]);
 
   // Mark messages as read when new messages arrive
   useEffect(() => {
@@ -155,190 +78,90 @@ export default function ChatScreen() {
     }
   }, [messages.length, markAsRead]);
 
-  // Scroll to bottom when keyboard appears
-  useEffect(() => {
-    const event = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const sub = Keyboard.addListener(event, () => {
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    });
-    return () => sub.remove();
-  }, []);
-
-  const handleSend = useCallback(async (content: string, imageUrl?: string) => {
-    await sendMessage(content, imageUrl);
-  }, [sendMessage]);
-
-  const handleShowMenu = () => {
-    setMenuVisible(true);
+  const handleSend = async (content: string) => {
+    await sendMessage(content);
   };
 
-  const menuOptions: ActionSheetOption[] = [
-    {
-      label: t('report.report'),
-      icon: 'flag-outline',
-      onPress: () => setReportModalVisible(true),
-    },
-    {
-      label: t('block.block'),
-      icon: 'ban',
-      destructive: true,
-      onPress: () => {
-        Alert.alert(
-          t('block.confirmTitle'),
-          t('block.confirmMessage', { name: otherUserName }),
-          [
-            { text: t('common.cancel'), style: 'cancel' },
-            {
-              text: t('block.block'),
-              style: 'destructive',
-              onPress: async () => {
-                try {
-                  await useBlockStore.getState().blockUser(otherUserId!);
-                  await useMatchStore.getState().fetchMatches();
-                  router.navigate('/(tabs)/chat');
-                } catch {
-                  toast.show(t('block.errorBlocking'), 'error');
-                }
-              },
-            },
-          ],
-        );
-      },
-    },
-  ];
-
-  const handleChatReport = async (reason: ReportReason, description: string, alsoBlock: boolean) => {
-    if (!otherUserId) return;
-    setReportLoading(true);
-    try {
-      await useBlockStore.getState().reportUser(otherUserId, reason, description);
-      if (alsoBlock) {
-        await useBlockStore.getState().blockUser(otherUserId);
-        await useMatchStore.getState().fetchMatches();
-        setReportModalVisible(false);
-        toast.show(t('report.successMessage'));
-        router.navigate('/(tabs)/chat');
-      } else {
-        setReportModalVisible(false);
-        toast.show(t('report.successMessage'));
-      }
-    } catch (err: any) {
-      toast.show(t(err?.message === 'DUPLICATE_REPORT' ? 'report.alreadyReported' : 'report.errorSubmitting'), 'error');
-    } finally {
-      setReportLoading(false);
+  const handleHeaderPress = () => {
+    if (otherUserId) {
+      router.push(`/match-profile?userId=${otherUserId}`);
     }
   };
 
-  const handleChatBlockOnly = () => {
-    if (!otherUserId) return;
-    setReportModalVisible(false);
+  const handleMorePress = () => {
     Alert.alert(
-      t('block.confirmTitle'),
-      t('block.confirmMessage', { name: otherUserName }),
+      otherUserName,
+      undefined,
       [
-        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: t('block.block'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await useBlockStore.getState().blockUser(otherUserId);
-              await useMatchStore.getState().fetchMatches();
-              router.navigate('/(tabs)/chat');
-            } catch {
-              toast.show(t('block.errorBlocking'), 'error');
+          text: t('matches.viewProfile'),
+          onPress: () => {
+            if (otherUserId) {
+              router.push(`/match-profile?userId=${otherUserId}`);
             }
           },
         },
-      ],
+        {
+          text: t('matches.unmatch'),
+          style: 'destructive',
+          onPress: () => confirmUnmatch(),
+        },
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+        },
+      ]
     );
   };
 
-  const isTyping = otherPresence?.typing_in_match === matchId;
-  const isOnline = otherPresence?.is_online ?? false;
-
-  // Build subtitle text
-  let subtitleText = '';
-  if (isOnline) {
-    subtitleText = t('chat.online');
-  } else if (otherPresence?.last_seen) {
-    subtitleText = formatLastSeen(otherPresence.last_seen, t);
-  }
-
-  // Match date for header
-  const matchDateText = matchCreatedAt
-    ? t('chat.matchedOn').replace('{{date}}', formatMatchDate(matchCreatedAt))
-    : '';
-
-  // Build chat items with date separators
-  const chatItems: ChatItem[] = useMemo(() => {
-    const items: ChatItem[] = [];
-
-    // Match separator at the top
-    if (matchCreatedAt) {
-      items.push({
-        type: 'match-separator',
-        id: 'match-date',
-        label: t('chat.matchedOn').replace('{{date}}', formatMatchDate(matchCreatedAt)),
-      });
-    }
-
-    let lastDateStr = '';
-    for (const msg of messages) {
-      const msgDateStr = new Date(msg.created_at).toDateString();
-      if (msgDateStr !== lastDateStr) {
-        items.push({
-          type: 'date-separator',
-          id: `date-${msgDateStr}`,
-          label: formatDateSeparator(msg.created_at, t),
-        });
-        lastDateStr = msgDateStr;
-      }
-      items.push({ type: 'message', id: msg.id, data: msg });
-    }
-
-    return items;
-  }, [messages, matchCreatedAt, t]);
+  const confirmUnmatch = () => {
+    Alert.alert(
+      t('matches.unmatchConfirmTitle'),
+      t('matches.unmatchConfirmMessage', { name: otherUserName }),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('matches.unmatch'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await unmatchUser(matchId!);
+              router.back();
+            } catch (error) {
+              console.error('Error unmatching:', error);
+              Alert.alert(t('common.error'), t('common.error'));
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.navigate('/(tabs)/chat')}
+          onPress={() => router.back()}
           style={styles.backButton}
           activeOpacity={0.7}
         >
           <Ionicons name="chevron-back" size={24} color={Colors.text} />
         </TouchableOpacity>
-        {otherUserAvatar ? (
-          <Image
-            source={{ uri: otherUserAvatar }}
-            style={styles.headerAvatar}
-            contentFit="cover"
-            transition={200}
-          />
-        ) : (
-          <View style={[styles.headerAvatar, styles.headerAvatarPlaceholder]}>
-            <Ionicons name="person" size={18} color={Colors.primaryLight} />
-          </View>
-        )}
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle} numberOfLines={1}>{otherUserName}</Text>
-          {subtitleText ? (
-            <View style={styles.statusRow}>
-              {isOnline && <View style={styles.onlineDot} />}
-              <Text style={styles.statusText}>{subtitleText}</Text>
-            </View>
-          ) : null}
-          {matchDateText ? (
-            <Text style={styles.matchDateHeader}>{matchDateText}</Text>
-          ) : null}
-        </View>
         <TouchableOpacity
-          onPress={handleShowMenu}
-          style={styles.menuButton}
+          style={styles.headerCenter}
+          onPress={handleHeaderPress}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {otherUserName}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleMorePress}
+          style={styles.moreButton}
           activeOpacity={0.7}
         >
           <Ionicons name="ellipsis-vertical" size={20} color={Colors.text} />
@@ -346,90 +169,44 @@ export default function ChatScreen() {
       </View>
 
       <KeyboardAvoidingView
-        style={[styles.keyboardView, isTablet && { maxWidth: chatMaxWidth, alignSelf: 'center' as const, width: '100%' as const }]}
-        behavior="padding"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={0}
       >
         {isLoading ? (
           <View style={styles.centered}>
             <ActivityIndicator size="large" color={Colors.primary} />
           </View>
+        ) : messages.length === 0 ? (
+          <View style={styles.centered}>
+            <Text style={styles.emptyText}>{t('chat.noMessages')}</Text>
+          </View>
         ) : (
           <FlatList
             ref={flatListRef}
-            data={chatItems}
+            data={messages}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => {
-              if (item.type === 'match-separator') {
-                return (
-                  <View style={styles.matchSeparator}>
-                    <Ionicons name="heart" size={14} color={Colors.primary} />
-                    <Text style={styles.matchSeparatorText}>{item.label}</Text>
-                  </View>
-                );
-              }
-              if (item.type === 'date-separator') {
-                return (
-                  <View style={styles.dateSeparator}>
-                    <View style={styles.dateSeparatorLine} />
-                    <Text style={styles.dateSeparatorText}>{item.label}</Text>
-                    <View style={styles.dateSeparatorLine} />
-                  </View>
-                );
-              }
-              return (
-                <ChatBubble
-                  content={item.data.content}
-                  imageUrl={item.data.image_url}
-                  isMine={item.data.sender_id === userId}
-                  timestamp={item.data.created_at}
-                  readAt={item.data.read_at}
-                  showReadReceipt={true}
-                />
-              );
-            }}
-            ListFooterComponent={messages.length === 0 ? (
-              <View style={styles.emptyFooter}>
-                <Text style={styles.emptyText}>{t('chat.noMessages')}</Text>
-              </View>
-            ) : null}
-            contentContainerStyle={[
-              styles.messagesList,
-              messages.length === 0 && styles.messagesListEmpty,
-            ]}
+            renderItem={({ item }) => (
+              <ChatBubble
+                content={item.content}
+                isMine={item.sender_id === userId}
+                timestamp={item.created_at}
+                readAt={item.read_at}
+                showReadReceipt={false} // TODO: true for premium users
+              />
+            )}
+            contentContainerStyle={styles.messagesList}
             onContentSizeChange={() =>
-              messages.length > 0 && flatListRef.current?.scrollToEnd({ animated: false })
+              flatListRef.current?.scrollToEnd({ animated: false })
             }
             onLayout={() =>
-              messages.length > 0 && flatListRef.current?.scrollToEnd({ animated: false })
+              flatListRef.current?.scrollToEnd({ animated: false })
             }
           />
         )}
 
-        {isTyping && <TypingIndicator />}
-
         <ChatInput onSend={handleSend} matchId={matchId!} />
       </KeyboardAvoidingView>
-
-      <Toast visible={toast.visible} message={toast.message} variant={toast.variant} onDismiss={toast.dismiss} />
-
-      <ActionSheet
-        visible={menuVisible}
-        title={otherUserName}
-        options={menuOptions}
-        onClose={() => setMenuVisible(false)}
-      />
-
-      {otherUserId && (
-        <ReportModal
-          visible={reportModalVisible}
-          targetUserName={otherUserName}
-          onReport={handleChatReport}
-          onBlockOnly={handleChatBlockOnly}
-          onClose={() => setReportModalVisible(false)}
-          loading={reportLoading}
-        />
-      )}
     </SafeAreaView>
   );
 }
@@ -454,47 +231,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-  },
-  headerAvatarPlaceholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   headerCenter: {
     flex: 1,
-    marginLeft: 10,
+    alignItems: 'center',
   },
-  menuButton: {
+  headerTitle: {
+    fontSize: 18,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  moreButton: {
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 1,
-  },
-  onlineDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: Colors.success,
-  },
-  statusText: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
   },
   keyboardView: {
     flex: 1,
@@ -511,51 +262,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
   },
-  emptyFooter: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 40,
-  },
-  messagesListEmpty: {
-    flexGrow: 1,
-  },
-  matchDateHeader: {
-    fontSize: 11,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    marginTop: 1,
-  },
   messagesList: {
     paddingVertical: 12,
-  },
-  matchSeparator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-  },
-  matchSeparatorText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primary,
-  },
-  dateSeparator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    gap: 12,
-  },
-  dateSeparatorLine: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.borderLight,
-  },
-  dateSeparatorText: {
-    fontSize: 12,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textTertiary,
   },
 });

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { reportError } from '@/lib/errorReporting';
 import { uploadPhoto, deletePhoto, getPhotoUrl } from '@/lib/storage';
 
 export interface Photo {
@@ -13,6 +14,7 @@ export interface Photo {
 interface PhotoStoreState {
   photos: Photo[];
   isLoading: boolean;
+  error: string | null;
 
   fetchPhotos: (userId: string) => Promise<void>;
   addPhoto: (userId: string, uri: string, position: number) => Promise<void>;
@@ -23,9 +25,10 @@ interface PhotoStoreState {
 export const usePhotoStore = create<PhotoStoreState>((set, get) => ({
   photos: [],
   isLoading: false,
+  error: null,
 
   fetchPhotos: async (userId: string) => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
       const { data, error } = await supabase
         .from('photos')
@@ -36,7 +39,8 @@ export const usePhotoStore = create<PhotoStoreState>((set, get) => ({
       if (error) throw error;
       set({ photos: (data as Photo[]) ?? [] });
     } catch (error) {
-      console.error('Error fetching photos:', error);
+      reportError(error, { source: 'photoStore.fetchPhotos' });
+      set({ error: 'profile.errorLoadingPhotos' });
     } finally {
       set({ isLoading: false });
     }
@@ -67,7 +71,7 @@ export const usePhotoStore = create<PhotoStoreState>((set, get) => ({
 
       await get().fetchPhotos(userId);
     } catch (error) {
-      console.error('Error adding photo:', error);
+      reportError(error, { source: 'photoStore.addPhoto' });
       throw error;
     }
   },
@@ -95,10 +99,10 @@ export const usePhotoStore = create<PhotoStoreState>((set, get) => ({
 
       set({ photos: get().photos.filter((p) => p.id !== photo.id) });
     } catch (error) {
-      console.error('Error removing photo:', error);
+      reportError(error, { source: 'photoStore.removePhoto' });
       throw error;
     }
   },
 
-  reset: () => set({ photos: [], isLoading: false }),
+  reset: () => set({ photos: [], isLoading: false, error: null }),
 }));

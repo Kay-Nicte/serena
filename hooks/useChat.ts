@@ -6,7 +6,10 @@ export function useChat(matchId: string) {
   const {
     messages,
     isLoading,
+    isLoadingOlder,
+    hasOlderMessages,
     fetchMessages,
+    fetchOlderMessages,
     sendMessage,
     markAsRead,
     subscribe,
@@ -28,9 +31,12 @@ export function useChat(matchId: string) {
   return {
     messages,
     isLoading,
+    isLoadingOlder,
+    hasOlderMessages,
     sendMessage: async (content: string, imageUrl?: string) => {
       await sendMessage(matchId, content, imageUrl);
     },
+    fetchOlderMessages: () => fetchOlderMessages(matchId),
     markAsRead: () => markAsRead(matchId),
   };
 }

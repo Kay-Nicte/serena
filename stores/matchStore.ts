@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { reportError } from '@/lib/errorReporting';
 import { useBlockStore } from './blockStore';
 
 export interface MatchUser {
@@ -18,25 +19,17 @@ export interface Match {
   created_at: string;
 }
 
-interface MatchQueryRow {
-  id: string;
-  user_a_id: string;
-  user_b_id: string;
-  created_at: string;
-  user_a: MatchUser | MatchUser[] | null;
-  user_b: MatchUser | MatchUser[] | null;
-}
-
 interface MatchStoreState {
   matches: Match[];
   isLoading: boolean;
   error: string | null;
 
   fetchMatches: () => Promise<void>;
+  unmatchUser: (matchId: string) => Promise<void>;
   reset: () => void;
 }
 
-export const useMatchStore = create<MatchStoreState>((set) => ({
+export const useMatchStore = create<MatchStoreState>((set, get) => ({
   matches: [],
   isLoading: false,
   error: null,
@@ -44,67 +37,30 @@ export const useMatchStore = create<MatchStoreState>((set) => ({
   fetchMatches: async () => {
     set({ isLoading: true, error: null });
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: matchesData, error } = await supabase
-        .from('matches')
-        .select(`
-          id,
-          user_a_id,
-          user_b_id,
-          created_at,
-          user_a:profiles!matches_user_a_id_fkey(id, name, avatar_url),
-          user_b:profiles!matches_user_b_id_fkey(id, name, avatar_url)
-        `)
-        .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`)
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.rpc('get_matches_with_details');
 
       if (error) throw error;
 
-      const matches: Match[] = await Promise.all(
-        (matchesData ?? []).map(async (match: MatchQueryRow) => {
-          const rawOther =
-            match.user_a_id === user.id ? match.user_b : match.user_a;
-          const otherUser: MatchUser = Array.isArray(rawOther)
-            ? rawOther[0] ?? { id: '', name: null, avatar_url: null }
-            : rawOther ?? { id: '', name: null, avatar_url: null };
-
-          // Get last message
-          const { data: lastMsg } = await supabase
-            .from('messages')
-            .select('content, image_url, created_at')
-            .eq('match_id', match.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          // Get unread count
-          const { count } = await supabase
-            .from('messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('match_id', match.id)
-            .neq('sender_id', user.id)
-            .is('read_at', null);
-
-          return {
-            id: match.id,
-            otherUser,
-            lastMessage: lastMsg?.content ?? null,
-            lastMessageImageUrl: lastMsg?.image_url ?? null,
-            lastMessageAt: lastMsg?.created_at ?? null,
-            unreadCount: count ?? 0,
-            created_at: match.created_at,
-          };
+      // The RPC returns a JSON array already sorted by last activity descending.
+      const matches: Match[] = (data ?? []).map(
+        (row: {
+          id: string;
+          created_at: string;
+          otherUser: MatchUser;
+          lastMessage: string | null;
+          lastMessageAt: string | null;
+          lastMessageImageUrl: string | null;
+          unreadCount: number;
+        }) => ({
+          id: row.id,
+          otherUser: row.otherUser,
+          lastMessage: row.lastMessage,
+          lastMessageImageUrl: row.lastMessageImageUrl ?? null,
+          lastMessageAt: row.lastMessageAt,
+          unreadCount: row.unreadCount,
+          created_at: row.created_at,
         })
       );
-
-      // Sort by last activity (last message or match creation)
-      matches.sort((a, b) => {
-        const aDate = a.lastMessageAt ?? a.created_at;
-        const bDate = b.lastMessageAt ?? b.created_at;
-        return new Date(bDate).getTime() - new Date(aDate).getTime();
-      });
 
       // Filter out blocked users
       const blockedIds = useBlockStore.getState().blockedIds;
@@ -112,10 +68,25 @@ export const useMatchStore = create<MatchStoreState>((set) => ({
 
       set({ matches: filteredMatches });
     } catch (error) {
-      console.error('Error fetching matches:', error);
+      reportError(error, { source: 'matchStore.fetchMatches' });
       set({ error: 'matches.errorFetching' });
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  unmatchUser: async (matchId: string) => {
+    try {
+      const { error } = await supabase.rpc('unmatch_user', {
+        target_match_id: matchId,
+      });
+
+      if (error) throw error;
+
+      await get().fetchMatches();
+    } catch (error) {
+      reportError(error, { source: 'matchStore.unmatchUser' });
+      throw error;
     }
   },
 

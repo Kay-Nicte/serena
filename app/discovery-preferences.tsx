@@ -5,7 +5,6 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -21,6 +20,7 @@ import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
 import { useProfileStore } from '@/stores/profileStore';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
+import { showToast } from '@/stores/toastStore';
 
 export default function DiscoveryPreferencesScreen() {
   const { t } = useTranslation();
@@ -69,7 +69,7 @@ export default function DiscoveryPreferencesScreen() {
     const max = parseInt(maxAge, 10) || Config.discoveryDefaults.maxAge;
 
     if (min < Config.minAge || max > Config.maxAge || min > max) {
-      Alert.alert(t('common.error'), t('common.error'));
+      showToast(t('common.error'), 'error');
       return;
     }
 
@@ -85,7 +85,7 @@ export default function DiscoveryPreferencesScreen() {
       await fetchCandidates();
       router.back();
     } catch {
-      Alert.alert(t('common.error'), t('common.error'));
+      showToast(t('common.error'), 'error');
     } finally {
       setSaving(false);
     }

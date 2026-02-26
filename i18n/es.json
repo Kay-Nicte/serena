@@ -12,7 +12,7 @@
     "offline": "Sin conexión a internet"
   },
   "welcome": {
-    "title": "Serena",
+    "title": "Serenade",
     "subtitle": "Conexiones reales para mujeres queer",
     "login": "Iniciar sesión",
     "register": "Crear cuenta"
@@ -44,7 +44,13 @@
     "newPasswordSubtitle": "Introduce tu nueva contraseña",
     "updatePassword": "Actualizar contraseña",
     "passwordUpdated": "Contraseña actualizada",
-    "passwordUpdatedMessage": "Tu contraseña se ha actualizado correctamente."
+    "passwordUpdatedMessage": "Tu contraseña se ha actualizado correctamente.",
+    "verifyEmailTitle": "Revisa tu correo",
+    "verifyEmailSubtitle": "Te hemos enviado un enlace de verificación a:",
+    "verifyEmailHint": "Revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta. Si no lo encuentras, revisa la carpeta de spam.",
+    "verifyEmailResend": "Reenviar correo",
+    "verifyEmailResent": "Correo reenviado",
+    "verifyEmailResentMessage": "Hemos enviado un nuevo enlace de verificación a tu correo."
   },
   "profile": {
     "completeTitle": "Completa tu perfil",
@@ -64,7 +70,12 @@
     "signOutConfirm": "¿Estás segura de que quieres cerrar sesión?",
     "primaryPhoto": "Principal",
     "removePhoto": "Eliminar foto",
-    "removePhotoConfirm": "¿Estás segura de que quieres eliminar esta foto?"
+    "removePhotoConfirm": "¿Estás segura de que quieres eliminar esta foto?",
+    "age": "Edad",
+    "ageValue": "{{age}} años",
+    "dayPlaceholder": "DD",
+    "monthPlaceholder": "MM",
+    "yearPlaceholder": "AAAA"
   },
   "orientation": {
     "lesbian": "Lesbiana",
@@ -93,13 +104,20 @@
     "like": "Me gusta",
     "pass": "Pasar",
     "loading": "Buscando perfiles...",
-    "errorFetching": "No se pudieron cargar los perfiles. Inténtalo de nuevo."
+    "errorFetching": "No se pudieron cargar los perfiles. Inténtalo de nuevo.",
+    "dailyLimitReached": "Has alcanzado el límite diario de likes. ¡Vuelve mañana!",
+    "refresh": "Actualizar"
   },
   "matches": {
     "title": "Matches",
     "empty": "Aún no tienes matches. ¡Sigue explorando!",
     "placeholder": "Tus conexiones aparecerán aquí",
-    "errorFetching": "No se pudieron cargar los matches. Desliza para reintentar."
+    "errorFetching": "No se pudieron cargar los matches. Desliza para reintentar.",
+    "unmatch": "Deshacer match",
+    "unmatchConfirmTitle": "¿Deshacer match?",
+    "unmatchConfirmMessage": "Perderás tu conversación con {{name}}",
+    "viewProfile": "Ver perfil",
+    "chat": "Chat"
   },
   "match": {
     "title": "¡Es un match!",
@@ -129,6 +147,11 @@
   "notifications": {
     "permissionTitle": "Activar notificaciones",
     "permissionMessage": "Recibe notificaciones sobre nuevos matches y mensajes"
+  },
+  "errorBoundary": {
+    "title": "¡Ups!",
+    "message": "Algo salió mal.",
+    "retry": "Reintentar"
   },
   "report": {
     "title": "Reportar a {{name}}",

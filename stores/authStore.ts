@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { reportError } from '@/lib/errorReporting';
 import * as auth from '@/lib/auth';
 import { useProfileStore } from './profileStore';
 import { useMatchStore } from './matchStore';
@@ -81,7 +82,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       .single();
 
     if (error) {
-      console.error('Error fetching profile:', error);
+      reportError(error, { source: 'authStore.fetchProfile' });
       return;
     }
 

@@ -10,8 +10,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useLocation } from '@/hooks/useLocation';
+import { usePresence } from '@/hooks/usePresence';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { Toast } from '@/components/Toast';
+import { useToastStore } from '@/stores/toastStore';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { useTranslation } from 'react-i18next';
 import '@/i18n';
 
 SplashScreen.preventAutoHideAsync();
@@ -24,6 +29,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useNotifications();
   useLocation();
+  usePresence();
 
   useEffect(() => {
     if (isLoading) return;
@@ -56,6 +62,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+function GlobalToast() {
+  const { visible, message, variant, dismiss } = useToastStore();
+  return <Toast visible={visible} message={message} variant={variant} onDismiss={dismiss} />;
+}
+
+function GlobalConfirmDialog() {
+  const { t } = useTranslation();
+  return <ConfirmDialog defaultConfirmLabel={t('common.done')} defaultCancelLabel={t('common.cancel')} />;
 }
 
 export default function RootLayout() {
@@ -94,9 +110,12 @@ export default function RootLayout() {
           <Stack.Screen name="change-password" />
           <Stack.Screen name="terms-of-service" />
           <Stack.Screen name="privacy-policy" />
+          <Stack.Screen name="match-profile" options={{ presentation: 'modal' }} />
         </Stack>
         <StatusBar style="dark" />
       </AuthGuard>
+      <GlobalToast />
+      <GlobalConfirmDialog />
     </ErrorBoundary>
   );
 }

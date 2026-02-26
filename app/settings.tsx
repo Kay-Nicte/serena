@@ -6,9 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  Alert,
   TextInput,
 } from 'react-native';
+import { showToast } from '@/stores/toastStore';
+import { showConfirm } from '@/components/ConfirmDialog';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -65,14 +66,14 @@ export default function SettingsScreen() {
           await savePushTokenToServer(token);
           setPushEnabled(true);
         } else {
-          Alert.alert(t('common.error'), t('notifications.permissionMessage'));
+          showToast(t('notifications.permissionMessage'), 'error');
         }
       } else {
         await removePushTokenFromServer();
         setPushEnabled(false);
       }
     } catch {
-      Alert.alert(t('common.error'));
+      showToast(t('common.error'), 'error');
     } finally {
       setPushLoading(false);
     }
@@ -89,10 +90,13 @@ export default function SettingsScreen() {
   };
 
   const handleSignOut = () => {
-    Alert.alert(t('settings.signOut'), t('settings.signOutConfirm'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      { text: t('settings.signOut'), style: 'destructive', onPress: signOut },
-    ]);
+    showConfirm({
+      title: t('settings.signOut'),
+      message: t('settings.signOutConfirm'),
+      confirmLabel: t('settings.signOut'),
+      destructive: true,
+      onConfirm: signOut,
+    });
   };
 
   const handleDeleteAccount = () => {
@@ -111,7 +115,7 @@ export default function SettingsScreen() {
       await deleteAccount();
       // Auth listener in authStore will handle navigation
     } catch {
-      Alert.alert(t('common.error'), t('settings.deleteAccountError'));
+      showToast(t('settings.deleteAccountError'), 'error');
       setDeleting(false);
     }
   };

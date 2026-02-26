@@ -1,22 +1,22 @@
-import { Button } from '@/components/ui/Button';
+import { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -35,7 +35,7 @@ export default function ForgotPasswordScreen() {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(
         email.trim(),
-        { redirectTo: 'serena://reset-password' }
+        { redirectTo: 'serenade://reset-password' }
       );
       if (error) throw error;
       setSent(true);

@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +16,7 @@ import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { signIn } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
+import { showToast } from '@/stores/toastStore';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -47,7 +47,7 @@ export default function LoginScreen() {
       await signIn(email.trim(), password);
       await fetchProfile();
     } catch {
-      Alert.alert(t('common.error'), t('auth.errorGeneric'));
+      showToast(t('auth.errorGeneric'), 'error');
     } finally {
       setLoading(false);
     }

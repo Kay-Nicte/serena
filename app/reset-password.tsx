@@ -5,7 +5,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
+import { showToast } from '@/stores/toastStore';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
@@ -47,12 +47,11 @@ export default function ResetPasswordScreen() {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
-      Alert.alert(t('auth.passwordUpdated'), t('auth.passwordUpdatedMessage'), [
-        { text: t('common.done'), onPress: () => router.replace('/(tabs)') },
-      ]);
+      showToast(t('auth.passwordUpdatedMessage'));
+      router.replace('/(tabs)');
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : t('auth.errorGeneric');
-      Alert.alert(t('common.error'), message);
+      showToast(message, 'error');
     } finally {
       setLoading(false);
     }

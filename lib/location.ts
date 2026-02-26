@@ -19,6 +19,18 @@ export async function getCurrentLocation(): Promise<{
     const { status } = await Location.getForegroundPermissionsAsync();
     if (status !== 'granted') return null;
 
+    // Prefer last known position if available and recent (< 10 min)
+    const lastKnown = await Location.getLastKnownPositionAsync();
+    if (lastKnown) {
+      const ageMs = Date.now() - lastKnown.timestamp;
+      if (ageMs < 10 * 60 * 1000) {
+        return {
+          latitude: lastKnown.coords.latitude,
+          longitude: lastKnown.coords.longitude,
+        };
+      }
+    }
+
     const location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Balanced,
     });

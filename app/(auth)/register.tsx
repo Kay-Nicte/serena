@@ -7,7 +7,6 @@ import {
   Platform,
   TouchableOpacity,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +17,7 @@ import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { signUp } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
+import { showToast } from '@/stores/toastStore';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -53,11 +53,17 @@ export default function RegisterScreen() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await signUp(email.trim(), password);
-      await fetchProfile();
+      const data = await signUp(email.trim(), password);
+      // If session is returned, email confirmation is disabled — proceed normally
+      if (data.session) {
+        await fetchProfile();
+      } else {
+        // Email confirmation required — show verification screen
+        router.replace({ pathname: '/(auth)/verify-email', params: { email: email.trim() } });
+      }
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : t('auth.errorGeneric');
-      Alert.alert(t('common.error'), message);
+      showToast(message, 'error');
     } finally {
       setLoading(false);
     }

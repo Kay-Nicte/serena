@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { reportError } from '@/lib/errorReporting';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+
+const PAGE_SIZE = 30;
 
 export interface Message {
   id: string;
@@ -16,10 +19,13 @@ interface ChatStoreState {
   messages: Message[];
   activeMatchId: string | null;
   isLoading: boolean;
+  isLoadingOlder: boolean;
+  hasOlderMessages: boolean;
   error: string | null;
   subscription: RealtimeChannel | null;
 
   fetchMessages: (matchId: string) => Promise<void>;
+  fetchOlderMessages: (matchId: string) => Promise<void>;
   sendMessage: (matchId: string, content: string, imageUrl?: string) => Promise<void>;
   markAsRead: (matchId: string) => Promise<void>;
   subscribe: (matchId: string) => void;
@@ -31,26 +37,59 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
   messages: [],
   activeMatchId: null,
   isLoading: false,
+  isLoadingOlder: false,
+  hasOlderMessages: true,
   error: null,
   subscription: null,
 
   fetchMessages: async (matchId: string) => {
-    set({ isLoading: true, error: null, activeMatchId: matchId });
+    set({ isLoading: true, error: null, activeMatchId: matchId, hasOlderMessages: true });
     try {
       const { data, error } = await supabase
         .from('messages')
         .select('*')
         .eq('match_id', matchId)
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: false })
+        .limit(PAGE_SIZE);
 
       if (error) throw error;
 
-      set({ messages: (data as Message[]) ?? [] });
+      const messages = ((data as Message[]) ?? []).reverse();
+      set({ messages, hasOlderMessages: (data?.length ?? 0) >= PAGE_SIZE });
     } catch (error) {
-      console.error('Error fetching messages:', error);
+      reportError(error, { source: 'chatStore.fetchMessages' });
       set({ error: 'chat.errorFetching' });
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  fetchOlderMessages: async (matchId: string) => {
+    const { isLoadingOlder, hasOlderMessages, messages } = get();
+    if (isLoadingOlder || !hasOlderMessages || messages.length === 0) return;
+
+    set({ isLoadingOlder: true });
+    try {
+      const oldestMessage = messages[0];
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('match_id', matchId)
+        .lt('created_at', oldestMessage.created_at)
+        .order('created_at', { ascending: false })
+        .limit(PAGE_SIZE);
+
+      if (error) throw error;
+
+      const olderMessages = ((data as Message[]) ?? []).reverse();
+      set({
+        messages: [...olderMessages, ...messages],
+        hasOlderMessages: (data?.length ?? 0) >= PAGE_SIZE,
+      });
+    } catch (error) {
+      reportError(error, { source: 'chatStore.fetchOlderMessages' });
+    } finally {
+      set({ isLoadingOlder: false });
     }
   },
 
@@ -68,7 +107,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error sending message:', error);
+      reportError(error, { source: 'chatStore.sendMessage' });
       set({ error: 'chat.errorSending' });
     }
   },
@@ -87,7 +126,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error marking messages as read:', error);
+      reportError(error, { source: 'chatStore.markAsRead' });
     }
   },
 
@@ -148,6 +187,8 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       messages: [],
       activeMatchId: null,
       isLoading: false,
+      isLoadingOlder: false,
+      hasOlderMessages: true,
       error: null,
       subscription: null,
     });

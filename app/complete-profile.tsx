@@ -116,7 +116,7 @@ export default function CompleteProfileScreen() {
               <View style={styles.dateField}>
                 <TextInput
                   style={styles.dateInput}
-                  placeholder="DD"
+                  placeholder={t('profile.dayPlaceholder')}
                   placeholderTextColor={Colors.textTertiary}
                   keyboardType="number-pad"
                   maxLength={2}
@@ -128,7 +128,7 @@ export default function CompleteProfileScreen() {
               <View style={styles.dateField}>
                 <TextInput
                   style={styles.dateInput}
-                  placeholder="MM"
+                  placeholder={t('profile.monthPlaceholder')}
                   placeholderTextColor={Colors.textTertiary}
                   keyboardType="number-pad"
                   maxLength={2}
@@ -140,7 +140,7 @@ export default function CompleteProfileScreen() {
               <View style={styles.dateFieldYear}>
                 <TextInput
                   style={styles.dateInput}
-                  placeholder="AAAA"
+                  placeholder={t('profile.yearPlaceholder')}
                   placeholderTextColor={Colors.textTertiary}
                   keyboardType="number-pad"
                   maxLength={4}

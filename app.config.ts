@@ -2,23 +2,21 @@ import { type ExpoConfig, type ConfigContext } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'Serena',
-  slug: 'Serena',
+  name: 'Serenade',
+  slug: 'Serenade',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
-  scheme: 'serena',
+  scheme: 'serenade',
   userInterfaceStyle: 'light',
   newArchEnabled: true,
   ios: {
     supportsTablet: true,
     infoPlist: {
       NSCameraUsageDescription:
-        'Serena necesita acceso a tu cámara para tomar fotos de perfil.',
+        'Serenade necesita acceso a tu cámara para tomar fotos de perfil.',
       NSPhotoLibraryUsageDescription:
-        'Serena necesita acceso a tu galería para seleccionar fotos de perfil.',
-      NSLocationWhenInUseUsageDescription:
-        'Serena usa tu ubicación para mostrarte personas cerca de ti.',
+        'Serenade necesita acceso a tu galería para seleccionar fotos de perfil.',
     },
   },
   android: {
@@ -33,8 +31,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'CAMERA',
       'READ_EXTERNAL_STORAGE',
       'WRITE_EXTERNAL_STORAGE',
-      'ACCESS_FINE_LOCATION',
-      'ACCESS_COARSE_LOCATION',
     ],
   },
   web: {
@@ -60,9 +56,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-image-picker',
       {
         photosPermission:
-          'Serena necesita acceso a tu galería para seleccionar fotos de perfil.',
+          'Serenade necesita acceso a tu galería para seleccionar fotos de perfil.',
         cameraPermission:
-          'Serena necesita acceso a tu cámara para tomar fotos de perfil.',
+          'Serenade necesita acceso a tu cámara para tomar fotos de perfil.',
       },
     ],
     '@react-native-community/datetimepicker',
@@ -70,13 +66,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-notifications',
       {
         color: '#E6A8B4',
-      },
-    ],
-    [
-      'expo-location',
-      {
-        locationWhenInUsePermission:
-          'Serena usa tu ubicación para mostrarte personas cerca de ti.',
       },
     ],
   ],

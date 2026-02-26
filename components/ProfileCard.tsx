@@ -1,14 +1,16 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import type { Profile } from '@/stores/authStore';
 
-interface ProfileCardProps {
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+export interface ProfileCardProps {
   profile: Profile;
   photos?: { uri: string }[];
-  cardWidth: number;
+  cardWidth?: number;
   maxHeight?: number;
 }
 
@@ -26,7 +28,7 @@ function calculateAge(birthDate: string | null): number | null {
   return age;
 }
 
-export function ProfileCard({ profile, photos, cardWidth, maxHeight }: ProfileCardProps) {
+export function ProfileCard({ profile, photos, cardWidth = SCREEN_WIDTH - 48, maxHeight }: ProfileCardProps) {
   const { t } = useTranslation();
   const age = calculateAge(profile.birth_date);
 

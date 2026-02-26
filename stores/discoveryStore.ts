@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { reportError } from '@/lib/errorReporting';
 import { Config } from '@/constants/config';
 
 export interface DiscoveryPreferences {
@@ -40,7 +41,7 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set, get) => ({
 
       set({ preferences: data as DiscoveryPreferences | null });
     } catch (error) {
-      console.error('Error fetching discovery preferences:', error);
+      reportError(error, { source: 'discoveryStore.fetchPreferences' });
     } finally {
       set({ isLoading: false });
     }
@@ -72,7 +73,7 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set, get) => ({
 
       set({ preferences: data as DiscoveryPreferences });
     } catch (error) {
-      console.error('Error updating discovery preferences:', error);
+      reportError(error, { source: 'discoveryStore.updatePreferences' });
       throw error;
     } finally {
       set({ isLoading: false });

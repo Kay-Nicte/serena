@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { showConfirm } from '@/components/ConfirmDialog';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,14 +31,12 @@ export function PhotoGrid({ photos, onAdd, onRemove, editable = true }: PhotoGri
   const photoByPosition = new Map(photos.map((p) => [p.position, p]));
 
   const handleRemove = (photo: Photo) => {
-    Alert.alert(
-      t('profile.removePhoto'),
-      t('profile.removePhotoConfirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        { text: t('common.done'), style: 'destructive', onPress: () => onRemove(photo) },
-      ]
-    );
+    showConfirm({
+      title: t('profile.removePhoto'),
+      message: t('profile.removePhotoConfirm'),
+      destructive: true,
+      onConfirm: () => onRemove(photo),
+    });
   };
 
   const slots = Array.from({ length: Config.maxPhotos }, (_, i) => i);

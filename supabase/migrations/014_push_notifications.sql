@@ -95,7 +95,7 @@ BEGIN
   -- Notificar a usuario A
   PERFORM public.send_push_notification(
     NEW.user_a_id,
-    'Serena',
+    'Serenade',
     COALESCE(v_name_b, 'Alguien') || ' y tu sois match! ',
     jsonb_build_object('type', 'new_match', 'match_id', NEW.id)
   );
@@ -103,7 +103,7 @@ BEGIN
   -- Notificar a usuario B
   PERFORM public.send_push_notification(
     NEW.user_b_id,
-    'Serena',
+    'Serenade',
     COALESCE(v_name_a, 'Alguien') || ' y tu sois match! ',
     jsonb_build_object('type', 'new_match', 'match_id', NEW.id)
   );

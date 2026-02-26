@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import i18n from '@/i18n';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Button } from '@/components/ui/Button';
@@ -31,9 +32,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       return (
         <View style={styles.container}>
-          <Text style={styles.title}>Oops!</Text>
-          <Text style={styles.message}>Something went wrong.</Text>
-          <Button title="Retry" onPress={this.handleRetry} variant="outline" />
+          <Text style={styles.title}>{i18n.t('errorBoundary.title')}</Text>
+          <Text style={styles.message}>{i18n.t('errorBoundary.message')}</Text>
+          <Button title={i18n.t('errorBoundary.retry')} onPress={this.handleRetry} variant="outline" />
         </View>
       );
     }

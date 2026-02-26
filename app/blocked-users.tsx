@@ -4,7 +4,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -17,6 +16,8 @@ import { Fonts } from '@/constants/fonts';
 import { useBlock } from '@/hooks/useBlock';
 import { useMatchStore } from '@/stores/matchStore';
 import type { BlockedUser } from '@/stores/blockStore';
+import { showToast } from '@/stores/toastStore';
+import { showConfirm } from '@/components/ConfirmDialog';
 
 export default function BlockedUsersScreen() {
   const { t } = useTranslation();
@@ -24,24 +25,20 @@ export default function BlockedUsersScreen() {
   const { blockedUsers, isLoading, unblockUser } = useBlock();
 
   const handleUnblock = (user: BlockedUser) => {
-    Alert.alert(
-      t('block.unblockConfirmTitle'),
-      t('block.unblockConfirmMessage', { name: user.blocked_name ?? '' }),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('block.unblock'),
-          onPress: async () => {
-            try {
-              await unblockUser(user.blocked_id);
-              await useMatchStore.getState().fetchMatches();
-            } catch {
-              Alert.alert(t('common.error'), t('block.errorUnblocking'));
-            }
-          },
-        },
-      ],
-    );
+    showConfirm({
+      title: t('block.unblockConfirmTitle'),
+      message: t('block.unblockConfirmMessage', { name: user.blocked_name ?? '' }),
+      confirmLabel: t('block.unblock'),
+      destructive: false,
+      onConfirm: async () => {
+        try {
+          await unblockUser(user.blocked_id);
+          await useMatchStore.getState().fetchMatches();
+        } catch {
+          showToast(t('block.errorUnblocking'), 'error');
+        }
+      },
+    });
   };
 
   const renderItem = ({ item }: { item: BlockedUser }) => (

@@ -78,7 +78,7 @@ export function ChatInput({ onSend, matchId }: ChatInputProps) {
       const imageUrl = await uploadChatImage(matchId, uri);
       onSend('', imageUrl);
     } catch (error) {
-      console.error('Error sending image:', error);
+      // Image send failed — error is shown via chat error state
     } finally {
       setIsUploading(false);
     }

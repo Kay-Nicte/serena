@@ -1,4 +1,4 @@
--- Enums for Serena
+-- Enums for Serenade
 
 CREATE TYPE orientation AS ENUM (
   'lesbian',

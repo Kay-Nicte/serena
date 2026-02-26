@@ -5,7 +5,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -19,6 +18,7 @@ import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { reauthenticate, changePassword } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
+import { showToast } from '@/stores/toastStore';
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -57,15 +57,14 @@ export default function ChangePasswordScreen() {
     try {
       await reauthenticate(user?.email ?? '', currentPassword);
       await changePassword(newPassword);
-      Alert.alert(t('auth.passwordUpdated'), t('changePassword.success'), [
-        { text: t('common.done'), onPress: () => router.back() },
-      ]);
+      showToast(t('changePassword.success'));
+      router.back();
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : '';
       if (message.includes('Invalid login credentials')) {
         setErrors({ currentPassword: t('changePassword.errorCurrentPassword') });
       } else {
-        Alert.alert(t('common.error'), t('changePassword.errorGeneric'));
+        showToast(t('changePassword.errorGeneric'), 'error');
       }
     } finally {
       setLoading(false);

@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { reportError } from './errorReporting';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface UserPresence {
@@ -27,7 +28,7 @@ export async function updatePresence(
 
     if (error) throw error;
   } catch (error) {
-    console.error('Error updating presence:', error);
+    reportError(error, { source: 'presence.updatePresence' });
   }
 }
 
@@ -62,7 +63,7 @@ export async function getPresence(userId: string): Promise<UserPresence | null> 
     .maybeSingle();
 
   if (error) {
-    console.error('Error fetching presence:', error);
+    reportError(error, { source: 'presence.getPresence' });
     return null;
   }
 

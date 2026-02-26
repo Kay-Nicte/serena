@@ -20,4 +20,5 @@ export const Config = {
     maxDistance: 50,
   },
   maxDistanceLimit: 200,
+  defaultMaxDistanceKm: 50,
 } as const;

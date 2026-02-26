@@ -12,7 +12,7 @@
     "offline": "No internet connection"
   },
   "welcome": {
-    "title": "Serena",
+    "title": "Serenade",
     "subtitle": "Real connections for queer women",
     "login": "Sign in",
     "register": "Create account"
@@ -44,7 +44,13 @@
     "newPasswordSubtitle": "Enter your new password below",
     "updatePassword": "Update password",
     "passwordUpdated": "Password updated",
-    "passwordUpdatedMessage": "Your password has been updated successfully."
+    "passwordUpdatedMessage": "Your password has been updated successfully.",
+    "verifyEmailTitle": "Check your email",
+    "verifyEmailSubtitle": "We've sent a verification link to:",
+    "verifyEmailHint": "Check your inbox and click the link to activate your account. If you can't find it, check your spam folder.",
+    "verifyEmailResend": "Resend email",
+    "verifyEmailResent": "Email resent",
+    "verifyEmailResentMessage": "We've sent a new verification link to your email."
   },
   "profile": {
     "completeTitle": "Complete your profile",
@@ -64,7 +70,12 @@
     "signOutConfirm": "Are you sure you want to sign out?",
     "primaryPhoto": "Main",
     "removePhoto": "Remove photo",
-    "removePhotoConfirm": "Are you sure you want to remove this photo?"
+    "removePhotoConfirm": "Are you sure you want to remove this photo?",
+    "age": "Age",
+    "ageValue": "{{age}} years old",
+    "dayPlaceholder": "DD",
+    "monthPlaceholder": "MM",
+    "yearPlaceholder": "YYYY"
   },
   "orientation": {
     "lesbian": "Lesbian",
@@ -93,13 +104,20 @@
     "like": "Like",
     "pass": "Pass",
     "loading": "Finding profiles...",
-    "errorFetching": "Could not load profiles. Try again."
+    "errorFetching": "Could not load profiles. Try again.",
+    "dailyLimitReached": "You've reached the daily like limit. Come back tomorrow.",
+    "refresh": "Refresh"
   },
   "matches": {
     "title": "Matches",
     "empty": "No matches yet. Keep exploring!",
     "placeholder": "Your connections will appear here",
-    "errorFetching": "Could not load matches. Pull to retry."
+    "errorFetching": "Could not load matches. Pull to retry.",
+    "unmatch": "Unmatch",
+    "unmatchConfirmTitle": "Unmatch?",
+    "unmatchConfirmMessage": "You will lose your conversation with {{name}}",
+    "viewProfile": "View Profile",
+    "chat": "Chat"
   },
   "match": {
     "title": "It's a match!",
@@ -129,6 +147,11 @@
   "notifications": {
     "permissionTitle": "Enable notifications",
     "permissionMessage": "Get notified about new matches and messages"
+  },
+  "errorBoundary": {
+    "title": "Oops!",
+    "message": "Something went wrong.",
+    "retry": "Retry"
   },
   "report": {
     "title": "Report {{name}}",

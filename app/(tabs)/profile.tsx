@@ -5,7 +5,6 @@ import {
   TextInput,
   StyleSheet,
   Image,
-  Alert,
   ScrollView,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -27,6 +26,7 @@ import { pickImage } from '@/lib/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useResponsive } from '@/hooks/useResponsive';
+import { showToast } from '@/stores/toastStore';
 
 const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
@@ -94,7 +94,7 @@ export default function ProfileScreen() {
       });
       setEditing(false);
     } catch {
-      Alert.alert(t('common.error'), t('common.error'));
+      showToast(t('common.error'), 'error');
     } finally {
       setSaving(false);
     }
@@ -133,12 +133,21 @@ export default function ProfileScreen() {
             ) : null}
 
             <View style={styles.info}>
-              {profile?.birth_date && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>{t('profile.birthDate')}</Text>
-                  <Text style={styles.infoValue}>{profile.birth_date}</Text>
-                </View>
-              )}
+              {profile?.birth_date && (() => {
+                const birth = new Date(profile.birth_date);
+                const today = new Date();
+                let age = today.getFullYear() - birth.getFullYear();
+                const monthDiff = today.getMonth() - birth.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                  age--;
+                }
+                return (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>{t('profile.age')}</Text>
+                    <Text style={styles.infoValue}>{t('profile.ageValue', { age })}</Text>
+                  </View>
+                );
+              })()}
               {profile?.orientation && (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>{t('profile.orientation')}</Text>
@@ -249,7 +258,7 @@ export default function ProfileScreen() {
               <View style={styles.dateField}>
                 <TextInput
                   style={styles.dateInput}
-                  placeholder="DD"
+                  placeholder={t('profile.dayPlaceholder')}
                   placeholderTextColor={Colors.textTertiary}
                   keyboardType="number-pad"
                   maxLength={2}
@@ -261,7 +270,7 @@ export default function ProfileScreen() {
               <View style={styles.dateField}>
                 <TextInput
                   style={styles.dateInput}
-                  placeholder="MM"
+                  placeholder={t('profile.monthPlaceholder')}
                   placeholderTextColor={Colors.textTertiary}
                   keyboardType="number-pad"
                   maxLength={2}
@@ -273,7 +282,7 @@ export default function ProfileScreen() {
               <View style={styles.dateFieldYear}>
                 <TextInput
                   style={styles.dateInput}
-                  placeholder="AAAA"
+                  placeholder={t('profile.yearPlaceholder')}
                   placeholderTextColor={Colors.textTertiary}
                   keyboardType="number-pad"
                   maxLength={4}

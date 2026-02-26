@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { reportError } from '@/lib/errorReporting';
 
 export interface BlockedUser {
   id: string;
@@ -81,7 +82,7 @@ export const useBlockStore = create<BlockStoreState>((set, get) => ({
         blockedIds: new Set(blockedUsers.map((b) => b.blocked_id)),
       });
     } catch (error) {
-      console.error('Error fetching blocked users:', error);
+      reportError(error, { source: 'blockStore.fetchBlockedUsers' });
       set({ error: 'block.errorFetching' });
     } finally {
       set({ isLoading: false });
@@ -97,7 +98,7 @@ export const useBlockStore = create<BlockStoreState>((set, get) => ({
 
       await get().fetchBlockedUsers();
     } catch (error) {
-      console.error('Error blocking user:', error);
+      reportError(error, { source: 'blockStore.blockUser' });
       set({ error: 'block.errorBlocking' });
       throw error;
     }
@@ -112,7 +113,7 @@ export const useBlockStore = create<BlockStoreState>((set, get) => ({
 
       await get().fetchBlockedUsers();
     } catch (error) {
-      console.error('Error unblocking user:', error);
+      reportError(error, { source: 'blockStore.unblockUser' });
       set({ error: 'block.errorUnblocking' });
       throw error;
     }
@@ -151,7 +152,7 @@ export const useBlockStore = create<BlockStoreState>((set, get) => ({
 
       if (error) throw error;
     } catch (error: any) {
-      console.error('Error reporting user:', error);
+      reportError(error, { source: 'blockStore.reportUser' });
       if (error?.message === 'DUPLICATE_REPORT') {
         set({ error: 'report.alreadyReported' });
       } else {

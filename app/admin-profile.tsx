@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
+import { Config } from '@/constants/config';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import type { Profile } from '@/stores/authStore';
 
@@ -65,7 +66,7 @@ export default function AdminProfileScreen() {
         const uris = photosRes.data
           .map((p: any) => {
             const { data } = supabase.storage
-              .from('photos')
+              .from(Config.storageBucket)
               .getPublicUrl(p.storage_path);
             return { uri: data.publicUrl };
           })

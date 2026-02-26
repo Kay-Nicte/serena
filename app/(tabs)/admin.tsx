@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -18,6 +17,7 @@ import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { ActionSheet, type ActionSheetOption } from '@/components/ActionSheet';
 import { Toast, useToast } from '@/components/Toast';
+import { showConfirm } from '@/components/ConfirmDialog';
 
 type ReportStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed';
 
@@ -108,7 +108,7 @@ export default function AdminScreen() {
 
       setReports(rows);
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      // Reports fetch failed
     } finally {
       setIsLoading(false);
     }
@@ -179,52 +179,43 @@ export default function AdminScreen() {
   };
 
   const confirmBan = (report: ReportRow) => {
-    Alert.alert(
-      t('admin.banConfirmTitle'),
-      t('admin.banConfirmMessage', { name: report.reported?.name ?? '' }),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('admin.banUser'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const { error } = await supabase.rpc('ban_user', {
-                target_user_id: report.reported_id,
-              });
-              if (error) throw error;
-              await updateReportStatus(report.id, 'resolved');
-            } catch {
-              toast.show(t('common.error'), 'error');
-            }
-          },
-        },
-      ],
-    );
+    showConfirm({
+      title: t('admin.banConfirmTitle'),
+      message: t('admin.banConfirmMessage', { name: report.reported?.name ?? '' }),
+      confirmLabel: t('admin.banUser'),
+      destructive: true,
+      onConfirm: async () => {
+        try {
+          const { error } = await supabase.rpc('ban_user', {
+            target_user_id: report.reported_id,
+          });
+          if (error) throw error;
+          await updateReportStatus(report.id, 'resolved');
+        } catch {
+          toast.show(t('common.error'), 'error');
+        }
+      },
+    });
   };
 
   const confirmUnban = (report: ReportRow) => {
-    Alert.alert(
-      t('admin.unbanConfirmTitle'),
-      t('admin.unbanConfirmMessage', { name: report.reported?.name ?? '' }),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('admin.unbanUser'),
-          onPress: async () => {
-            try {
-              const { error } = await supabase.rpc('unban_user', {
-                target_user_id: report.reported_id,
-              });
-              if (error) throw error;
-              await fetchReports();
-            } catch {
-              toast.show(t('common.error'), 'error');
-            }
-          },
-        },
-      ],
-    );
+    showConfirm({
+      title: t('admin.unbanConfirmTitle'),
+      message: t('admin.unbanConfirmMessage', { name: report.reported?.name ?? '' }),
+      confirmLabel: t('admin.unbanUser'),
+      destructive: false,
+      onConfirm: async () => {
+        try {
+          const { error } = await supabase.rpc('unban_user', {
+            target_user_id: report.reported_id,
+          });
+          if (error) throw error;
+          await fetchReports();
+        } catch {
+          toast.show(t('common.error'), 'error');
+        }
+      },
+    });
   };
 
   const formatDate = (iso: string) => {
