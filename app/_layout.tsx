@@ -35,8 +35,10 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
     const inAuthGroup = segments[0] === '(auth)';
     const inCompleteProfile = segments[0] === 'complete-profile';
+    const inPublicScreen =
+      segments[0] === 'terms-of-service' || segments[0] === 'privacy-policy';
 
-    if (!isAuthenticated && !inAuthGroup) {
+    if (!isAuthenticated && !inAuthGroup && !inPublicScreen) {
       router.replace('/(auth)/welcome');
     } else if (isAuthenticated && !isProfileComplete && !inCompleteProfile) {
       router.replace('/complete-profile');
@@ -88,6 +90,10 @@ export default function RootLayout() {
           <Stack.Screen name="discovery-preferences" />
           <Stack.Screen name="blocked-users" />
           <Stack.Screen name="admin-profile" />
+          <Stack.Screen name="settings" />
+          <Stack.Screen name="change-password" />
+          <Stack.Screen name="terms-of-service" />
+          <Stack.Screen name="privacy-policy" />
         </Stack>
         <StatusBar style="dark" />
       </AuthGuard>

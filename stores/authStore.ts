@@ -20,6 +20,7 @@ export interface Profile {
   avatar_url: string | null;
   is_profile_complete: boolean;
   is_admin: boolean;
+  language_preference: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -81,6 +82,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (error) {
       console.error('Error fetching profile:', error);
       return;
+    }
+
+    if (data?.language_preference) {
+      const i18n = (await import('@/i18n')).default;
+      await i18n.changeLanguage(data.language_preference);
     }
 
     set({

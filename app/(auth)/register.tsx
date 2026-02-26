@@ -106,9 +106,19 @@ export default function RegisterScreen() {
 
             <Text style={styles.terms}>
               {t('auth.termsAgree')}{' '}
-              <Text style={styles.termsLink}>{t('auth.termsLink')}</Text>{' '}
+              <Text
+                style={styles.termsLink}
+                onPress={() => router.push('/terms-of-service')}
+              >
+                {t('auth.termsLink')}
+              </Text>{' '}
               {t('auth.and')}{' '}
-              <Text style={styles.termsLink}>{t('auth.privacyLink')}</Text>
+              <Text
+                style={styles.termsLink}
+                onPress={() => router.push('/privacy-policy')}
+              >
+                {t('auth.privacyLink')}
+              </Text>
             </Text>
 
             <Button

@@ -223,6 +223,19 @@ export default function ProfileScreen() {
             )}
           </TouchableOpacity>
 
+          {/* Settings */}
+          <TouchableOpacity
+            style={styles.discoveryCard}
+            onPress={() => router.push('/settings')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.discoveryHeader}>
+              <Ionicons name="settings-outline" size={20} color={Colors.text} />
+              <Text style={[styles.discoveryTitle, { flex: 1, marginLeft: 8 }]}>{t('settings.title')}</Text>
+              <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+            </View>
+          </TouchableOpacity>
+
           <View style={styles.bottom}>
             <Button
               title={t('profile.signOut')}
