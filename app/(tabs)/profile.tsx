@@ -337,6 +337,25 @@ export default function ProfileScreen() {
             </View>
           </View>
 
+          {/* Premium Upsell */}
+          {!isPremium && (
+            <View style={styles.premiumUpsell}>
+              <Text style={styles.premiumUpsellTitle}>
+                {t('premium.upsellTitle')} {'✨'}
+              </Text>
+              <Text style={styles.premiumUpsellDescription}>
+                {t('premium.upsellDescription')}
+              </Text>
+              <TouchableOpacity
+                style={styles.premiumUpsellButton}
+                onPress={() => showToast(t('premium.comingSoon'), 'info')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.premiumUpsellButtonText}>{t('premium.viewPlans')}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Streak Card */}
           <View style={styles.streakCard}>
             <View style={styles.streakHeader}>
@@ -952,6 +971,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  premiumUpsell: {
+    backgroundColor: '#7B4A5C',
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  premiumUpsellTitle: {
+    fontSize: 22,
+    fontFamily: Fonts.heading,
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  premiumUpsellDescription: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: 'rgba(255,255,255,0.85)',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  premiumUpsellButton: {
+    marginTop: 6,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#D4A574',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  premiumUpsellButtonText: {
+    fontSize: 16,
+    fontFamily: Fonts.bodySemiBold,
+    color: '#D4A574',
   },
   discoveryTitle: {
     fontSize: 18,

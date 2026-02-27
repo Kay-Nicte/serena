@@ -324,7 +324,11 @@
     "keepGoingTitle": "¡No te preocupes!",
     "keepGoingMessage": "Mantén tu racha diaria y seguirás ganando superlikes y rompehielos como recompensa. ¡Te esperamos mañana!",
     "understood": "Entendido",
-    "completeProfileTeaser": "¡Completa tu perfil entero para conseguir 7 días de Premium gratis!"
+    "completeProfileTeaser": "¡Completa tu perfil entero para conseguir 7 días de Premium gratis!",
+    "upsellTitle": "Serena Premium",
+    "upsellDescription": "10 perfiles al día, ve quién te ha dado like, y filtros avanzados",
+    "viewPlans": "Ver planes",
+    "comingSoon": "¡Los planes premium estarán disponibles pronto!"
   },
   "streak": {
     "title": "Racha diaria",
