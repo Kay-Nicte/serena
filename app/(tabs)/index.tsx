@@ -12,8 +12,9 @@ import { computeActivityLevel, useProfileStore } from "@/stores/profileStore";
 import { showToast } from "@/stores/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
   ScrollView,
@@ -48,6 +49,16 @@ export default function TodayScreen() {
   const remainingLikes = useDailyStatsStore((s) => s.remainingLikes);
   const reward = useDailyStatsStore((s) => s.reward);
   const isPremium = useAuthStore((s) => s.profile?.is_premium ?? false);
+  const isVerified = useAuthStore((s) => s.profile?.is_verified ?? false);
+  const verificationStatus = useAuthStore((s) => s.profile?.verification_status ?? 'none');
+  const fetchProfile = useAuthStore((s) => s.fetchProfile);
+
+  // Refresh profile on tab focus to pick up verification status changes
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [fetchProfile])
+  );
   const candidatePresence = useProfileStore((s) => s.candidatePresence);
   const superlikeSenders = useProfileStore((s) => s.superlikeSenders);
   const sendIceBreaker = useIceBreakerStore((s) => s.sendIceBreaker);
@@ -99,6 +110,36 @@ export default function TodayScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>{t("today.title")}</Text>
       </View>
+
+      {/* Verification banner */}
+      {!isVerified && (
+        <TouchableOpacity
+          style={[
+            styles.verificationBanner,
+            verificationStatus === 'pending' && styles.verificationBannerPending,
+          ]}
+          onPress={() => {
+            if (verificationStatus !== 'pending') {
+              router.push('/verify-identity');
+            }
+          }}
+          activeOpacity={verificationStatus === 'pending' ? 1 : 0.7}
+        >
+          <Ionicons
+            name={verificationStatus === 'pending' ? 'time-outline' : 'shield-checkmark-outline'}
+            size={18}
+            color={verificationStatus === 'pending' ? Colors.warning : Colors.primary}
+          />
+          <Text style={styles.verificationBannerText}>
+            {verificationStatus === 'pending'
+              ? t("verification.bannerPending")
+              : t("verification.banner")}
+          </Text>
+          {verificationStatus !== 'pending' && (
+            <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
+          )}
+        </TouchableOpacity>
+      )}
 
       {isLoading ? (
         <View style={styles.centeredFull}>
@@ -152,7 +193,7 @@ export default function TodayScreen() {
               <Ionicons name="close" size={32} color={Colors.textSecondary} />
             </TouchableOpacity>
 
-            {availableIceBreakers > 0 && (
+            {availableIceBreakers > 0 && isVerified && (
               <TouchableOpacity
                 style={[styles.actionButton, styles.iceBreakerButton]}
                 onPress={() => setIceBreakerModalVisible(true)}
@@ -258,6 +299,29 @@ const styles = StyleSheet.create({
   },
   refreshButton: {
     padding: 8,
+  },
+  verificationBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginHorizontal: 24,
+    marginBottom: 4,
+    backgroundColor: Colors.primaryPastel,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  verificationBannerPending: {
+    backgroundColor: "#FFF8E1",
+    borderColor: "#FFE082",
+  },
+  verificationBannerText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.text,
   },
   cardWrapper: {
     flex: 1,

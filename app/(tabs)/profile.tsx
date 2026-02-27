@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -40,7 +40,7 @@ import { usePhotos } from '@/hooks/usePhotos';
 import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
 import { pickImage } from '@/lib/storage';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showToast } from '@/stores/toastStore';
 import { useStreak } from '@/hooks/useStreak';
@@ -57,6 +57,14 @@ export default function ProfileScreen() {
   const { preferences } = useDiscoveryPreferences();
   const { isTablet, contentMaxWidth, horizontalPadding } = useResponsive();
   useStreak(); // triggers fetch on mount
+
+  // Refresh profile on tab focus to pick up verification status changes
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [fetchProfile])
+  );
+
   const isPremium = profile?.is_premium ?? false;
   const premiumUntil = profile?.premium_until ?? null;
   const currentStreak = useDailyStatsStore((s) => s.currentStreak);
@@ -64,6 +72,24 @@ export default function ProfileScreen() {
   const availableIceBreakers = useDailyStatsStore((s) => s.availableIceBreakers);
   const remainingLikes = useDailyStatsStore((s) => s.remainingLikes);
   const totalLikes = useDailyStatsStore((s) => s.totalLikes);
+
+  // Profile is fully complete when ALL fields are filled (hogwarts_house excluded)
+  const isProfileFullyComplete = !!(
+    profile?.name?.trim() &&
+    profile?.birth_date &&
+    profile?.bio?.trim() &&
+    ensureArray(profile?.orientation).length > 0 &&
+    ensureArray(profile?.looking_for).length > 0 &&
+    ensureArray(profile?.interests).length > 0 &&
+    profile?.children &&
+    profile?.zodiac &&
+    profile?.zodiac_ascendant &&
+    ensureArray(profile?.pets).length > 0 &&
+    profile?.smoking &&
+    profile?.drinking &&
+    profile?.height_cm &&
+    photos.length > 0
+  );
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -185,7 +211,9 @@ export default function ProfileScreen() {
         try {
           const { data } = await supabase.rpc('activate_premium_trial');
           if (data?.granted) {
+            setSaving(false);
             setTrialGranted(true);
+            return; // Stay in edit mode to show the modal
           }
         } catch {
           // Non-critical
@@ -226,7 +254,15 @@ export default function ProfileScreen() {
               </View>
             )}
 
-            <Text style={styles.name}>{profile?.name ?? '—'}</Text>
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>{profile?.name ?? '—'}</Text>
+              {profile?.is_verified && (
+                <View style={styles.verifiedBadge}>
+                  <Ionicons name="shield-checkmark" size={14} color={Colors.success} />
+                  <Text style={styles.verifiedBadgeText}>{t('verification.verified')}</Text>
+                </View>
+              )}
+            </View>
 
             {isPremium && (
               <View style={styles.premiumBadge}>
@@ -337,8 +373,58 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Premium Upsell */}
-          {!isPremium && (
+          {/* Verification banner */}
+          {!profile?.is_verified && (
+            <TouchableOpacity
+              style={[
+                styles.verificationBanner,
+                profile?.verification_status === 'pending' && styles.verificationBannerPending,
+              ]}
+              onPress={() => {
+                if (profile?.verification_status !== 'pending') {
+                  router.push('/verify-identity');
+                }
+              }}
+              activeOpacity={profile?.verification_status === 'pending' ? 1 : 0.7}
+            >
+              <Ionicons
+                name={profile?.verification_status === 'pending' ? 'time-outline' : 'shield-checkmark-outline'}
+                size={20}
+                color={profile?.verification_status === 'pending' ? Colors.warning : Colors.primary}
+              />
+              <View style={styles.verificationBannerContent}>
+                <Text style={styles.verificationBannerTitle}>
+                  {profile?.verification_status === 'pending'
+                    ? t('verification.pendingTitle')
+                    : t('verification.promptTitle')}
+                </Text>
+                <Text style={styles.verificationBannerSubtitle}>
+                  {profile?.verification_status === 'pending'
+                    ? t('verification.bannerPending')
+                    : t('verification.banner')}
+                </Text>
+              </View>
+              {profile?.verification_status !== 'pending' && (
+                <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
+          )}
+
+          {/* Premium trial teaser — profile incomplete + never had premium */}
+          {!isPremium && !premiumUntil && !isProfileFullyComplete && (
+            <TouchableOpacity
+              style={styles.premiumTeaser}
+              onPress={() => setEditing(true)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="diamond" size={20} color="#E0A800" />
+              <Text style={styles.premiumTeaserText}>{t('premium.completeProfileTeaser')}</Text>
+              <Ionicons name="chevron-forward" size={18} color="#9A7800" />
+            </TouchableOpacity>
+          )}
+
+          {/* Premium Upsell — only when profile is complete or trial already used */}
+          {!isPremium && (isProfileFullyComplete || !!premiumUntil) && (
             <View style={styles.premiumUpsell}>
               <Text style={styles.premiumUpsellTitle}>
                 {t('premium.upsellTitle')} {'✨'}
@@ -714,7 +800,7 @@ export default function ProfileScreen() {
             </View>
             <TouchableOpacity
               style={styles.modalButton}
-              onPress={() => { setTrialGranted(false); fetchProfile(); }}
+              onPress={() => { setTrialGranted(false); fetchProfile(); setEditing(false); }}
               activeOpacity={0.7}
             >
               <Text style={styles.modalButtonText}>{t('common.done')}</Text>
@@ -779,10 +865,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   name: {
     fontSize: 22,
     fontFamily: Fonts.heading,
     color: Colors.text,
+  },
+  verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  verifiedBadgeText: {
+    fontSize: 12,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.success,
   },
   premiumBadge: {
     flexDirection: 'row',
@@ -971,6 +1076,51 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  premiumTeaser: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#FFF8E1',
+    borderWidth: 1,
+    borderColor: '#FFE082',
+    borderRadius: 16,
+    padding: 14,
+  },
+  premiumTeaserText: {
+    fontSize: 14,
+    fontFamily: Fonts.bodyMedium,
+    color: '#9A7800',
+    flex: 1,
+    lineHeight: 20,
+  },
+  verificationBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: Colors.primaryPastel,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    borderRadius: 16,
+    padding: 16,
+  },
+  verificationBannerPending: {
+    backgroundColor: '#FFF8E1',
+    borderColor: '#FFE082',
+  },
+  verificationBannerContent: {
+    flex: 1,
+    gap: 2,
+  },
+  verificationBannerTitle: {
+    fontSize: 15,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.text,
+  },
+  verificationBannerSubtitle: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
   },
   premiumUpsell: {
     backgroundColor: '#7B4A5C',

@@ -120,6 +120,8 @@ export default function RootLayout() {
           <Stack.Screen name="terms-of-service" />
           <Stack.Screen name="privacy-policy" />
           <Stack.Screen name="match-profile" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="verify-identity" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="admin-verification" />
         </Stack>
         <StatusBar style="dark" />
       </AuthGuard>

@@ -168,7 +168,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
 
       if (error) throw error;
 
-      const result = data as MatchResult & { error?: string };
+      const result = data as MatchResult & { error?: string; held?: boolean };
 
       if (result.error) {
         if (result.error === 'daily_limit_reached') {
@@ -176,6 +176,10 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
         }
         // Do not advance to next candidate on error
         return;
+      }
+
+      if (result.held) {
+        showToast(i18n.t('verification.heldLikesInfo'), 'info');
       }
 
       if (result.matched) {
@@ -198,13 +202,17 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
 
       if (error) throw error;
 
-      const result = data as MatchResult & { error?: string };
+      const result = data as MatchResult & { error?: string; held?: boolean };
 
       if (result.error) {
         if (result.error === 'no_superlikes_available') {
           showToast(i18n.t('superlike.noSuperlikes'), 'error');
         }
         return;
+      }
+
+      if (result.held) {
+        showToast(i18n.t('verification.heldLikesInfo'), 'info');
       }
 
       if (result.matched) {

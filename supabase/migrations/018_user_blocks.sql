@@ -274,14 +274,14 @@ BEGIN
 
   PERFORM public.send_push_notification(
     NEW.user_a_id,
-    'Serena',
+    'Serenade',
     COALESCE(v_name_b, 'Alguien') || ' y tu sois match! ',
     jsonb_build_object('type', 'new_match', 'match_id', NEW.id)
   );
 
   PERFORM public.send_push_notification(
     NEW.user_b_id,
-    'Serena',
+    'Serenade',
     COALESCE(v_name_a, 'Alguien') || ' y tu sois match! ',
     jsonb_build_object('type', 'new_match', 'match_id', NEW.id)
   );

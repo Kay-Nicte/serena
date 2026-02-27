@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet } from 'react-native';
@@ -7,12 +8,55 @@ import { Fonts } from '@/constants/fonts';
 import { useAuthStore } from '@/stores/authStore';
 import { useIceBreakerStore } from '@/stores/iceBreakerStore';
 import { PremiumExpiryModal } from '@/components/PremiumExpiryModal';
+import { supabase } from '@/lib/supabase';
+
+function useAdminPendingCount(isAdmin: boolean) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!isAdmin) {
+      setCount(0);
+      return;
+    }
+
+    let mounted = true;
+
+    const fetchCounts = async () => {
+      try {
+        const [reportsRes, verificationsRes] = await Promise.all([
+          supabase.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+          supabase.rpc('admin_get_pending_verifications'),
+        ]);
+
+        if (!mounted) return;
+
+        const reportCount = reportsRes.count ?? 0;
+        const verificationCount = Array.isArray(verificationsRes.data) ? verificationsRes.data.length : 0;
+        setCount(reportCount + verificationCount);
+      } catch {
+        // Non-critical
+      }
+    };
+
+    fetchCounts();
+
+    // Refresh every 60s
+    const interval = setInterval(fetchCounts, 60_000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [isAdmin]);
+
+  return count;
+}
 
 export default function TabLayout() {
   const { t } = useTranslation();
   const profile = useAuthStore((s) => s.profile);
   const isAdmin = profile?.is_admin === true;
   const pendingCount = useIceBreakerStore((s) => s.pendingIceBreakers.length);
+  const adminPendingCount = useAdminPendingCount(isAdmin);
 
   return (
     <>
@@ -83,7 +127,16 @@ export default function TabLayout() {
           title: t('tabs.admin'),
           href: isAdmin ? '/(tabs)/admin' : null,
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="shield-outline" size={size} color={color} />
+            <View>
+              <Ionicons name="shield-outline" size={size} color={color} />
+              {adminPendingCount > 0 && (
+                <View style={tabStyles.badge}>
+                  <Text style={tabStyles.badgeText}>
+                    {adminPendingCount > 9 ? '9+' : adminPendingCount}
+                  </Text>
+                </View>
+              )}
+            </View>
           ),
         }}
       />

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -30,6 +31,7 @@ const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
 export default function CompleteProfileScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { user, updateProfile } = useAuthStore();
   const { photos, addPhoto, removePhoto } = usePhotoStore();
 
@@ -51,6 +53,7 @@ export default function CompleteProfileScreen() {
   const [hogwartsHouse, setHogwartsHouse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [trialGranted, setTrialGranted] = useState(false);
+  const [showVerifyPrompt, setShowVerifyPrompt] = useState(false);
 
   const yearNum = parseInt(year, 10);
   const isValidYear = year.length === 4 && yearNum >= 1900 && yearNum <= new Date().getFullYear();
@@ -142,8 +145,10 @@ export default function CompleteProfileScreen() {
         }
       }
 
-      // Mark complete now (triggers navigation)
-      await updateProfile({ is_profile_complete: true } as any);
+      // Show verification prompt before marking complete
+      setShowVerifyPrompt(true);
+      setLoading(false);
+      return;
     } catch {
       showToast(t('common.error'), 'error');
     } finally {
@@ -153,7 +158,19 @@ export default function CompleteProfileScreen() {
 
   const handleTrialDismiss = async () => {
     setTrialGranted(false);
-    // NOW mark profile complete → triggers navigation to tabs
+    // Show verification prompt before navigating
+    setShowVerifyPrompt(true);
+  };
+
+  const handleVerifyNow = async () => {
+    setShowVerifyPrompt(false);
+    await updateProfile({ is_profile_complete: true } as any);
+    // Small delay so navigation to tabs completes before pushing modal
+    setTimeout(() => router.push('/verify-identity'), 300);
+  };
+
+  const handleVerifyLater = async () => {
+    setShowVerifyPrompt(false);
     await updateProfile({ is_profile_complete: true } as any);
   };
 
@@ -444,6 +461,32 @@ export default function CompleteProfileScreen() {
           </View>
         </View>
       </Modal>
+      {/* Verification prompt modal */}
+      <Modal visible={showVerifyPrompt} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.verifyIconCircle}>
+              <Ionicons name="shield-checkmark" size={36} color={Colors.primary} />
+            </View>
+            <Text style={styles.modalTitle}>{t('verification.promptTitle')}</Text>
+            <Text style={styles.modalDescription}>{t('verification.promptMessage')}</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={handleVerifyNow}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="camera" size={18} color={Colors.textOnPrimary} />
+              <Text style={styles.modalButtonText}>{t('verification.verifyNow')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleVerifyLater}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.verifyLaterText}>{t('verification.verifyLater')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -599,6 +642,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     backgroundColor: Colors.primary,
     paddingHorizontal: 40,
     paddingVertical: 14,
@@ -609,5 +655,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.bodySemiBold,
     color: Colors.textOnPrimary,
+  },
+  verifyIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: Colors.primaryPastel,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  verifyLaterText: {
+    fontSize: 15,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.textTertiary,
+    marginTop: 4,
   },
 });

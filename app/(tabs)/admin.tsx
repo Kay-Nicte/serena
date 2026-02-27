@@ -52,6 +52,7 @@ export default function AdminScreen() {
   const [filter, setFilter] = useState<ReportStatus | 'all'>('pending');
   const [actionSheetVisible, setActionSheetVisible] = useState(false);
   const [actionSheetOptions, setActionSheetOptions] = useState<ActionSheetOption[]>([]);
+  const [pendingVerifications, setPendingVerifications] = useState(0);
   const toast = useToast();
 
   const fetchReports = useCallback(async () => {
@@ -114,9 +115,19 @@ export default function AdminScreen() {
     }
   }, [filter]);
 
+  const fetchPendingVerifications = useCallback(async () => {
+    try {
+      const { data } = await supabase.rpc('admin_get_pending_verifications');
+      setPendingVerifications(Array.isArray(data) ? data.length : 0);
+    } catch {
+      // Non-critical
+    }
+  }, []);
+
   useEffect(() => {
     fetchReports();
-  }, [fetchReports]);
+    fetchPendingVerifications();
+  }, [fetchReports, fetchPendingVerifications]);
 
   const handleAction = (report: ReportRow) => {
     const isBanned = !!report.reported?.banned_at;
@@ -299,7 +310,22 @@ export default function AdminScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>{t('admin.title')}</Text>
+      <View style={styles.adminHeader}>
+        <Text style={styles.title}>{t('admin.title')}</Text>
+        <TouchableOpacity
+          style={styles.verificationsLink}
+          onPress={() => router.push('/admin-verification')}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="shield-checkmark-outline" size={18} color={Colors.textOnPrimary} />
+          <Text style={styles.verificationsLinkText}>{t('admin.verifications')}</Text>
+          {pendingVerifications > 0 && (
+            <View style={styles.verificationsCountBadge}>
+              <Text style={styles.verificationsCountText}>{pendingVerifications}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
 
       {/* Filter tabs */}
       <View style={styles.filters}>
@@ -360,13 +386,47 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  adminHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
   title: {
     fontSize: 28,
     fontFamily: Fonts.heading,
     color: Colors.text,
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
+  },
+  verificationsLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  verificationsLinkText: {
+    fontSize: 13,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.textOnPrimary,
+  },
+  verificationsCountBadge: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    marginLeft: 2,
+  },
+  verificationsCountText: {
+    fontSize: 11,
+    fontFamily: Fonts.bodyBold,
+    color: Colors.primary,
   },
   filters: {
     flexDirection: 'row',

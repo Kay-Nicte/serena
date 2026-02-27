@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
@@ -27,11 +28,13 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
     confirmPassword?: string;
+    age?: string;
   }>({});
 
   const validate = () => {
@@ -44,6 +47,9 @@ export default function RegisterScreen() {
     }
     if (password !== confirmPassword) {
       newErrors.confirmPassword = t('auth.errorPasswordMismatch');
+    }
+    if (!ageConfirmed) {
+      newErrors.age = t('auth.errorAgeConfirm');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -110,6 +116,22 @@ export default function RegisterScreen() {
               error={errors.confirmPassword}
             />
 
+            <TouchableOpacity
+              style={styles.checkboxRow}
+              onPress={() => setAgeConfirmed((v) => !v)}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name={ageConfirmed ? 'checkbox' : 'square-outline'}
+                size={22}
+                color={ageConfirmed ? Colors.primary : Colors.textTertiary}
+              />
+              <Text style={styles.checkboxLabel}>{t('auth.ageConfirm')}</Text>
+            </TouchableOpacity>
+            {errors.age && (
+              <Text style={styles.errorText}>{errors.age}</Text>
+            )}
+
             <Text style={styles.terms}>
               {t('auth.termsAgree')}{' '}
               <Text
@@ -173,6 +195,25 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 16,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 4,
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.text,
+    flex: 1,
+  },
+  errorText: {
+    fontSize: 12,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.error,
+    marginLeft: 32,
+    marginTop: -4,
   },
   terms: {
     fontSize: 12,

@@ -54,6 +54,28 @@ export async function deletePhoto(path: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function uploadVerificationSelfie(
+  userId: string,
+  uri: string
+): Promise<string> {
+  const timestamp = Date.now();
+  const path = `${userId}/${timestamp}.jpg`;
+
+  const base64 = await readAsStringAsync(uri, {
+    encoding: 'base64',
+  });
+
+  const { error } = await supabase.storage
+    .from('verification-selfies')
+    .upload(path, decode(base64), {
+      contentType: 'image/jpeg',
+      upsert: true,
+    });
+
+  if (error) throw error;
+  return path;
+}
+
 export async function uploadChatImage(
   matchId: string,
   uri: string

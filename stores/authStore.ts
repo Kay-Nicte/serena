@@ -10,6 +10,7 @@ import { usePhotoStore } from './photoStore';
 import { useDiscoveryStore } from './discoveryStore';
 import { useBlockStore } from './blockStore';
 import { useDailyStatsStore } from './dailyStatsStore';
+import { useVerificationStore } from './verificationStore';
 import type { Orientation, LookingFor } from '@/constants/config';
 
 export interface Profile {
@@ -34,6 +35,8 @@ export interface Profile {
   drinking: string | null;
   height_cm: number | null;
   hogwarts_house: string | null;
+  is_verified: boolean;
+  verification_status: string;
   created_at: string;
   updated_at: string;
   distance_km?: number | null;
@@ -45,6 +48,7 @@ interface AuthState {
   profile: Profile | null;
   isLoading: boolean;
   isProfileComplete: boolean;
+  isVerified: boolean;
   initialize: () => Promise<void>;
   fetchProfile: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
@@ -86,6 +90,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   profile: null,
   isLoading: true,
   isProfileComplete: false,
+  isVerified: false,
 
   initialize: async () => {
     try {
@@ -135,6 +140,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       profile: normalizeProfile(data),
       isProfileComplete: data?.is_profile_complete ?? false,
+      isVerified: data?.is_verified ?? false,
     });
   },
 
@@ -181,11 +187,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     useDiscoveryStore.getState().reset();
     useBlockStore.getState().reset();
     useDailyStatsStore.getState().reset();
+    useVerificationStore.getState().reset();
     set({
       session: null,
       user: null,
       profile: null,
       isProfileComplete: false,
+      isVerified: false,
     });
   },
 }));

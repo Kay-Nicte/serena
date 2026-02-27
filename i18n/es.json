@@ -30,6 +30,8 @@
     "termsLink": "Términos y Condiciones",
     "privacyLink": "Política de Privacidad",
     "and": "y",
+    "ageConfirm": "Confirmo que tengo al menos 18 años",
+    "errorAgeConfirm": "Debes tener al menos 18 años para usar Serenade",
     "errorInvalidEmail": "Correo electrónico inválido",
     "errorPasswordShort": "La contraseña debe tener al menos 6 caracteres",
     "errorPasswordMismatch": "Las contraseñas no coinciden",
@@ -244,7 +246,17 @@
     "noConversation": "No se encontró conversación entre estas usuarias",
     "reportHistory": "Historial de reportes",
     "noReportHistory": "Sin reportes previos",
-    "reportedNTimes": "Reportada {{count}} veces en total"
+    "reportedNTimes": "Reportada {{count}} veces en total",
+    "verifications": "Verificaciones",
+    "noVerifications": "No hay verificaciones pendientes",
+    "requestedGesture": "Gesto solicitado",
+    "selfiePhoto": "Selfie de verificación",
+    "profilePhotos": "Fotos del perfil",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "rejectReason": "Motivo del rechazo (opcional)",
+    "verificationApproved": "¡Usuaria verificada! {{count}} matches creados.",
+    "verificationRejected": "Verificación rechazada."
   },
   "discovery": {
     "title": "Descubrimiento",
@@ -302,8 +314,8 @@
   "legal": {
     "termsTitle": "Términos de Servicio",
     "privacyTitle": "Política de Privacidad",
-    "termsContent": "Bienvenida a Serena. Al usar nuestra aplicación, aceptas estos Términos de Servicio.\n\n1. Aceptación de los Términos\nAl acceder o usar Serena, aceptas estar sujeta a estos Términos. Si no estás de acuerdo, no uses la app.\n\n2. Elegibilidad\nDebes tener al menos 18 años para usar Serena. Al crear una cuenta, confirmas que cumples con este requisito de edad.\n\n3. Cuenta\nEres responsable de mantener la confidencialidad de las credenciales de tu cuenta y de todas las actividades que ocurran en ella.\n\n4. Conducta del Usuario\nAceptas no:\n- Publicar contenido falso, engañoso o fraudulento\n- Acosar, amenazar o intimidar a otras usuarias\n- Usar la app para cualquier propósito ilegal\n- Crear múltiples cuentas\n- Suplantar la identidad de otra persona\n\n5. Contenido\nConservas la propiedad del contenido que publicas pero otorgas a Serena una licencia para usarlo dentro de la app. Podemos eliminar contenido que viole estos términos.\n\n6. Privacidad\nTu uso de Serena también se rige por nuestra Política de Privacidad.\n\n7. Terminación\nNos reservamos el derecho de suspender o terminar cuentas que violen estos términos. Puedes eliminar tu cuenta en cualquier momento desde Ajustes.\n\n8. Descargo de Responsabilidad\nSerena se proporciona \"tal cual\" sin garantías de ningún tipo. No somos responsables de las interacciones entre usuarias.\n\n9. Cambios\nPodemos actualizar estos Términos periódicamente. El uso continuado de la app constituye la aceptación de los cambios.\n\n10. Contacto\nPara preguntas sobre estos Términos, contáctanos a través de la app.",
-    "privacyContent": "Política de Privacidad de Serena\n\nÚltima actualización: 2025\n\n1. Información que Recopilamos\n- Información de cuenta: correo electrónico, nombre, fecha de nacimiento\n- Información de perfil: fotos, biografía, orientación, preferencias\n- Datos de uso: interacciones, matches, mensajes\n- Información del dispositivo: tipo de dispositivo, sistema operativo\n- Datos de ubicación: ubicación aproximada (si está habilitada)\n\n2. Cómo Usamos tu Información\n- Para proporcionar y mejorar nuestros servicios\n- Para conectarte con otras usuarias según tus preferencias\n- Para enviarte notificaciones sobre matches y mensajes\n- Para garantizar la seguridad y prevenir abusos\n\n3. Compartir Información\nNo vendemos tu información personal. Podemos compartir datos con:\n- Otras usuarias: tu información de perfil es visible para posibles matches\n- Proveedores de servicios: que nos ayudan a operar la app\n- Autoridades: cuando lo requiera la ley\n\n4. Almacenamiento y Seguridad\nTus datos se almacenan de forma segura usando cifrado estándar de la industria. Tomamos medidas razonables para proteger tu información.\n\n5. Tus Derechos\nTienes derecho a:\n- Acceder a tus datos personales\n- Corregir datos inexactos\n- Eliminar tu cuenta y datos\n- Exportar tus datos\n- Retirar el consentimiento para el procesamiento de datos\n\n6. Retención de Datos\nConservamos tus datos mientras tu cuenta esté activa. Cuando eliminas tu cuenta, todos tus datos se eliminan permanentemente.\n\n7. Cookies y Seguimiento\nUsamos el seguimiento mínimo necesario para la funcionalidad de la app.\n\n8. Privacidad de Menores\nSerena no está destinada a usuarias menores de 18 años. No recopilamos datos de menores a sabiendas.\n\n9. Cambios a esta Política\nPodemos actualizar esta política periódicamente. Te notificaremos sobre cambios significativos.\n\n10. Contacto\nPara preguntas relacionadas con la privacidad, contáctanos a través de la app."
+    "termsContent": "Bienvenida a Serenade. Al usar nuestra aplicación, aceptas estos Términos de Servicio.\n\n1. Aceptación de los Términos\nAl acceder o usar Serenade, aceptas estar sujeta a estos Términos. Si no estás de acuerdo, no uses la app.\n\n2. Elegibilidad\nDebes tener al menos 18 años para usar Serenade. Al crear una cuenta, confirmas que cumples con este requisito de edad.\n\n3. Cuenta\nEres responsable de mantener la confidencialidad de las credenciales de tu cuenta y de todas las actividades que ocurran en ella.\n\n4. Conducta del Usuario\nAceptas no:\n- Publicar contenido falso, engañoso o fraudulento\n- Acosar, amenazar o intimidar a otras usuarias\n- Usar la app para cualquier propósito ilegal\n- Crear múltiples cuentas\n- Suplantar la identidad de otra persona\n\n5. Contenido\nConservas la propiedad del contenido que publicas pero otorgas a Serenade una licencia para usarlo dentro de la app. Podemos eliminar contenido que viole estos términos.\n\n6. Privacidad\nTu uso de Serenade también se rige por nuestra Política de Privacidad.\n\n7. Terminación\nNos reservamos el derecho de suspender o terminar cuentas que violen estos términos. Puedes eliminar tu cuenta en cualquier momento desde Ajustes.\n\n8. Descargo de Responsabilidad\nSerena se proporciona \"tal cual\" sin garantías de ningún tipo. No somos responsables de las interacciones entre usuarias.\n\n9. Cambios\nPodemos actualizar estos Términos periódicamente. El uso continuado de la app constituye la aceptación de los cambios.\n\n10. Contacto\nPara preguntas sobre estos Términos, contáctanos a través de la app.",
+    "privacyContent": "Política de Privacidad de Serenade\n\nÚltima actualización: 2025\n\n1. Información que Recopilamos\n- Información de cuenta: correo electrónico, nombre, fecha de nacimiento\n- Información de perfil: fotos, biografía, orientación, preferencias\n- Datos de uso: interacciones, matches, mensajes\n- Información del dispositivo: tipo de dispositivo, sistema operativo\n- Datos de ubicación: ubicación aproximada (si está habilitada)\n\n2. Cómo Usamos tu Información\n- Para proporcionar y mejorar nuestros servicios\n- Para conectarte con otras usuarias según tus preferencias\n- Para enviarte notificaciones sobre matches y mensajes\n- Para garantizar la seguridad y prevenir abusos\n\n3. Compartir Información\nNo vendemos tu información personal. Podemos compartir datos con:\n- Otras usuarias: tu información de perfil es visible para posibles matches\n- Proveedores de servicios: que nos ayudan a operar la app\n- Autoridades: cuando lo requiera la ley\n\n4. Almacenamiento y Seguridad\nTus datos se almacenan de forma segura usando cifrado estándar de la industria. Tomamos medidas razonables para proteger tu información.\n\n5. Tus Derechos\nTienes derecho a:\n- Acceder a tus datos personales\n- Corregir datos inexactos\n- Eliminar tu cuenta y datos\n- Exportar tus datos\n- Retirar el consentimiento para el procesamiento de datos\n\n6. Retención de Datos\nConservamos tus datos mientras tu cuenta esté activa. Cuando eliminas tu cuenta, todos tus datos se eliminan permanentemente.\n\n7. Cookies y Seguimiento\nUsamos el seguimiento mínimo necesario para la funcionalidad de la app.\n\n8. Privacidad de Menores\nSerena no está destinada a usuarias menores de 18 años. No recopilamos datos de menores a sabiendas.\n\n9. Cambios a esta Política\nPodemos actualizar esta política periódicamente. Te notificaremos sobre cambios significativos.\n\n10. Contacto\nPara preguntas relacionadas con la privacidad, contáctanos a través de la app."
   },
   "premium": {
     "trialTitle": "¡Bienvenida a Premium!",
@@ -325,7 +337,7 @@
     "keepGoingMessage": "Mantén tu racha diaria y seguirás ganando superlikes y rompehielos como recompensa. ¡Te esperamos mañana!",
     "understood": "Entendido",
     "completeProfileTeaser": "¡Completa tu perfil entero para conseguir 7 días de Premium gratis!",
-    "upsellTitle": "Serena Premium",
+    "upsellTitle": "Serenade Premium",
     "upsellDescription": "10 perfiles al día, ve quién te ha dado like, y filtros avanzados",
     "viewPlans": "Ver planes",
     "comingSoon": "¡Los planes premium estarán disponibles pronto!"
@@ -424,5 +436,40 @@
     "accepted": "¡Rompehielos aceptado!",
     "alreadyMatched": "Ya tienes match con esta persona",
     "charCount": "{{current}}/{{max}}"
+  },
+  "verification": {
+    "title": "Verifica tu identidad",
+    "subtitle": "Hazte un selfie haciendo el gesto de abajo para confirmar que eres real",
+    "gestureInstruction": "Haz este gesto:",
+    "gesture_peace_sign": "Signo de paz (V con dos dedos)",
+    "gesture_thumbs_up": "Pulgar arriba",
+    "gesture_hand_on_chin": "Mano en la barbilla",
+    "gesture_point_at_camera": "Señala a la cámara",
+    "gesture_ok_sign": "Signo OK (círculo con pulgar e índice)",
+    "gesture_wave": "Saluda con la mano",
+    "gesture_finger_heart": "Corazón con los dedos",
+    "gesture_salute": "Saludo militar",
+    "takePhoto": "Hacer selfie",
+    "retakePhoto": "Repetir",
+    "submit": "Enviar para revisión",
+    "submitting": "Enviando...",
+    "pendingTitle": "Verificación pendiente",
+    "pendingMessage": "Tu selfie está siendo revisado. Puedes usar la app, pero no aparecerás en las búsquedas de otras personas hasta que te aprueben.",
+    "rejectedTitle": "Verificación no aprobada",
+    "rejectedMessage": "Tu selfie de verificación no fue aprobado. Inténtalo de nuevo.",
+    "rejectedReason": "Motivo: {{reason}}",
+    "tryAgain": "Intentar de nuevo",
+    "approvedTitle": "¡Estás verificada!",
+    "approvedMessage": "Tu perfil ahora es visible para las demás.",
+    "verifyNow": "Verificar ahora",
+    "verifyLater": "Más tarde",
+    "banner": "Verifica tu identidad para que las demás te vean",
+    "bannerPending": "Verificación en revisión...",
+    "cameraPermission": "Se necesita acceso a la cámara para la verificación",
+    "heldLikesInfo": "¡Tus likes están guardados! Cuando te verifiques, serán visibles.",
+    "notVerified": "Necesitas verificar tu identidad primero",
+    "promptTitle": "¡Un paso más!",
+    "promptMessage": "Verifica tu identidad para que las demás puedan ver tu perfil y hacer match contigo.",
+    "verified": "Verificada"
   }
 }
