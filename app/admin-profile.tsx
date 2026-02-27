@@ -20,6 +20,21 @@ import { Config } from '@/constants/config';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import type { Profile } from '@/stores/authStore';
 
+function ensureArray(val: unknown): string[] {
+  if (val == null) return [];
+  if (Array.isArray(val)) {
+    return val.flatMap((v) => {
+      const s = String(v).replace(/^\{|\}$/g, '');
+      return s.includes(',') ? s.split(',').map((x) => x.replace(/"/g, '').trim()) : [s];
+    });
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.replace(/^\{|\}$/g, '');
+    return trimmed ? trimmed.split(',').map((s) => s.replace(/"/g, '').trim()) : [];
+  }
+  return [String(val)];
+}
+
 interface ConversationMessage {
   id: string;
   sender_id: string;
@@ -280,20 +295,16 @@ export default function AdminProfileScreen() {
           )}
 
           <View style={styles.tags}>
-            {profile.orientation && (
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>
-                  {t(`orientation.${profile.orientation}`)}
-                </Text>
+            {ensureArray(profile.orientation).map((o) => (
+              <View key={o} style={styles.tag}>
+                <Text style={styles.tagText}>{t(`orientation.${o}`)}</Text>
               </View>
-            )}
-            {profile.looking_for && (
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>
-                  {t(`lookingFor.${profile.looking_for}`)}
-                </Text>
+            ))}
+            {ensureArray(profile.looking_for).map((lf) => (
+              <View key={lf} style={styles.tag}>
+                <Text style={styles.tagText}>{t(`lookingFor.${lf}`)}</Text>
               </View>
-            )}
+            ))}
           </View>
 
           {/* Admin details */}

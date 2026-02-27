@@ -14,13 +14,15 @@ export async function updatePresence(
   typingInMatch?: string | null
 ): Promise<void> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    // Use getSession (local, no network call) instead of getUser (network call)
+    // so sign-out can reliably mark offline before the session is destroyed.
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
 
     const { error } = await supabase
       .from('user_presence')
       .upsert({
-        user_id: user.id,
+        user_id: session.user.id,
         is_online: isOnline,
         last_seen: new Date().toISOString(),
         typing_in_match: typingInMatch ?? null,

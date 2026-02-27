@@ -5,13 +5,31 @@ import { Fonts } from '@/constants/fonts';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import type { Profile } from '@/stores/authStore';
 
+// Ensure orientation/looking_for are always clean string arrays
+function ensureArray(val: unknown): string[] {
+  if (val == null) return [];
+  if (Array.isArray(val)) {
+    return val.flatMap((v) => {
+      const s = String(v).replace(/^\{|\}$/g, '');
+      return s.includes(',') ? s.split(',').map((x) => x.replace(/"/g, '').trim()) : [s];
+    });
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.replace(/^\{|\}$/g, '');
+    return trimmed ? trimmed.split(',').map((s) => s.replace(/"/g, '').trim()) : [];
+  }
+  return [String(val)];
+}
+
 type ActivityLevel = 'today' | 'this_week' | 'this_month' | 'inactive';
 
 interface ProfileCardProps {
   profile: Profile;
   photos?: { uri: string }[];
   activityLevel?: ActivityLevel | null;
+  lastSeen?: string;
   showActivityLevel?: boolean;
+  isSuperlike?: boolean;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -36,7 +54,18 @@ const ACTIVITY_CONFIG: Record<ActivityLevel, { color: string; i18nKey: string }>
   inactive: { color: Colors.textTertiary, i18nKey: 'today.activityInactive' },
 };
 
-export function ProfileCard({ profile, photos, activityLevel, showActivityLevel }: ProfileCardProps) {
+function formatInactiveTime(lastSeen: string | undefined, t: (key: string, opts?: any) => string): string {
+  if (!lastSeen) return t('today.activityInactive');
+  const diff = Date.now() - new Date(lastSeen).getTime();
+  const months = Math.floor(diff / (30 * 24 * 3600000));
+  if (months <= 1) return t('today.inactiveMonth');
+  if (months < 12) return t('today.inactiveMonths', { count: months });
+  const years = Math.floor(months / 12);
+  if (years === 1) return t('today.inactiveYear');
+  return t('today.inactiveYears', { count: years });
+}
+
+export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActivityLevel, isSuperlike }: ProfileCardProps) {
   const { t } = useTranslation();
   const age = calculateAge(profile.birth_date);
 
@@ -47,6 +76,14 @@ export function ProfileCard({ profile, photos, activityLevel, showActivityLevel 
         fallbackUri={profile.avatar_url}
         width={CARD_WIDTH}
       />
+
+      {isSuperlike && (
+        <View style={styles.superlikeBanner}>
+          <Text style={styles.superlikeBannerText}>
+            {'⭐ '}{t('superlike.receivedBadge')}
+          </Text>
+        </View>
+      )}
 
       <View style={styles.info}>
         <View style={styles.nameRow}>
@@ -65,7 +102,9 @@ export function ProfileCard({ profile, photos, activityLevel, showActivityLevel 
               ]}
             />
             <Text style={styles.activityText}>
-              {t(ACTIVITY_CONFIG[activityLevel].i18nKey)}
+              {activityLevel === 'inactive'
+                ? formatInactiveTime(lastSeen, t)
+                : t(ACTIVITY_CONFIG[activityLevel].i18nKey)}
             </Text>
           </View>
         )}
@@ -75,20 +114,16 @@ export function ProfileCard({ profile, photos, activityLevel, showActivityLevel 
         ) : null}
 
         <View style={styles.tags}>
-          {profile.orientation ? (
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>
-                {t(`orientation.${profile.orientation}`)}
-              </Text>
+          {ensureArray(profile.orientation).map((o, i) => (
+            <View key={`o-${o}-${i}`} style={styles.tag}>
+              <Text style={styles.tagText}>{t(`orientation.${o}`)}</Text>
             </View>
-          ) : null}
-          {profile.looking_for ? (
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>
-                {t(`lookingFor.${profile.looking_for}`)}
-              </Text>
+          ))}
+          {ensureArray(profile.looking_for).map((lf, i) => (
+            <View key={`lf-${lf}-${i}`} style={styles.tag}>
+              <Text style={styles.tagText}>{t(`lookingFor.${lf}`)}</Text>
             </View>
-          ) : null}
+          ))}
         </View>
       </View>
     </View>
@@ -175,5 +210,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.bodyMedium,
     color: Colors.primaryDark,
+  },
+  superlikeBanner: {
+    backgroundColor: '#FFF8E1',
+    borderBottomWidth: 1,
+    borderBottomColor: '#FFE082',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  superlikeBannerText: {
+    fontSize: 14,
+    fontFamily: Fonts.bodySemiBold,
+    color: '#E0A800',
   },
 });

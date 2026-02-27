@@ -18,6 +18,21 @@ import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, type Orientation, type Looki
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Tag } from '@/components/ui/Tag';
+
+function ensureArray(val: unknown): string[] {
+  if (val == null) return [];
+  if (Array.isArray(val)) {
+    return val.flatMap((v) => {
+      const s = String(v).replace(/^\{|\}$/g, '');
+      return s.includes(',') ? s.split(',').map((x) => x.replace(/"/g, '').trim()) : [s];
+    });
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.replace(/^\{|\}$/g, '');
+    return trimmed ? trimmed.split(',').map((s) => s.replace(/"/g, '').trim()) : [];
+  }
+  return [String(val)];
+}
 import { PhotoGrid } from '@/components/PhotoGrid';
 import { useAuthStore } from '@/stores/authStore';
 import { usePhotos } from '@/hooks/usePhotos';
@@ -28,6 +43,7 @@ import { useRouter } from 'expo-router';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showToast } from '@/stores/toastStore';
 import { useStreak } from '@/hooks/useStreak';
+import { useDailyStatsStore } from '@/stores/dailyStatsStore';
 
 const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
@@ -38,7 +54,14 @@ export default function ProfileScreen() {
   const { photos, addPhoto, removePhoto } = usePhotos(user?.id);
   const { preferences } = useDiscoveryPreferences();
   const { isTablet, contentMaxWidth, horizontalPadding } = useResponsive();
-  const { currentStreak, availableSuperlikes, availableIceBreakers } = useStreak();
+  useStreak(); // triggers fetch on mount
+  const isPremium = profile?.is_premium ?? false;
+  const premiumUntil = profile?.premium_until ?? null;
+  const currentStreak = useDailyStatsStore((s) => s.currentStreak);
+  const availableSuperlikes = useDailyStatsStore((s) => s.availableSuperlikes);
+  const availableIceBreakers = useDailyStatsStore((s) => s.availableIceBreakers);
+  const remainingLikes = useDailyStatsStore((s) => s.remainingLikes);
+  const totalLikes = useDailyStatsStore((s) => s.totalLikes);
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -46,16 +69,29 @@ export default function ProfileScreen() {
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');
-  const [orientation, setOrientation] = useState<string | null>(null);
-  const [lookingFor, setLookingFor] = useState<string | null>(null);
+  const [orientations, setOrientations] = useState<string[]>([]);
+  const [lookingFor, setLookingFor] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [showStreakInfo, setShowStreakInfo] = useState(false);
+
+  const isUnderage = (() => {
+    const d = parseInt(day, 10);
+    const m = parseInt(month, 10);
+    const y = parseInt(year, 10);
+    if (!d || !m || !y || year.length < 4) return false;
+    const today = new Date();
+    let age = today.getFullYear() - y;
+    const monthDiff = (today.getMonth() + 1) - m;
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < d)) age--;
+    return age < 18;
+  })();
 
   useEffect(() => {
     if (profile) {
       setName(profile.name ?? '');
       setBio(profile.bio ?? '');
-      setOrientation(profile.orientation);
-      setLookingFor(profile.looking_for);
+      setOrientations(profile.orientation ?? []);
+      setLookingFor(profile.looking_for ?? []);
       if (profile.birth_date) {
         const [y, m, d] = profile.birth_date.split('-');
         setYear(y);
@@ -78,8 +114,16 @@ export default function ProfileScreen() {
     await fetchProfile();
   };
 
+  const toggleOrientation = (o: string) => {
+    setOrientations((prev) => prev.includes(o) ? [] : [o]);
+  };
+
+  const toggleLookingFor = (lf: string) => {
+    setLookingFor((prev) => prev.includes(lf) ? prev.filter((x) => x !== lf) : [...prev, lf]);
+  };
+
   const handleSave = async () => {
-    if (!name.trim()) return;
+    if (!name.trim() || isUnderage) return;
     setSaving(true);
     try {
       const birthDateString =
@@ -91,9 +135,9 @@ export default function ProfileScreen() {
         name: name.trim(),
         bio: bio.trim() || null,
         birth_date: birthDateString,
-        orientation: orientation as Orientation,
-        looking_for: lookingFor as LookingFor,
-      });
+        orientation: orientations.length > 0 ? orientations : null,
+        looking_for: lookingFor.length > 0 ? lookingFor : null,
+      } as any);
       setEditing(false);
     } catch {
       showToast(t('common.error'), 'error');
@@ -130,6 +174,18 @@ export default function ProfileScreen() {
 
             <Text style={styles.name}>{profile?.name ?? '—'}</Text>
 
+            {isPremium && (
+              <View style={styles.premiumBadge}>
+                <Ionicons name="diamond" size={14} color="#E0A800" />
+                <Text style={styles.premiumBadgeText}>{t('premium.badge')}</Text>
+                {premiumUntil && (
+                  <Text style={styles.premiumExpiry}>
+                    {t('premium.expiresOn', { date: new Date(premiumUntil).toLocaleDateString() })}
+                  </Text>
+                )}
+              </View>
+            )}
+
             {profile?.bio ? (
               <Text style={styles.bio}>{profile.bio}</Text>
             ) : null}
@@ -150,19 +206,19 @@ export default function ProfileScreen() {
                   </View>
                 );
               })()}
-              {profile?.orientation && (
+              {ensureArray(profile?.orientation).length > 0 && (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>{t('profile.orientation')}</Text>
                   <Text style={styles.infoValue}>
-                    {t(`orientation.${profile.orientation}`)}
+                    {ensureArray(profile?.orientation).map((o) => t(`orientation.${o}`)).join(', ')}
                   </Text>
                 </View>
               )}
-              {profile?.looking_for && (
+              {ensureArray(profile?.looking_for).length > 0 && (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>{t('profile.lookingFor')}</Text>
                   <Text style={styles.infoValue}>
-                    {t(`lookingFor.${profile.looking_for}`)}
+                    {ensureArray(profile?.looking_for).map((lf) => t(`lookingFor.${lf}`)).join(', ')}
                   </Text>
                 </View>
               )}
@@ -174,7 +230,17 @@ export default function ProfileScreen() {
             <View style={styles.streakHeader}>
               <Ionicons name="flame" size={22} color={Colors.warning} />
               <Text style={styles.streakTitle}>{t('streak.title')}</Text>
+              <TouchableOpacity onPress={() => setShowStreakInfo((v) => !v)} hitSlop={8}>
+                <Ionicons
+                  name={showStreakInfo ? 'information-circle' : 'information-circle-outline'}
+                  size={20}
+                  color={Colors.textTertiary}
+                />
+              </TouchableOpacity>
             </View>
+            {showStreakInfo && (
+              <Text style={styles.streakInfoText}>{t('streak.info')}</Text>
+            )}
             {currentStreak > 0 ? (
               <Text style={styles.streakValue}>
                 {currentStreak === 1 ? t('streak.day') : t('streak.days', { count: currentStreak })}
@@ -183,6 +249,15 @@ export default function ProfileScreen() {
               <Text style={styles.streakEmpty}>{t('streak.noStreak')}</Text>
             )}
             <View style={styles.streakItems}>
+              <View style={styles.streakItem}>
+                <Ionicons name="heart" size={16} color={Colors.primary} />
+                <Text style={styles.streakItemText}>
+                  {t('streak.remainingLikes', { remaining: remainingLikes, total: totalLikes })}
+                </Text>
+                {currentStreak >= 2 && currentStreak < 10 && (
+                  <Text style={styles.streakBonus}>+1</Text>
+                )}
+              </View>
               <View style={styles.streakItem}>
                 <Ionicons name="star" size={16} color={Colors.warning} />
                 <Text style={styles.streakItemText}>
@@ -322,6 +397,9 @@ export default function ProfileScreen() {
                 />
               </View>
             </View>
+            {isUnderage && (
+              <Text style={styles.underageError}>{t('profile.underageError')}</Text>
+            )}
           </View>
 
           {/* Bio */}
@@ -343,8 +421,8 @@ export default function ProfileScreen() {
                 <Tag
                   key={o}
                   label={t(`orientation.${o}`)}
-                  selected={orientation === o}
-                  onPress={() => setOrientation(o)}
+                  selected={orientations.includes(o)}
+                  onPress={() => toggleOrientation(o)}
                 />
               ))}
             </View>
@@ -358,8 +436,8 @@ export default function ProfileScreen() {
                 <Tag
                   key={lf}
                   label={t(`lookingFor.${lf}`)}
-                  selected={lookingFor === lf}
-                  onPress={() => setLookingFor(lf)}
+                  selected={lookingFor.includes(lf)}
+                  onPress={() => toggleLookingFor(lf)}
                 />
               ))}
             </View>
@@ -369,7 +447,7 @@ export default function ProfileScreen() {
             title={t('common.save')}
             onPress={handleSave}
             loading={saving}
-            disabled={!name.trim()}
+            disabled={!name.trim() || isUnderage}
             style={styles.saveButton}
           />
         </ScrollView>
@@ -435,6 +513,28 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: Fonts.heading,
     color: Colors.text,
+  },
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FFF8E1',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FFE082',
+  },
+  premiumBadgeText: {
+    fontSize: 13,
+    fontFamily: Fonts.bodySemiBold,
+    color: '#E0A800',
+  },
+  premiumExpiry: {
+    fontSize: 11,
+    fontFamily: Fonts.body,
+    color: '#C49000',
+    marginLeft: 4,
   },
   bio: {
     fontSize: 14,
@@ -510,6 +610,12 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     color: Colors.textTertiary,
   },
+  underageError: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    color: Colors.error,
+    marginTop: 4,
+  },
   tags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -564,6 +670,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
+  },
+  streakBonus: {
+    fontSize: 12,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.success,
+  },
+  streakInfoText: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    lineHeight: 19,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: 12,
+    padding: 12,
+    overflow: 'hidden',
   },
   discoveryCard: {
     padding: 20,

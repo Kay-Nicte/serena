@@ -62,9 +62,13 @@ export function ConfirmDialog({ defaultConfirmLabel, defaultCancelLabel }: Confi
   const { visible, title, message, confirmLabel, cancelLabel, destructive, onConfirm, dismiss } =
     useConfirmStore();
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     dismiss();
-    onConfirm?.();
+    try {
+      await onConfirm?.();
+    } catch {
+      // Error handled by the caller
+    }
   };
 
   return (

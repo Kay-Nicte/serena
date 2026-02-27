@@ -9,6 +9,7 @@ import { useChatStore } from './chatStore';
 import { usePhotoStore } from './photoStore';
 import { useDiscoveryStore } from './discoveryStore';
 import { useBlockStore } from './blockStore';
+import { useDailyStatsStore } from './dailyStatsStore';
 import type { Orientation, LookingFor } from '@/constants/config';
 
 export interface Profile {
@@ -16,8 +17,8 @@ export interface Profile {
   name: string | null;
   birth_date: string | null;
   bio: string | null;
-  orientation: Orientation | null;
-  looking_for: LookingFor | null;
+  orientation: Orientation[] | null;
+  looking_for: LookingFor[] | null;
   avatar_url: string | null;
   is_profile_complete: boolean;
   is_admin: boolean;
@@ -39,6 +40,27 @@ interface AuthState {
   fetchProfile: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   signOut: () => Promise<void>;
+  forceReset: () => void;
+}
+
+// Supabase may return text[] as PostgreSQL literal "{val1,val2}" if schema cache is stale.
+// This normalizes it to a proper JS array.
+function normalizeArray(val: unknown): string[] | null {
+  if (val == null) return null;
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string' && val.startsWith('{') && val.endsWith('}')) {
+    const inner = val.slice(1, -1);
+    return inner ? inner.split(',').map((s) => s.replace(/"/g, '')) : [];
+  }
+  return [String(val)];
+}
+
+function normalizeProfile(data: any): Profile {
+  return {
+    ...data,
+    orientation: normalizeArray(data.orientation),
+    looking_for: normalizeArray(data.looking_for),
+  };
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -94,7 +116,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
 
     set({
-      profile: data as Profile,
+      profile: normalizeProfile(data),
       isProfileComplete: data?.is_profile_complete ?? false,
     });
   },
@@ -114,15 +136,34 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signOut: async () => {
-    const { removePushTokenFromServer } = await import('@/lib/notifications');
-    await removePushTokenFromServer();
-    await auth.signOut();
+    try {
+      const { updatePresence } = await import('@/lib/presence');
+      await updatePresence(false);
+    } catch {
+      // Presence cleanup is best-effort
+    }
+    try {
+      const { removePushTokenFromServer } = await import('@/lib/notifications');
+      await removePushTokenFromServer();
+    } catch {
+      // Push token cleanup is best-effort; don't block sign out
+    }
+    try {
+      await auth.signOut();
+    } catch {
+      // Sign out may fail if session is already invalid; force reset anyway
+    }
+    get().forceReset();
+  },
+
+  forceReset: () => {
     useProfileStore.getState().reset();
     useMatchStore.getState().reset();
     useChatStore.getState().reset();
     usePhotoStore.getState().reset();
     useDiscoveryStore.getState().reset();
     useBlockStore.getState().reset();
+    useDailyStatsStore.getState().reset();
     set({
       session: null,
       user: null,

@@ -1,18 +1,26 @@
-import { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/colors';
-import { Fonts } from '@/constants/fonts';
-import { Ionicons } from '@expo/vector-icons';
-import { useDailyProfiles } from '@/hooks/useDailyProfiles';
-import { useStreak } from '@/hooks/useStreak';
-import { usePremium } from '@/hooks/usePremium';
-import { useProfileStore, computeActivityLevel } from '@/stores/profileStore';
-import { showToast } from '@/stores/toastStore';
-import { ProfileCard } from '@/components/ProfileCard';
-import { MatchOverlay } from '@/components/MatchOverlay';
+import { MatchOverlay } from "@/components/MatchOverlay";
+import { ProfileCard } from "@/components/ProfileCard";
+import { Colors } from "@/constants/colors";
+import { Fonts } from "@/constants/fonts";
+import { useDailyProfiles } from "@/hooks/useDailyProfiles";
+import { useStreak } from "@/hooks/useStreak";
+import { useAuthStore } from "@/stores/authStore";
+import { useDailyStatsStore } from "@/stores/dailyStatsStore";
+import { computeActivityLevel, useProfileStore } from "@/stores/profileStore";
+import { showToast } from "@/stores/toastStore";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TodayScreen() {
   const { t } = useTranslation();
@@ -32,16 +40,23 @@ export default function TodayScreen() {
     resetPasses,
   } = useDailyProfiles();
 
-  const { availableSuperlikes, reward } = useStreak();
-  const { isPremium } = usePremium();
+  useStreak(); // triggers fetch on mount
+  const availableSuperlikes = useDailyStatsStore((s) => s.availableSuperlikes);
+  const remainingLikes = useDailyStatsStore((s) => s.remainingLikes);
+  const reward = useDailyStatsStore((s) => s.reward);
+  const isPremium = useAuthStore((s) => s.profile?.is_premium ?? false);
   const candidatePresence = useProfileStore((s) => s.candidatePresence);
+  const superlikeSenders = useProfileStore((s) => s.superlikeSenders);
   const shownRewardRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (reward && reward !== shownRewardRef.current) {
       shownRewardRef.current = reward;
-      const msg = reward === 'superlike' ? t('streak.rewardSuperlike') : t('streak.rewardIceBreaker');
-      showToast(msg, 'success');
+      const msg =
+        reward === "superlike"
+          ? t("streak.rewardSuperlike")
+          : t("streak.rewardIceBreaker");
+      showToast(msg, "success");
     }
   }, [reward]);
 
@@ -59,81 +74,111 @@ export default function TodayScreen() {
   const photos = currentPhotos.map((p) => ({ uri: p.url }));
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('today.title')}</Text>
-        {currentProfile && hasMore && !isLoading && (
-          <TouchableOpacity onPress={refresh} style={styles.refreshButton} activeOpacity={0.7}>
-            <Ionicons name="refresh" size={22} color={Colors.textSecondary} />
-          </TouchableOpacity>
-        )}
+        <Text style={styles.title}>{t("today.title")}</Text>
       </View>
 
-      <View style={styles.cardContainer}>
-        {isLoading ? (
-          <View style={styles.centered}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>{t('today.loading')}</Text>
-          </View>
-        ) : error ? (
-          <View style={styles.centered}>
-            <Ionicons name="alert-circle-outline" size={64} color={Colors.primary} />
-            <Text style={styles.errorText}>{t(error)}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={refresh} activeOpacity={0.7}>
-              <Ionicons name="refresh" size={20} color={Colors.surface} />
-              <Text style={styles.retryText}>{t('common.retry')}</Text>
-            </TouchableOpacity>
-          </View>
-        ) : currentProfile && hasMore ? (
+      {isLoading ? (
+        <View style={styles.centeredFull}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loadingText}>{t("today.loading")}</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.centeredFull}>
+          <Ionicons
+            name="alert-circle-outline"
+            size={64}
+            color={Colors.primary}
+          />
+          <Text style={styles.errorText}>{t(error)}</Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={refresh}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="refresh" size={20} color={Colors.surface} />
+            <Text style={styles.retryText}>{t("common.retry")}</Text>
+          </TouchableOpacity>
+        </View>
+      ) : currentProfile && hasMore ? (
+        <View style={styles.cardWrapper}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
             <ProfileCard
               profile={currentProfile}
               photos={photos}
-              activityLevel={computeActivityLevel(candidatePresence[currentProfile.id])}
+              activityLevel={computeActivityLevel(
+                candidatePresence[currentProfile.id],
+              )}
+              lastSeen={
+                candidatePresence[currentProfile.id] ??
+                currentProfile.updated_at
+              }
               showActivityLevel={isPremium}
+              isSuperlike={superlikeSenders.includes(currentProfile.id)}
             />
-        ) : (
-          <View style={styles.centered}>
-            <Ionicons name="heart" size={64} color={Colors.primaryLight} />
-            <Text style={styles.emptyText}>{t('today.empty')}</Text>
-            <TouchableOpacity style={styles.secondChanceButton} onPress={resetPasses} activeOpacity={0.7}>
-              <Ionicons name="refresh-circle-outline" size={22} color={Colors.primary} />
-              <Text style={styles.secondChanceText}>{t('today.secondChance')}</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
+          </ScrollView>
 
-      {currentProfile && hasMore && !isLoading && !error && (
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.passButton]}
-            onPress={pass}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="close" size={32} color={Colors.textSecondary} />
-          </TouchableOpacity>
-
-          {availableSuperlikes > 0 && (
+          <View style={styles.actions}>
             <TouchableOpacity
-              style={[styles.actionButton, styles.superlikeButton]}
-              onPress={superlike}
+              style={[styles.actionButton, styles.passButton]}
+              onPress={pass}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close" size={32} color={Colors.textSecondary} />
+            </TouchableOpacity>
+
+            {availableSuperlikes > 0 && (
+              <TouchableOpacity
+                style={[styles.actionButton, styles.superlikeButton]}
+                onPress={superlike}
+                activeOpacity={0.7}
+              >
+                <View>
+                  <Ionicons name="star" size={32} color="#E0A800" />
+                  <View style={styles.superlikeBadge}>
+                    <Text style={styles.superlikeBadgeText}>
+                      {availableSuperlikes}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={[styles.actionButton, styles.likeButton]}
+              onPress={like}
               activeOpacity={0.7}
             >
               <View>
-                <Ionicons name="star" size={32} color="#E0A800" />
-                <View style={styles.superlikeBadge}>
-                  <Text style={styles.superlikeBadgeText}>{availableSuperlikes}</Text>
+                <Ionicons name="heart" size={32} color={Colors.primary} />
+                <View style={styles.likeBadge}>
+                  <Text style={styles.likeBadgeText}>{remainingLikes}</Text>
                 </View>
               </View>
             </TouchableOpacity>
-          )}
-
+          </View>
+        </View>
+      ) : (
+        <View style={styles.centeredFull}>
+          <Ionicons name="heart" size={64} color={Colors.primaryLight} />
+          <Text style={styles.emptyText}>{t("today.empty")}</Text>
           <TouchableOpacity
-            style={[styles.actionButton, styles.likeButton]}
-            onPress={like}
+            style={styles.secondChanceButton}
+            onPress={resetPasses}
             activeOpacity={0.7}
           >
-            <Ionicons name="heart" size={32} color={Colors.primary} />
+            <Ionicons
+              name="refresh-circle-outline"
+              size={22}
+              color={Colors.primary}
+            />
+            <Text style={styles.secondChanceText}>
+              {t("today.secondChance")}
+            </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -153,9 +198,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 4,
@@ -169,15 +214,18 @@ const styles = StyleSheet.create({
   refreshButton: {
     padding: 8,
   },
-  cardContainer: {
+  cardWrapper: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    overflow: 'hidden',
   },
-  centered: {
-    alignItems: 'center',
+  scrollContent: {
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingBottom: 80,
+  },
+  centeredFull: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     gap: 16,
     paddingHorizontal: 40,
   },
@@ -190,19 +238,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 24,
   },
   emptyText: {
     fontSize: 16,
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 24,
   },
   secondChanceButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     backgroundColor: Colors.primaryPastel,
     paddingHorizontal: 20,
@@ -218,8 +266,8 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   retryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     backgroundColor: Colors.primary,
     paddingHorizontal: 20,
@@ -233,19 +281,21 @@ const styles = StyleSheet.create({
     color: Colors.surface,
   },
   actions: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 32,
-    paddingTop: 12,
-    paddingBottom: 16,
+    position: "absolute",
+    bottom: 10,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 24,
   },
   actionButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    shadowColor: '#000',
+    alignItems: "center",
+    justifyContent: "center",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -262,25 +312,42 @@ const styles = StyleSheet.create({
     borderColor: Colors.primaryLight,
   },
   superlikeButton: {
-    backgroundColor: '#FFF8E1',
+    backgroundColor: "#FFF8E1",
     borderWidth: 1,
-    borderColor: '#FFE082',
+    borderColor: "#FFE082",
   },
   superlikeBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -4,
     right: -8,
-    backgroundColor: '#E0A800',
+    backgroundColor: "#E0A800",
     borderRadius: 8,
     minWidth: 16,
     height: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 4,
+  },
+  likeBadge: {
+    position: "absolute",
+    top: -4,
+    right: -8,
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  likeBadgeText: {
+    fontSize: 9,
+    fontFamily: Fonts.bodySemiBold,
+    color: "#FFFFFF",
   },
   superlikeBadgeText: {
     fontSize: 9,
     fontFamily: Fonts.bodySemiBold,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
 });

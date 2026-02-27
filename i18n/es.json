@@ -75,7 +75,8 @@
     "ageValue": "{{age}} años",
     "dayPlaceholder": "DD",
     "monthPlaceholder": "MM",
-    "yearPlaceholder": "AAAA"
+    "yearPlaceholder": "AAAA",
+    "underageError": "Debes tener al menos 18 años"
   },
   "orientation": {
     "lesbian": "Lesbiana",
@@ -111,7 +112,11 @@
     "activityToday": "Activa hoy",
     "activityThisWeek": "Activa esta semana",
     "activityThisMonth": "Activa este mes",
-    "activityInactive": "Inactiva"
+    "activityInactive": "Inactiva",
+    "inactiveMonth": "Hace 1 mes",
+    "inactiveMonths": "Hace {{count}} meses",
+    "inactiveYear": "Hace más de 1 año",
+    "inactiveYears": "Hace más de {{count}} años"
   },
   "matches": {
     "title": "Matches",
@@ -121,6 +126,8 @@
     "unmatch": "Deshacer match",
     "unmatchConfirmTitle": "¿Deshacer match?",
     "unmatchConfirmMessage": "Perderás tu conversación con {{name}}",
+    "errorUnmatching": "No se pudo deshacer el match. Inténtalo de nuevo.",
+    "deletedUser": "Usuaria eliminada",
     "viewProfile": "Ver perfil",
     "chat": "Chat"
   },
@@ -135,6 +142,8 @@
     "empty": "No tienes conversaciones aún",
     "placeholder": "Escribe un mensaje...",
     "send": "Enviar",
+    "blocked": "Has bloqueado a esta usuaria",
+    "unavailable": "Esta usuaria no está disponible",
     "noMessages": "Aún no hay mensajes. ¡Di hola!",
     "errorFetching": "No se pudieron cargar los mensajes.",
     "errorSending": "No se pudo enviar el mensaje. Inténtalo de nuevo.",
@@ -151,7 +160,8 @@
   },
   "notifications": {
     "permissionTitle": "Activar notificaciones",
-    "permissionMessage": "Recibe notificaciones sobre nuevos matches y mensajes"
+    "permissionMessage": "Recibe notificaciones sobre nuevos matches y mensajes",
+    "pushNotAvailable": "Las notificaciones push no están disponibles en este dispositivo"
   },
   "errorBoundary": {
     "title": "¡Ups!",
@@ -180,16 +190,17 @@
   "block": {
     "block": "Bloquear",
     "unblock": "Desbloquear",
-    "confirmTitle": "¿Bloquear usuario?",
-    "confirmMessage": "{{name}} no podrá ver tu perfil ni contactarte. Puedes desbloquearla después desde Ajustes → Usuarios bloqueados.",
-    "blocked": "Usuario bloqueado",
-    "unblockConfirmTitle": "¿Desbloquear usuario?",
+    "confirmTitle": "¿Bloquear a {{name}}?",
+    "confirmMessage": "No podrá ver tu perfil ni contactarte. Puedes desbloquearla después desde Ajustes → Usuarias bloqueadas.",
+    "blocked": "Usuaria bloqueada",
+    "unblockConfirmTitle": "¿Desbloquear a {{name}}?",
     "unblockConfirmMessage": "{{name}} podrá ver tu perfil de nuevo.",
-    "blockedUsers": "Usuarios bloqueados",
-    "noBlockedUsers": "No hay usuarios bloqueados",
-    "errorFetching": "No se pudieron cargar los usuarios bloqueados.",
-    "errorBlocking": "No se pudo bloquear al usuario.",
-    "errorUnblocking": "No se pudo desbloquear al usuario."
+    "blockedUsers": "Usuarias bloqueadas",
+    "noBlockedUsers": "No hay usuarias bloqueadas",
+    "errorFetching": "No se pudieron cargar las usuarias bloqueadas.",
+    "errorBlocking": "No se pudo bloquear a la usuaria.",
+    "errorUnblocking": "No se pudo desbloquear a la usuaria.",
+    "unblockSuccess": "Usuaria desbloqueada"
   },
   "admin": {
     "title": "Reportes",
@@ -252,6 +263,8 @@
     "deleteAccountConfirmWord": "ELIMINAR",
     "deleteAccountSuccess": "Cuenta eliminada",
     "deleteAccountError": "No se pudo eliminar la cuenta. Inténtalo de nuevo.",
+    "deleteConfirm": "Eliminar",
+    "deleteCancel": "No",
     "notifications": "Notificaciones",
     "pushNotifications": "Notificaciones push",
     "language": "Idioma",
@@ -262,7 +275,7 @@
     "privacyPolicy": "Política de Privacidad",
     "about": "Acerca de",
     "version": "Versión",
-    "blockedUsers": "Usuarios bloqueados",
+    "blockedUsers": "Usuarias bloqueadas",
     "signOut": "Cerrar sesión",
     "signOutConfirm": "¿Estás segura de que quieres cerrar sesión?"
   },
@@ -284,26 +297,43 @@
   },
   "premium": {
     "trialTitle": "¡Bienvenida a Premium!",
-    "trialDescription": "Disfruta 7 días de funciones premium gratis: más likes, confirmaciones de lectura e indicadores de actividad.",
+    "trialDescription": "Has desbloqueado 7 días de funciones premium gratis. Esto es lo que incluye:",
     "trialActivated": "¡Tu prueba gratuita de 7 días ha comenzado!",
     "badge": "Premium",
-    "expiresOn": "Expira el {{date}}"
+    "expiresOn": "Expira el {{date}}",
+    "benefit10Likes": "10 likes al día (en vez de 5)",
+    "benefitSuperlike": "1 superlike al día",
+    "benefitIceBreaker": "1 rompehielos al día",
+    "benefitReadReceipts": "Confirmaciones de lectura en chats",
+    "benefitLastSeen": "Ver la última conexión de las demás",
+    "expiredTitle": "Tu premium ha expirado",
+    "expiredMessage": "Ya no tienes acceso a las funciones premium:",
+    "renew": "Renovar Premium",
+    "noThanks": "No, gracias",
+    "renewComingSoon": "La renovación de premium estará disponible pronto.",
+    "keepGoingTitle": "¡No te preocupes!",
+    "keepGoingMessage": "Mantén tu racha diaria y seguirás ganando superlikes y rompehielos como recompensa. ¡Te esperamos mañana!",
+    "understood": "Entendido",
+    "completeProfileTeaser": "¡Añade fotos y una bio para conseguir 7 días de Premium gratis!"
   },
   "streak": {
     "title": "Racha diaria",
     "days": "{{count}} días",
     "day": "1 día",
     "bonusLike": "+1 like extra hoy",
-    "rewardSuperlike": "¡Día 5: ganaste un superlike!",
-    "rewardIceBreaker": "¡Día 10: ganaste un rompehielos!",
+    "rewardSuperlike": "¡Día 10: ganaste un superlike!",
+    "rewardIceBreaker": "¡Día 15: ganaste un rompehielos!",
+    "remainingLikes": "{{remaining}}/{{total}} likes restantes",
     "availableSuperlikes": "{{count}} superlikes",
     "availableIceBreakers": "{{count}} rompehielos",
+    "info": "¡Abre la app cada día para construir tu racha!\n\nDía 2–14: +1 like extra por día\nDía 10: ganas un superlike\nDía 15: ganas un rompehielos (la racha se reinicia)",
     "noStreak": "¡Abre la app cada día para construir tu racha!"
   },
   "superlike": {
     "noSuperlikes": "No tienes superlikes disponibles",
     "sent": "¡Superlike enviado!",
-    "received": "¡Alguien te envió un superlike!"
+    "received": "¡Alguien te envió un superlike!",
+    "receivedBadge": "Te ha dado superlike"
   },
   "iceBreaker": {
     "title": "Rompehielos",

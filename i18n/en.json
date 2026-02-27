@@ -75,7 +75,8 @@
     "ageValue": "{{age}} years old",
     "dayPlaceholder": "DD",
     "monthPlaceholder": "MM",
-    "yearPlaceholder": "YYYY"
+    "yearPlaceholder": "YYYY",
+    "underageError": "You must be at least 18 years old"
   },
   "orientation": {
     "lesbian": "Lesbian",
@@ -111,7 +112,11 @@
     "activityToday": "Active today",
     "activityThisWeek": "Active this week",
     "activityThisMonth": "Active this month",
-    "activityInactive": "Inactive"
+    "activityInactive": "Inactive",
+    "inactiveMonth": "1 month ago",
+    "inactiveMonths": "{{count}} months ago",
+    "inactiveYear": "More than 1 year ago",
+    "inactiveYears": "More than {{count}} years ago"
   },
   "matches": {
     "title": "Matches",
@@ -121,6 +126,8 @@
     "unmatch": "Unmatch",
     "unmatchConfirmTitle": "Unmatch?",
     "unmatchConfirmMessage": "You will lose your conversation with {{name}}",
+    "errorUnmatching": "Could not unmatch. Please try again.",
+    "deletedUser": "Deleted user",
     "viewProfile": "View Profile",
     "chat": "Chat"
   },
@@ -135,6 +142,8 @@
     "empty": "No conversations yet",
     "placeholder": "Write a message...",
     "send": "Send",
+    "blocked": "You blocked this user",
+    "unavailable": "This user is not available",
     "noMessages": "No messages yet. Say hello!",
     "errorFetching": "Could not load messages.",
     "errorSending": "Message could not be sent. Try again.",
@@ -151,7 +160,8 @@
   },
   "notifications": {
     "permissionTitle": "Enable notifications",
-    "permissionMessage": "Get notified about new matches and messages"
+    "permissionMessage": "Get notified about new matches and messages",
+    "pushNotAvailable": "Push notifications are not available on this device"
   },
   "errorBoundary": {
     "title": "Oops!",
@@ -180,16 +190,17 @@
   "block": {
     "block": "Block",
     "unblock": "Unblock",
-    "confirmTitle": "Block user?",
+    "confirmTitle": "Block {{name}}?",
     "confirmMessage": "{{name}} won't be able to see your profile or contact you. You can unblock them later from Settings → Blocked users.",
     "blocked": "User blocked",
-    "unblockConfirmTitle": "Unblock user?",
+    "unblockConfirmTitle": "Unblock {{name}}?",
     "unblockConfirmMessage": "{{name}} will be able to see your profile again.",
     "blockedUsers": "Blocked users",
     "noBlockedUsers": "No blocked users",
     "errorFetching": "Could not load blocked users.",
     "errorBlocking": "Could not block user.",
-    "errorUnblocking": "Could not unblock user."
+    "errorUnblocking": "Could not unblock user.",
+    "unblockSuccess": "User unblocked"
   },
   "admin": {
     "title": "Reports",
@@ -252,6 +263,8 @@
     "deleteAccountConfirmWord": "DELETE",
     "deleteAccountSuccess": "Account deleted",
     "deleteAccountError": "Could not delete account. Try again.",
+    "deleteConfirm": "Delete",
+    "deleteCancel": "No",
     "notifications": "Notifications",
     "pushNotifications": "Push notifications",
     "language": "Language",
@@ -284,26 +297,43 @@
   },
   "premium": {
     "trialTitle": "Welcome to Premium!",
-    "trialDescription": "Enjoy 7 days of premium features for free: more likes, read receipts, and activity indicators.",
+    "trialDescription": "You've unlocked 7 days of premium features for free. Here's what you get:",
     "trialActivated": "Your 7-day free trial has started!",
     "badge": "Premium",
-    "expiresOn": "Expires {{date}}"
+    "expiresOn": "Expires {{date}}",
+    "benefit10Likes": "10 likes per day (instead of 5)",
+    "benefitSuperlike": "1 superlike per day",
+    "benefitIceBreaker": "1 ice breaker per day",
+    "benefitReadReceipts": "Read receipts in chats",
+    "benefitLastSeen": "See when others were last online",
+    "expiredTitle": "Your premium has expired",
+    "expiredMessage": "You no longer have access to premium features:",
+    "renew": "Renew Premium",
+    "noThanks": "No, thanks",
+    "renewComingSoon": "Premium renewal coming soon!",
+    "keepGoingTitle": "Don't worry!",
+    "keepGoingMessage": "Keep your daily streak going and you'll keep earning superlikes and ice breakers as rewards. See you tomorrow!",
+    "understood": "Got it",
+    "completeProfileTeaser": "Add photos and a bio to get 7 days of Premium for free!"
   },
   "streak": {
     "title": "Daily Streak",
     "days": "{{count}} days",
     "day": "1 day",
     "bonusLike": "+1 bonus like today",
-    "rewardSuperlike": "Day 5: you earned a superlike!",
-    "rewardIceBreaker": "Day 10: you earned an ice breaker!",
+    "rewardSuperlike": "Day 10: you earned a superlike!",
+    "rewardIceBreaker": "Day 15: you earned an ice breaker!",
+    "remainingLikes": "{{remaining}}/{{total}} likes remaining",
     "availableSuperlikes": "{{count}} superlikes",
     "availableIceBreakers": "{{count}} ice breakers",
+    "info": "Open the app every day to build your streak!\n\nDay 2–14: +1 bonus like per day\nDay 10: earn a superlike\nDay 15: earn an ice breaker (streak resets)",
     "noStreak": "Open the app daily to build your streak!"
   },
   "superlike": {
     "noSuperlikes": "No superlikes available",
     "sent": "Superlike sent!",
-    "received": "Someone sent you a superlike!"
+    "received": "Someone sent you a superlike!",
+    "receivedBadge": "Gave you a superlike"
   },
   "iceBreaker": {
     "title": "Ice Breakers",

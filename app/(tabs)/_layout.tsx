@@ -4,13 +4,19 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
+import { useAuthStore } from '@/stores/authStore';
 import { useIceBreakerStore } from '@/stores/iceBreakerStore';
+import { PremiumExpiryModal } from '@/components/PremiumExpiryModal';
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  const profile = useAuthStore((s) => s.profile);
+  const isAdmin = profile?.is_admin === true;
   const pendingCount = useIceBreakerStore((s) => s.pendingIceBreakers.length);
 
   return (
+    <>
+    <PremiumExpiryModal />
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -71,7 +77,18 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="admin"
+        options={{
+          title: t('tabs.admin'),
+          href: isAdmin ? '/(tabs)/admin' : null,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="shield-outline" size={size} color={color} />
+          ),
+        }}
+      />
     </Tabs>
+    </>
   );
 }
 

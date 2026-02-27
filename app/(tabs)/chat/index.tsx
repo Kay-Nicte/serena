@@ -16,6 +16,7 @@ import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useMatches } from '@/hooks/useMatches';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useBlockStore } from '@/stores/blockStore';
 import { supabase } from '@/lib/supabase';
 import type { Match } from '@/stores/matchStore';
 import type { UserPresence } from '@/lib/presence';
@@ -108,7 +109,16 @@ export default function ChatListScreen() {
   const router = useRouter();
   const { matches, isLoading, refresh } = useMatches();
   const { isTablet, chatMaxWidth } = useResponsive();
+  const blockedIds = useBlockStore((s) => s.blockedIds);
   const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
+  const [blockedByIds, setBlockedByIds] = useState<Set<string>>(new Set());
+
+  // Fetch who blocked me (reverse direction — RLS doesn't allow seeing this)
+  useEffect(() => {
+    supabase.rpc('get_users_who_blocked_me').then(({ data }) => {
+      if (data) setBlockedByIds(new Set(data as string[]));
+    });
+  }, []);
 
   // Fetch online status for all matched users
   useEffect(() => {
@@ -188,7 +198,11 @@ export default function ChatListScreen() {
             <ConversationItem
               match={item}
               onPress={() => handleConversationPress(item)}
-              isOnline={onlineUserIds.has(item.otherUser.id)}
+              isOnline={
+                onlineUserIds.has(item.otherUser.id) &&
+                !blockedIds.has(item.otherUser.id) &&
+                !blockedByIds.has(item.otherUser.id)
+              }
             />
           )}
           onRefresh={refresh}

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { useDailyStatsStore } from '@/stores/dailyStatsStore';
 
 interface IceBreakerSender {
   id: string;
@@ -70,6 +71,7 @@ export const useIceBreakerStore = create<IceBreakerStoreState>((set) => ({
       if (result.error) {
         return { success: false, errorKey: result.error };
       }
+      useDailyStatsStore.getState().decrementIceBreaker();
       return { success: true };
     } catch (error) {
       console.error('Error sending ice breaker:', error);

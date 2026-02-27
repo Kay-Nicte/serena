@@ -26,7 +26,7 @@ export default function BlockedUsersScreen() {
 
   const handleUnblock = (user: BlockedUser) => {
     showConfirm({
-      title: t('block.unblockConfirmTitle'),
+      title: t('block.unblockConfirmTitle', { name: user.blocked_name ?? '' }),
       message: t('block.unblockConfirmMessage', { name: user.blocked_name ?? '' }),
       confirmLabel: t('block.unblock'),
       destructive: false,

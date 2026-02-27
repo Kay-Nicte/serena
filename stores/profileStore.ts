@@ -4,8 +4,28 @@ import { Config } from '@/constants/config';
 import { reportError } from '@/lib/errorReporting';
 import i18n from '@/i18n';
 import { showToast } from '@/stores/toastStore';
+import { useDailyStatsStore } from '@/stores/dailyStatsStore';
 import type { Profile } from './authStore';
 import { type Photo, withPhotoUrls } from '@/hooks/usePhotos';
+
+// Supabase may return text[] as PostgreSQL literal "{val1,val2}" if schema cache is stale.
+function normalizeArray(val: unknown): string[] | null {
+  if (val == null) return null;
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string' && val.startsWith('{') && val.endsWith('}')) {
+    const inner = val.slice(1, -1);
+    return inner ? inner.split(',').map((s) => s.replace(/"/g, '')) : [];
+  }
+  return [String(val)];
+}
+
+function normalizeCandidate(data: any): Profile {
+  return {
+    ...data,
+    orientation: normalizeArray(data.orientation),
+    looking_for: normalizeArray(data.looking_for),
+  };
+}
 
 interface MatchResult {
   matched: boolean;
@@ -14,8 +34,8 @@ interface MatchResult {
 
 export function computeActivityLevel(
   lastSeen: string | undefined,
-): 'today' | 'this_week' | 'this_month' | 'inactive' | null {
-  if (!lastSeen) return null;
+): 'today' | 'this_week' | 'this_month' | 'inactive' {
+  if (!lastSeen) return 'inactive';
   const diff = Date.now() - new Date(lastSeen).getTime();
   const hours = diff / 3600000;
   if (hours < 24) return 'today';
@@ -28,6 +48,7 @@ interface ProfileStoreState {
   candidates: Profile[];
   candidatePhotos: Record<string, Photo[]>;
   candidatePresence: Record<string, string>;
+  superlikeSenders: string[];
   currentIndex: number;
   isLoading: boolean;
   error: string | null;
@@ -48,6 +69,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
   candidates: [],
   candidatePhotos: {},
   candidatePresence: {},
+  superlikeSenders: [],
   currentIndex: 0,
   isLoading: false,
   error: null,
@@ -67,7 +89,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
 
       if (error) throw error;
 
-      const candidates = (data as Profile[]) ?? [];
+      const candidates = ((data as any[]) ?? []).map(normalizeCandidate);
 
       // Fetch photos for all candidates
       const candidateIds = candidates.map((c) => c.id);
@@ -104,7 +126,14 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
         }
       }
 
-      set({ candidates, candidatePhotos: photosMap, candidatePresence: presenceMap, currentIndex: 0 });
+      // Fetch superlike senders (users who superliked us, unmatched)
+      let superlikeSenders: string[] = [];
+      const { data: slData } = await supabase.rpc('get_superlike_senders');
+      if (slData) {
+        superlikeSenders = slData as string[];
+      }
+
+      set({ candidates, candidatePhotos: photosMap, candidatePresence: presenceMap, superlikeSenders, currentIndex: 0 });
     } catch (error) {
       reportError(error, { source: 'profileStore.fetchCandidates' });
       set({ error: 'today.errorFetching' });
@@ -146,6 +175,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
         set({ matchResult: result });
       }
 
+      useDailyStatsStore.getState().decrementLike();
       set((state) => ({ currentIndex: state.currentIndex + 1 }));
     } catch (error) {
       reportError(error, { source: 'profileStore.likeProfile' });
@@ -174,6 +204,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
         set({ matchResult: result });
       }
 
+      useDailyStatsStore.getState().decrementSuperlike();
       set((state) => ({ currentIndex: state.currentIndex + 1 }));
     } catch (error) {
       reportError(error, { source: 'profileStore.superlikeProfile' });
@@ -203,6 +234,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       candidates: [],
       candidatePhotos: {},
       candidatePresence: {},
+      superlikeSenders: [],
       currentIndex: 0,
       isLoading: false,
       error: null,

@@ -12,6 +12,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useLocation } from '@/hooks/useLocation';
 import { usePresence } from '@/hooks/usePresence';
 import { useStreak } from '@/hooks/useStreak';
+import { useBlockStore } from '@/stores/blockStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { Toast } from '@/components/Toast';
@@ -32,6 +33,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   useLocation();
   usePresence();
   useStreak();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      useBlockStore.getState().fetchBlockedUsers();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (isLoading) return;

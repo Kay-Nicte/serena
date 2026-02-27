@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { reportError } from '@/lib/errorReporting';
-import { useBlockStore } from './blockStore';
 
 export interface MatchUser {
   id: string;
@@ -62,11 +61,7 @@ export const useMatchStore = create<MatchStoreState>((set, get) => ({
         })
       );
 
-      // Filter out blocked users
-      const blockedIds = useBlockStore.getState().blockedIds;
-      const filteredMatches = matches.filter(m => !blockedIds.has(m.otherUser.id));
-
-      set({ matches: filteredMatches });
+      set({ matches });
     } catch (error) {
       reportError(error, { source: 'matchStore.fetchMatches' });
       set({ error: 'matches.errorFetching' });

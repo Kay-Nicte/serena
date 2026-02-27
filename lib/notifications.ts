@@ -49,6 +49,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
     const Notifications = await import('expo-notifications');
 
     if (!Device.isDevice) {
+      console.warn('[Push] Not a physical device — push notifications require a real device');
       return null;
     }
 
@@ -71,17 +72,20 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
     }
 
     if (finalStatus !== 'granted') {
+      console.warn('[Push] Permission not granted:', finalStatus);
       return null;
     }
 
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
     if (!projectId) {
+      console.warn('[Push] Missing EXPO_PUBLIC_PROJECT_ID in .env — cannot register push token');
       return null;
     }
 
     const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
     return tokenData.data;
-  } catch {
+  } catch (error) {
+    console.warn('[Push] Registration failed:', error);
     return null;
   }
 }
@@ -121,6 +125,9 @@ function handleNotificationNavigation(data: Record<string, unknown>): void {
       if (data.match_id) {
         router.push(`/(tabs)/chat/${data.match_id}`);
       }
+      break;
+    case 'superlike':
+      router.push('/(tabs)');
       break;
     case 'new_report':
       router.push('/(tabs)/admin' as never);

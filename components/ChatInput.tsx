@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
+  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -17,9 +18,11 @@ import { pickImage, uploadChatImage } from '@/lib/storage';
 interface ChatInputProps {
   onSend: (content: string, imageUrl?: string) => void;
   matchId: string;
+  disabled?: boolean;
+  disabledMessage?: string;
 }
 
-export function ChatInput({ onSend, matchId }: ChatInputProps) {
+export function ChatInput({ onSend, matchId, disabled, disabledMessage }: ChatInputProps) {
   const { t } = useTranslation();
   const [text, setText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -83,6 +86,15 @@ export function ChatInput({ onSend, matchId }: ChatInputProps) {
       setIsUploading(false);
     }
   };
+
+  if (disabled) {
+    return (
+      <View style={[styles.container, styles.containerDisabled]}>
+        <Ionicons name="ban" size={18} color={Colors.textTertiary} />
+        <Text style={styles.disabledText}>{disabledMessage ?? t('chat.blocked')}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -166,5 +178,14 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     backgroundColor: Colors.borderLight,
+  },
+  containerDisabled: {
+    justifyContent: 'center',
+    gap: 6,
+  },
+  disabledText: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.textTertiary,
   },
 });

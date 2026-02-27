@@ -42,28 +42,47 @@ export async function deleteAccount() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  // Clean up chat images from storage before deleting account data
-  const { data: matches } = await supabase
-    .from('matches')
-    .select('id')
-    .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`);
+  // Clean up storage files client-side (Supabase doesn't allow direct SQL on storage.objects)
+  try {
+    // Clean up profile photos
+    const { data: photos } = await supabase
+      .from('photos')
+      .select('storage_path')
+      .eq('user_id', user.id);
 
-  if (matches && matches.length > 0) {
-    for (const match of matches) {
-      const { data: files } = await supabase.storage
-        .from('chat-images')
-        .list(match.id);
+    if (photos && photos.length > 0) {
+      const paths = photos.map((p) => p.storage_path);
+      await supabase.storage.from('profile-photos').remove(paths);
+    }
 
-      if (files && files.length > 0) {
-        const filePaths = files.map((file) => `${match.id}/${file.name}`);
-        await supabase.storage.from('chat-images').remove(filePaths);
+    // Clean up chat images
+    const { data: matches } = await supabase
+      .from('matches')
+      .select('id')
+      .or(`user_a_id.eq.${user.id},user_b_id.eq.${user.id}`);
+
+    if (matches && matches.length > 0) {
+      for (const match of matches) {
+        const { data: files } = await supabase.storage
+          .from('chat-images')
+          .list(match.id);
+
+        if (files && files.length > 0) {
+          const filePaths = files.map((file) => `${match.id}/${file.name}`);
+          await supabase.storage.from('chat-images').remove(filePaths);
+        }
       }
     }
+  } catch {
+    // Storage cleanup is best-effort; don't block account deletion
   }
 
   // Call the server-side RPC to delete all account data
   const { error } = await supabase.rpc('delete_own_account');
-  if (error) throw error;
+  if (error) {
+    console.error('[DeleteAccount] RPC error:', JSON.stringify(error));
+    throw error;
+  }
 }
 
 export async function sendPasswordResetEmail(email: string) {

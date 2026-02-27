@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useMatches } from '@/hooks/useMatches';
 import { useIceBreakerStore } from '@/stores/iceBreakerStore';
+import { useMatchStore } from '@/stores/matchStore';
+import { ActionSheet, type ActionSheetOption } from '@/components/ActionSheet';
 import type { Match } from '@/stores/matchStore';
 import type { IceBreaker } from '@/stores/iceBreakerStore';
 
@@ -27,11 +29,17 @@ const GRID_GAP = 12;
 const GRID_PADDING = 24;
 const ITEM_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
 
-function MatchCard({ match, onPress }: { match: Match; onPress: () => void }) {
+function formatMatchDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString([], { day: 'numeric', month: 'long' });
+}
+
+function MatchCard({ match, onPress, onLongPress, deletedLabel }: { match: Match; onPress: () => void; onLongPress: () => void; deletedLabel: string }) {
   return (
     <TouchableOpacity
       style={styles.matchCard}
       onPress={onPress}
+      onLongPress={onLongPress}
       activeOpacity={0.7}
     >
       {match.otherUser.avatar_url ? (
@@ -46,9 +54,15 @@ function MatchCard({ match, onPress }: { match: Match; onPress: () => void }) {
           <Ionicons name="person" size={40} color={Colors.primaryLight} />
         </View>
       )}
-      <Text style={styles.matchName} numberOfLines={1}>
-        {match.otherUser.name ?? ''}
-      </Text>
+      <View style={styles.matchInfo}>
+        <Text style={[styles.matchName, !match.otherUser.name && styles.matchNameDeleted]} numberOfLines={1}>
+          {match.otherUser.name ?? deletedLabel}
+        </Text>
+        <Text style={styles.matchDate} numberOfLines={1}>
+          <Ionicons name="heart" size={11} color={Colors.primary} />{' '}
+          {formatMatchDate(match.created_at)}
+        </Text>
+      </View>
       {match.unreadCount > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{match.unreadCount}</Text>
@@ -125,6 +139,25 @@ export default function MatchesScreen() {
   const handleMatchPress = (match: Match) => {
     router.push(`/(tabs)/chat/${match.id}`);
   };
+
+  const [actionSheetMatch, setActionSheetMatch] = useState<Match | null>(null);
+
+  const handleLongPress = useCallback((match: Match) => {
+    setActionSheetMatch(match);
+  }, []);
+
+  const actionSheetOptions: ActionSheetOption[] = actionSheetMatch ? [
+    {
+      label: t('matches.unmatch'),
+      icon: 'heart-dislike-outline',
+      destructive: true,
+      onPress: async () => {
+        const match = actionSheetMatch;
+        await useMatchStore.getState().unmatchUser(match.id);
+        refresh();
+      },
+    },
+  ] : [];
 
   const handleAcceptIceBreaker = useCallback(
     async (iceBreaker: IceBreaker) => {
@@ -208,12 +241,19 @@ export default function MatchesScreen() {
           contentContainerStyle={styles.grid}
           ListHeaderComponent={renderIceBreakersHeader}
           renderItem={({ item }) => (
-            <MatchCard match={item} onPress={() => handleMatchPress(item)} />
+            <MatchCard match={item} onPress={() => handleMatchPress(item)} onLongPress={() => handleLongPress(item)} deletedLabel={t('matches.deletedUser')} />
           )}
           onRefresh={handleRefresh}
           refreshing={isLoading}
         />
       )}
+
+      <ActionSheet
+        visible={!!actionSheetMatch}
+        title={actionSheetMatch ? t('matches.unmatchConfirmMessage', { name: actionSheetMatch.otherUser.name }) : ''}
+        options={actionSheetOptions}
+        onClose={() => setActionSheetMatch(null)}
+      />
     </SafeAreaView>
   );
 }
@@ -273,12 +313,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  matchInfo: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
   matchName: {
     fontSize: 15,
     fontFamily: Fonts.bodySemiBold,
     color: Colors.text,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+  },
+  matchNameDeleted: {
+    color: Colors.textTertiary,
+    fontStyle: 'italic',
+  },
+  matchDate: {
+    fontSize: 12,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    marginTop: 2,
   },
   badge: {
     position: 'absolute',

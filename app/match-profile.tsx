@@ -26,9 +26,24 @@ interface ProfileData {
   name: string | null;
   birth_date: string | null;
   bio: string | null;
-  orientation: string | null;
-  looking_for: string | null;
+  orientation: string[] | null;
+  looking_for: string[] | null;
   avatar_url: string | null;
+}
+
+function ensureArray(val: unknown): string[] {
+  if (val == null) return [];
+  if (Array.isArray(val)) {
+    return val.flatMap((v) => {
+      const s = String(v).replace(/^\{|\}$/g, '');
+      return s.includes(',') ? s.split(',').map((x) => x.replace(/"/g, '').trim()) : [s];
+    });
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.replace(/^\{|\}$/g, '');
+    return trimmed ? trimmed.split(',').map((s) => s.replace(/"/g, '').trim()) : [];
+  }
+  return [String(val)];
 }
 
 interface PhotoRow {
@@ -165,20 +180,16 @@ export default function MatchProfileScreen() {
           ) : null}
 
           <View style={styles.tags}>
-            {profile.orientation ? (
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>
-                  {t(`orientation.${profile.orientation}`)}
-                </Text>
+            {ensureArray(profile.orientation).map((o) => (
+              <View key={o} style={styles.tag}>
+                <Text style={styles.tagText}>{t(`orientation.${o}`)}</Text>
               </View>
-            ) : null}
-            {profile.looking_for ? (
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>
-                  {t(`lookingFor.${profile.looking_for}`)}
-                </Text>
+            ))}
+            {ensureArray(profile.looking_for).map((lf) => (
+              <View key={lf} style={styles.tag}>
+                <Text style={styles.tagText}>{t(`lookingFor.${lf}`)}</Text>
               </View>
-            ) : null}
+            ))}
           </View>
         </View>
       </ScrollView>
