@@ -9,12 +9,13 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Modal,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
-import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, type Orientation, type LookingFor } from '@/constants/config';
+import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, INTERESTS, CHILDREN_OPTIONS, ZODIAC_SIGNS, PET_OPTIONS, SMOKING_OPTIONS, DRINKING_OPTIONS, HOGWARTS_HOUSES } from '@/constants/config';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Tag } from '@/components/ui/Tag';
@@ -44,6 +45,7 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { showToast } from '@/stores/toastStore';
 import { useStreak } from '@/hooks/useStreak';
 import { useDailyStatsStore } from '@/stores/dailyStatsStore';
+import { supabase } from '@/lib/supabase';
 
 const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
@@ -71,8 +73,18 @@ export default function ProfileScreen() {
   const [year, setYear] = useState('');
   const [orientations, setOrientations] = useState<string[]>([]);
   const [lookingFor, setLookingFor] = useState<string[]>([]);
+  const [interests, setInterests] = useState<string[]>([]);
+  const [children, setChildren] = useState<string | null>(null);
+  const [zodiac, setZodiac] = useState<string | null>(null);
+  const [zodiacAscendant, setZodiacAscendant] = useState<string | null>(null);
+  const [pets, setPets] = useState<string[]>([]);
+  const [smokingVal, setSmokingVal] = useState<string | null>(null);
+  const [drinkingVal, setDrinkingVal] = useState<string | null>(null);
+  const [heightCm, setHeightCm] = useState<string>('');
+  const [hogwartsHouse, setHogwartsHouse] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
+  const [trialGranted, setTrialGranted] = useState(false);
 
   const isUnderage = (() => {
     const d = parseInt(day, 10);
@@ -92,6 +104,15 @@ export default function ProfileScreen() {
       setBio(profile.bio ?? '');
       setOrientations(profile.orientation ?? []);
       setLookingFor(profile.looking_for ?? []);
+      setInterests(profile.interests ?? []);
+      setChildren(profile.children ?? null);
+      setZodiac(profile.zodiac ?? null);
+      setZodiacAscendant(profile.zodiac_ascendant ?? null);
+      setPets(profile.pets ?? []);
+      setSmokingVal(profile.smoking ?? null);
+      setDrinkingVal(profile.drinking ?? null);
+      setHeightCm(profile.height_cm ? String(profile.height_cm) : '');
+      setHogwartsHouse(profile.hogwarts_house ?? null);
       if (profile.birth_date) {
         const [y, m, d] = profile.birth_date.split('-');
         setYear(y);
@@ -122,6 +143,16 @@ export default function ProfileScreen() {
     setLookingFor((prev) => prev.includes(lf) ? prev.filter((x) => x !== lf) : [...prev, lf]);
   };
 
+  const toggleInterest = (i: string) => {
+    setInterests((prev) => prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]);
+  };
+  const toggleSingleSelect = (current: string | null, value: string, setter: (v: string | null) => void) => {
+    setter(current === value ? null : value);
+  };
+  const togglePet = (p: string) => {
+    setPets((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
+  };
+
   const handleSave = async () => {
     if (!name.trim() || isUnderage) return;
     setSaving(true);
@@ -137,7 +168,30 @@ export default function ProfileScreen() {
         birth_date: birthDateString,
         orientation: orientations.length > 0 ? orientations : null,
         looking_for: lookingFor.length > 0 ? lookingFor : null,
+        interests: interests.length > 0 ? interests : null,
+        children: children,
+        zodiac: zodiac,
+        zodiac_ascendant: zodiacAscendant,
+        pets: pets.length > 0 ? pets : null,
+        smoking: smokingVal,
+        drinking: drinkingVal,
+        height_cm: heightCm ? parseInt(heightCm, 10) || null : null,
+        hogwarts_house: hogwartsHouse,
       } as any);
+
+      // Try to activate premium trial if user hasn't had it yet
+      // The RPC checks profile completeness server-side
+      if (!isPremium && !premiumUntil) {
+        try {
+          const { data } = await supabase.rpc('activate_premium_trial');
+          if (data?.granted) {
+            setTrialGranted(true);
+          }
+        } catch {
+          // Non-critical
+        }
+      }
+
       setEditing(false);
     } catch {
       showToast(t('common.error'), 'error');
@@ -220,6 +274,64 @@ export default function ProfileScreen() {
                   <Text style={styles.infoValue}>
                     {ensureArray(profile?.looking_for).map((lf) => t(`lookingFor.${lf}`)).join(', ')}
                   </Text>
+                </View>
+              )}
+              {ensureArray(profile?.interests).length > 0 && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.interests')}</Text>
+                  <Text style={styles.infoValue}>
+                    {ensureArray(profile?.interests).map((i) => t(`interests.${i}`)).join(', ')}
+                  </Text>
+                </View>
+              )}
+              {profile?.zodiac && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.zodiac')}</Text>
+                  <Text style={styles.infoValue}>{t(`zodiac.${profile.zodiac}`)}</Text>
+                </View>
+              )}
+              {profile?.zodiac_ascendant && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.zodiacAscendant')}</Text>
+                  <Text style={styles.infoValue}>{t(`zodiac.${profile.zodiac_ascendant}`)}</Text>
+                </View>
+              )}
+              {profile?.height_cm && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.height')}</Text>
+                  <Text style={styles.infoValue}>{t('profile.heightCm', { cm: profile.height_cm })}</Text>
+                </View>
+              )}
+              {profile?.children && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.children')}</Text>
+                  <Text style={styles.infoValue}>{t(`children.${profile.children}`)}</Text>
+                </View>
+              )}
+              {ensureArray(profile?.pets).length > 0 && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.pets')}</Text>
+                  <Text style={styles.infoValue}>
+                    {ensureArray(profile?.pets).map((p) => t(`pets.${p}`)).join(', ')}
+                  </Text>
+                </View>
+              )}
+              {profile?.smoking && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.smoking')}</Text>
+                  <Text style={styles.infoValue}>{t(`smoking.${profile.smoking}`)}</Text>
+                </View>
+              )}
+              {profile?.drinking && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.drinking')}</Text>
+                  <Text style={styles.infoValue}>{t(`drinking.${profile.drinking}`)}</Text>
+                </View>
+              )}
+              {profile?.hogwarts_house && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.hogwartsHouse')}</Text>
+                  <Text style={styles.infoValue}>{t(`hogwarts.${profile.hogwarts_house}`)}</Text>
                 </View>
               )}
             </View>
@@ -443,6 +555,105 @@ export default function ProfileScreen() {
             </View>
           </View>
 
+          {/* Interests */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.interests')}</Text>
+            <View style={styles.tags}>
+              {INTERESTS.map((i) => (
+                <Tag key={i} label={t(`interests.${i}`)} selected={interests.includes(i)} onPress={() => toggleInterest(i)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Zodiac */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.zodiac')}</Text>
+            <View style={styles.tags}>
+              {ZODIAC_SIGNS.map((z) => (
+                <Tag key={z} label={t(`zodiac.${z}`)} selected={zodiac === z} onPress={() => toggleSingleSelect(zodiac, z, setZodiac)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Zodiac Ascendant */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.zodiacAscendant')}</Text>
+            <View style={styles.tags}>
+              {ZODIAC_SIGNS.map((z) => (
+                <Tag key={z} label={t(`zodiac.${z}`)} selected={zodiacAscendant === z} onPress={() => toggleSingleSelect(zodiacAscendant, z, setZodiacAscendant)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Height */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.height')}</Text>
+            <View style={styles.dateRow}>
+              <View style={styles.dateField}>
+                <TextInput
+                  style={styles.dateInput}
+                  placeholder="cm"
+                  placeholderTextColor={Colors.textTertiary}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                  value={heightCm}
+                  onChangeText={setHeightCm}
+                />
+              </View>
+              <Text style={styles.dateSeparator}>cm</Text>
+            </View>
+          </View>
+
+          {/* Children */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.children')}</Text>
+            <View style={styles.tags}>
+              {CHILDREN_OPTIONS.map((c) => (
+                <Tag key={c} label={t(`children.${c}`)} selected={children === c} onPress={() => toggleSingleSelect(children, c, setChildren)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Pets */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.pets')}</Text>
+            <View style={styles.tags}>
+              {PET_OPTIONS.map((p) => (
+                <Tag key={p} label={t(`pets.${p}`)} selected={pets.includes(p)} onPress={() => togglePet(p)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Smoking */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.smoking')}</Text>
+            <View style={styles.tags}>
+              {SMOKING_OPTIONS.map((s) => (
+                <Tag key={s} label={t(`smoking.${s}`)} selected={smokingVal === s} onPress={() => toggleSingleSelect(smokingVal, s, setSmokingVal)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Drinking */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.drinking')}</Text>
+            <View style={styles.tags}>
+              {DRINKING_OPTIONS.map((d) => (
+                <Tag key={d} label={t(`drinking.${d}`)} selected={drinkingVal === d} onPress={() => toggleSingleSelect(drinkingVal, d, setDrinkingVal)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Hogwarts House */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.hogwartsHouse')}</Text>
+            <View style={styles.tags}>
+              {HOGWARTS_HOUSES.map((h) => (
+                <Tag key={h} label={t(`hogwarts.${h}`)} selected={hogwartsHouse === h} onPress={() => toggleSingleSelect(hogwartsHouse, h, setHogwartsHouse)} />
+              ))}
+            </View>
+          </View>
+
           <Button
             title={t('common.save')}
             onPress={handleSave}
@@ -452,6 +663,46 @@ export default function ProfileScreen() {
           />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Premium trial modal */}
+      <Modal visible={trialGranted} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Ionicons name="diamond" size={40} color="#E0A800" />
+            <Text style={styles.modalTitle}>{t('premium.trialTitle')}</Text>
+            <Text style={styles.modalDescription}>{t('premium.trialDescription')}</Text>
+            <View style={styles.modalBenefits}>
+              <View style={styles.modalBenefit}>
+                <Ionicons name="heart" size={18} color={Colors.primary} />
+                <Text style={styles.modalBenefitText}>{t('premium.benefit10Likes')}</Text>
+              </View>
+              <View style={styles.modalBenefit}>
+                <Ionicons name="star" size={18} color="#E0A800" />
+                <Text style={styles.modalBenefitText}>{t('premium.benefitSuperlike')}</Text>
+              </View>
+              <View style={styles.modalBenefit}>
+                <Ionicons name="chatbubble" size={18} color={Colors.primary} />
+                <Text style={styles.modalBenefitText}>{t('premium.benefitIceBreaker')}</Text>
+              </View>
+              <View style={styles.modalBenefit}>
+                <Ionicons name="eye" size={18} color={Colors.primary} />
+                <Text style={styles.modalBenefitText}>{t('premium.benefitReadReceipts')}</Text>
+              </View>
+              <View style={styles.modalBenefit}>
+                <Ionicons name="time" size={18} color={Colors.primary} />
+                <Text style={styles.modalBenefitText}>{t('premium.benefitLastSeen')}</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => { setTrialGranted(false); fetchProfile(); }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.modalButtonText}>{t('common.done')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -706,5 +957,67 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: Fonts.heading,
     color: Colors.text,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  modalCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 24,
+    padding: 28,
+    alignItems: 'center',
+    gap: 14,
+    width: '100%',
+    maxWidth: 360,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontFamily: Fonts.heading,
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  modalDescription: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  modalBenefits: {
+    width: '100%',
+    gap: 10,
+    paddingVertical: 4,
+  },
+  modalBenefit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  modalBenefitText: {
+    fontSize: 14,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.text,
+    flex: 1,
+  },
+  modalButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 40,
+    paddingVertical: 14,
+    borderRadius: 24,
+    marginTop: 4,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.textOnPrimary,
   },
 });

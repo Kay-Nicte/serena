@@ -25,6 +25,15 @@ export interface Profile {
   is_premium: boolean;
   premium_until: string | null;
   language_preference: string | null;
+  interests: string[] | null;
+  children: string | null;
+  zodiac: string | null;
+  zodiac_ascendant: string | null;
+  pets: string[] | null;
+  smoking: string | null;
+  drinking: string | null;
+  height_cm: number | null;
+  hogwarts_house: string | null;
   created_at: string;
   updated_at: string;
   distance_km?: number | null;
@@ -43,14 +52,20 @@ interface AuthState {
   forceReset: () => void;
 }
 
-// Supabase may return text[] as PostgreSQL literal "{val1,val2}" if schema cache is stale.
-// This normalizes it to a proper JS array.
+// Supabase may return text[] as PostgreSQL literal "{val1,val2}" or as an array
+// whose elements still contain braces/quotes. This normalizes all cases.
 function normalizeArray(val: unknown): string[] | null {
   if (val == null) return null;
-  if (Array.isArray(val)) return val;
+  if (Array.isArray(val)) {
+    return val.flatMap((v) => {
+      const s = String(v).replace(/^\{|\}$/g, '');
+      const parts = s.includes(',') ? s.split(',') : [s];
+      return parts.map((p) => p.replace(/"/g, '').trim()).filter(Boolean);
+    });
+  }
   if (typeof val === 'string' && val.startsWith('{') && val.endsWith('}')) {
     const inner = val.slice(1, -1);
-    return inner ? inner.split(',').map((s) => s.replace(/"/g, '')) : [];
+    return inner ? inner.split(',').map((s) => s.replace(/"/g, '').trim()) : [];
   }
   return [String(val)];
 }
@@ -60,6 +75,8 @@ function normalizeProfile(data: any): Profile {
     ...data,
     orientation: normalizeArray(data.orientation),
     looking_for: normalizeArray(data.looking_for),
+    interests: normalizeArray(data.interests),
+    pets: normalizeArray(data.pets),
   };
 }
 

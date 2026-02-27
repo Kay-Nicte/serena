@@ -124,7 +124,29 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
               <Text style={styles.tagText}>{t(`lookingFor.${lf}`)}</Text>
             </View>
           ))}
+          {ensureArray(profile.interests).map((int, i) => (
+            <View key={`int-${int}-${i}`} style={styles.interestTag}>
+              <Text style={styles.interestTagText}>{t(`interests.${int}`)}</Text>
+            </View>
+          ))}
         </View>
+
+        {(profile.zodiac || profile.height_cm || profile.hogwarts_house) && (
+          <View style={styles.detailRow}>
+            {profile.zodiac && (
+              <Text style={styles.detailText}>{t(`zodiac.${profile.zodiac}`)}</Text>
+            )}
+            {profile.zodiac_ascendant && (
+              <Text style={styles.detailText}>{t('profile.zodiacAscendant')}: {t(`zodiac.${profile.zodiac_ascendant}`)}</Text>
+            )}
+            {profile.height_cm && (
+              <Text style={styles.detailText}>{t('profile.heightCm', { cm: profile.height_cm })}</Text>
+            )}
+            {profile.hogwarts_house && (
+              <Text style={styles.detailText}>{t(`hogwarts.${profile.hogwarts_house}`)}</Text>
+            )}
+          </View>
+        )}
       </View>
     </View>
   );
@@ -210,6 +232,29 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.bodyMedium,
     color: Colors.primaryDark,
+  },
+  interestTag: {
+    backgroundColor: '#E8F5E9',
+    borderWidth: 1,
+    borderColor: '#A5D6A7',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  interestTagText: {
+    fontSize: 13,
+    fontFamily: Fonts.bodyMedium,
+    color: '#2E7D32',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  detailText: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
   },
   superlikeBanner: {
     backgroundColor: '#FFF8E1',

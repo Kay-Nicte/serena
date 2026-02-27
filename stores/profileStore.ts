@@ -8,13 +8,20 @@ import { useDailyStatsStore } from '@/stores/dailyStatsStore';
 import type { Profile } from './authStore';
 import { type Photo, withPhotoUrls } from '@/hooks/usePhotos';
 
-// Supabase may return text[] as PostgreSQL literal "{val1,val2}" if schema cache is stale.
+// Supabase may return text[] as PostgreSQL literal "{val1,val2}" or as an array
+// whose elements still contain braces/quotes. This normalizes all cases.
 function normalizeArray(val: unknown): string[] | null {
   if (val == null) return null;
-  if (Array.isArray(val)) return val;
+  if (Array.isArray(val)) {
+    return val.flatMap((v) => {
+      const s = String(v).replace(/^\{|\}$/g, '');
+      const parts = s.includes(',') ? s.split(',') : [s];
+      return parts.map((p) => p.replace(/"/g, '').trim()).filter(Boolean);
+    });
+  }
   if (typeof val === 'string' && val.startsWith('{') && val.endsWith('}')) {
     const inner = val.slice(1, -1);
-    return inner ? inner.split(',').map((s) => s.replace(/"/g, '')) : [];
+    return inner ? inner.split(',').map((s) => s.replace(/"/g, '').trim()) : [];
   }
   return [String(val)];
 }

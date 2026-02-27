@@ -1,0 +1,10 @@
+-- Add extended profile fields (all optional)
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS interests TEXT[];
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS children TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS zodiac TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS zodiac_ascendant TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS pets TEXT[];
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS smoking TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS drinking TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS height_cm INTEGER;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS hogwarts_house TEXT;

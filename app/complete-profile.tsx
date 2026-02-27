@@ -19,7 +19,7 @@ import { Tag } from '@/components/ui/Tag';
 import { PhotoGrid } from '@/components/PhotoGrid';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
-import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, type Orientation, type LookingFor } from '@/constants/config';
+import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, INTERESTS, CHILDREN_OPTIONS, ZODIAC_SIGNS, PET_OPTIONS, SMOKING_OPTIONS, DRINKING_OPTIONS, HOGWARTS_HOUSES } from '@/constants/config';
 import { useAuthStore } from '@/stores/authStore';
 import { usePhotoStore, type Photo } from '@/stores/photoStore';
 import { pickImage } from '@/lib/storage';
@@ -40,6 +40,15 @@ export default function CompleteProfileScreen() {
   const [bio, setBio] = useState('');
   const [orientations, setOrientations] = useState<string[]>([]);
   const [lookingFor, setLookingFor] = useState<string[]>([]);
+  const [interests, setInterests] = useState<string[]>([]);
+  const [children, setChildren] = useState<string | null>(null);
+  const [zodiac, setZodiac] = useState<string | null>(null);
+  const [zodiacAscendant, setZodiacAscendant] = useState<string | null>(null);
+  const [pets, setPets] = useState<string[]>([]);
+  const [smokingVal, setSmokingVal] = useState<string | null>(null);
+  const [drinkingVal, setDrinkingVal] = useState<string | null>(null);
+  const [heightCm, setHeightCm] = useState<string>('');
+  const [hogwartsHouse, setHogwartsHouse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [trialGranted, setTrialGranted] = useState(false);
 
@@ -71,6 +80,16 @@ export default function CompleteProfileScreen() {
     setLookingFor((prev) => prev.includes(lf) ? prev.filter((x) => x !== lf) : [...prev, lf]);
   };
 
+  const toggleInterest = (i: string) => {
+    setInterests((prev) => prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]);
+  };
+  const toggleSingleSelect = (current: string | null, value: string, setter: (v: string | null) => void) => {
+    setter(current === value ? null : value);
+  };
+  const togglePet = (p: string) => {
+    setPets((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
+  };
+
   const handleAddPhoto = async (position: number) => {
     const uri = await pickImage();
     if (uri && user) {
@@ -97,22 +116,33 @@ export default function CompleteProfileScreen() {
           bio: bio.trim(),
           orientation: orientations,
           looking_for: lookingFor,
+          interests: interests.length > 0 ? interests : null,
+          children: children,
+          zodiac: zodiac,
+          zodiac_ascendant: zodiacAscendant,
+          pets: pets.length > 0 ? pets : null,
+          smoking: smokingVal,
+          drinking: drinkingVal,
+          height_cm: heightCm ? parseInt(heightCm, 10) || null : null,
+          hogwarts_house: hogwartsHouse,
         })
         .eq('id', user!.id);
 
-      // Activate 7-day premium free trial
-      try {
-        const { data } = await supabase.rpc('activate_premium_trial');
-        if (data?.granted) {
-          setTrialGranted(true);
-          setLoading(false);
-          return; // Wait for modal dismiss before marking complete
+      // Activate 7-day premium free trial ONLY if profile is fully complete
+      if (isProfileFullyComplete) {
+        try {
+          const { data } = await supabase.rpc('activate_premium_trial');
+          if (data?.granted) {
+            setTrialGranted(true);
+            setLoading(false);
+            return; // Wait for modal dismiss before marking complete
+          }
+        } catch {
+          // Non-critical: trial activation failure should not block profile completion
         }
-      } catch {
-        // Non-critical: trial activation failure should not block profile completion
       }
 
-      // No trial modal → mark complete now (triggers navigation)
+      // Mark complete now (triggers navigation)
       await updateProfile({ is_profile_complete: true } as any);
     } catch {
       showToast(t('common.error'), 'error');
@@ -128,6 +158,21 @@ export default function CompleteProfileScreen() {
   };
 
   const isValid = name.trim() && birthDateString && !isUnderage && photos.length > 0;
+
+  // Profile is fully complete when ALL fields are filled (hogwarts_house excluded)
+  const isProfileFullyComplete =
+    isValid &&
+    bio.trim().length > 0 &&
+    orientations.length > 0 &&
+    lookingFor.length > 0 &&
+    interests.length > 0 &&
+    children !== null &&
+    zodiac !== null &&
+    zodiacAscendant !== null &&
+    pets.length > 0 &&
+    smokingVal !== null &&
+    drinkingVal !== null &&
+    (heightCm !== '' && parseInt(heightCm, 10) > 0);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -247,6 +292,105 @@ export default function CompleteProfileScreen() {
                   selected={lookingFor.includes(lf)}
                   onPress={() => toggleLookingFor(lf)}
                 />
+              ))}
+            </View>
+          </View>
+
+          {/* Interests */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.interests')}</Text>
+            <View style={styles.tags}>
+              {INTERESTS.map((i) => (
+                <Tag key={i} label={t(`interests.${i}`)} selected={interests.includes(i)} onPress={() => toggleInterest(i)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Zodiac */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.zodiac')}</Text>
+            <View style={styles.tags}>
+              {ZODIAC_SIGNS.map((z) => (
+                <Tag key={z} label={t(`zodiac.${z}`)} selected={zodiac === z} onPress={() => toggleSingleSelect(zodiac, z, setZodiac)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Zodiac Ascendant */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.zodiacAscendant')}</Text>
+            <View style={styles.tags}>
+              {ZODIAC_SIGNS.map((z) => (
+                <Tag key={z} label={t(`zodiac.${z}`)} selected={zodiacAscendant === z} onPress={() => toggleSingleSelect(zodiacAscendant, z, setZodiacAscendant)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Height */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.height')}</Text>
+            <View style={styles.dateRow}>
+              <View style={styles.dateField}>
+                <TextInput
+                  style={styles.dateInput}
+                  placeholder="cm"
+                  placeholderTextColor={Colors.textTertiary}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                  value={heightCm}
+                  onChangeText={setHeightCm}
+                />
+              </View>
+              <Text style={styles.dateSeparator}>cm</Text>
+            </View>
+          </View>
+
+          {/* Children */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.children')}</Text>
+            <View style={styles.tags}>
+              {CHILDREN_OPTIONS.map((c) => (
+                <Tag key={c} label={t(`children.${c}`)} selected={children === c} onPress={() => toggleSingleSelect(children, c, setChildren)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Pets */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.pets')}</Text>
+            <View style={styles.tags}>
+              {PET_OPTIONS.map((p) => (
+                <Tag key={p} label={t(`pets.${p}`)} selected={pets.includes(p)} onPress={() => togglePet(p)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Smoking */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.smoking')}</Text>
+            <View style={styles.tags}>
+              {SMOKING_OPTIONS.map((s) => (
+                <Tag key={s} label={t(`smoking.${s}`)} selected={smokingVal === s} onPress={() => toggleSingleSelect(smokingVal, s, setSmokingVal)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Drinking */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.drinking')}</Text>
+            <View style={styles.tags}>
+              {DRINKING_OPTIONS.map((d) => (
+                <Tag key={d} label={t(`drinking.${d}`)} selected={drinkingVal === d} onPress={() => toggleSingleSelect(drinkingVal, d, setDrinkingVal)} />
+              ))}
+            </View>
+          </View>
+
+          {/* Hogwarts House */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.hogwartsHouse')}</Text>
+            <View style={styles.tags}>
+              {HOGWARTS_HOUSES.map((h) => (
+                <Tag key={h} label={t(`hogwarts.${h}`)} selected={hogwartsHouse === h} onPress={() => toggleSingleSelect(hogwartsHouse, h, setHogwartsHouse)} />
               ))}
             </View>
           </View>

@@ -76,7 +76,17 @@
     "dayPlaceholder": "DD",
     "monthPlaceholder": "MM",
     "yearPlaceholder": "YYYY",
-    "underageError": "You must be at least 18 years old"
+    "underageError": "You must be at least 18 years old",
+    "interests": "Interests",
+    "children": "Children",
+    "zodiac": "Zodiac sign",
+    "zodiacAscendant": "Ascendant",
+    "pets": "Pets",
+    "smoking": "Smoking",
+    "drinking": "Drinking",
+    "height": "Height",
+    "heightCm": "{{cm}} cm",
+    "hogwartsHouse": "Hogwarts house"
   },
   "orientation": {
     "lesbian": "Lesbian",
@@ -314,7 +324,7 @@
     "keepGoingTitle": "Don't worry!",
     "keepGoingMessage": "Keep your daily streak going and you'll keep earning superlikes and ice breakers as rewards. See you tomorrow!",
     "understood": "Got it",
-    "completeProfileTeaser": "Add photos and a bio to get 7 days of Premium for free!"
+    "completeProfileTeaser": "Complete your entire profile to get 7 days of Premium for free!"
   },
   "streak": {
     "title": "Daily Streak",
@@ -334,6 +344,70 @@
     "sent": "Superlike sent!",
     "received": "Someone sent you a superlike!",
     "receivedBadge": "Gave you a superlike"
+  },
+  "interests": {
+    "travel": "Travel",
+    "cooking": "Cooking",
+    "music": "Music",
+    "hiking": "Hiking",
+    "yoga": "Yoga",
+    "photography": "Photography",
+    "art": "Art",
+    "gaming": "Gaming",
+    "reading": "Reading",
+    "fitness": "Fitness",
+    "dancing": "Dancing",
+    "movies": "Movies",
+    "nature": "Nature",
+    "wine": "Wine",
+    "coffee": "Coffee",
+    "cats": "Cats",
+    "dogs": "Dogs"
+  },
+  "children": {
+    "has_and_wants_more": "Has children, wants more",
+    "has_and_doesnt_want_more": "Has children, doesn't want more",
+    "doesnt_have_and_wants": "Doesn't have, wants children",
+    "doesnt_have_and_doesnt_want": "Doesn't have, doesn't want",
+    "not_sure": "Not sure yet"
+  },
+  "zodiac": {
+    "aries": "♈ Aries",
+    "taurus": "♉ Taurus",
+    "gemini": "♊ Gemini",
+    "cancer": "♋ Cancer",
+    "leo": "♌ Leo",
+    "virgo": "♍ Virgo",
+    "libra": "♎ Libra",
+    "scorpio": "♏ Scorpio",
+    "sagittarius": "♐ Sagittarius",
+    "capricorn": "♑ Capricorn",
+    "aquarius": "♒ Aquarius",
+    "pisces": "♓ Pisces"
+  },
+  "pets": {
+    "dog": "Dog",
+    "cat": "Cat",
+    "bird": "Bird",
+    "fish": "Fish",
+    "reptile": "Reptile",
+    "none": "None"
+  },
+  "smoking": {
+    "never": "Never",
+    "sometimes": "Sometimes",
+    "regularly": "Regularly"
+  },
+  "drinking": {
+    "never": "Never",
+    "sometimes": "Sometimes",
+    "regularly": "Regularly"
+  },
+  "hogwarts": {
+    "gryffindor": "Gryffindor",
+    "slytherin": "Slytherin",
+    "hufflepuff": "Hufflepuff",
+    "ravenclaw": "Ravenclaw"
   },
   "iceBreaker": {
     "title": "Ice Breakers",

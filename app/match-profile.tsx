@@ -29,6 +29,15 @@ interface ProfileData {
   orientation: string[] | null;
   looking_for: string[] | null;
   avatar_url: string | null;
+  interests: string[] | null;
+  children: string | null;
+  zodiac: string | null;
+  zodiac_ascendant: string | null;
+  pets: string[] | null;
+  smoking: string | null;
+  drinking: string | null;
+  height_cm: number | null;
+  hogwarts_house: string | null;
 }
 
 function ensureArray(val: unknown): string[] {
@@ -80,7 +89,7 @@ export default function MatchProfileScreen() {
       try {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('id, name, birth_date, bio, orientation, looking_for, avatar_url')
+          .select('id, name, birth_date, bio, orientation, looking_for, avatar_url, interests, children, zodiac, zodiac_ascendant, pets, smoking, drinking, height_cm, hogwarts_house')
           .eq('id', userId)
           .single();
 
@@ -180,17 +189,93 @@ export default function MatchProfileScreen() {
           ) : null}
 
           <View style={styles.tags}>
-            {ensureArray(profile.orientation).map((o) => (
-              <View key={o} style={styles.tag}>
+            {ensureArray(profile.orientation).map((o, i) => (
+              <View key={`o-${o}-${i}`} style={styles.tag}>
                 <Text style={styles.tagText}>{t(`orientation.${o}`)}</Text>
               </View>
             ))}
-            {ensureArray(profile.looking_for).map((lf) => (
-              <View key={lf} style={styles.tag}>
+            {ensureArray(profile.looking_for).map((lf, i) => (
+              <View key={`lf-${lf}-${i}`} style={styles.tag}>
                 <Text style={styles.tagText}>{t(`lookingFor.${lf}`)}</Text>
               </View>
             ))}
           </View>
+
+          {ensureArray(profile.interests).length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>{t('profile.interests')}</Text>
+              <View style={styles.tags}>
+                {ensureArray(profile.interests).map((int, i) => (
+                  <View key={`int-${int}-${i}`} style={styles.interestTag}>
+                    <Text style={styles.interestTagText}>{t(`interests.${int}`)}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {(profile.zodiac || profile.height_cm) && (
+            <View style={styles.section}>
+              {profile.zodiac && (
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t('profile.zodiac')}</Text>
+                  <Text style={styles.detailValue}>{t(`zodiac.${profile.zodiac}`)}</Text>
+                </View>
+              )}
+              {profile.zodiac_ascendant && (
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t('profile.zodiacAscendant')}</Text>
+                  <Text style={styles.detailValue}>{t(`zodiac.${profile.zodiac_ascendant}`)}</Text>
+                </View>
+              )}
+              {profile.height_cm && (
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t('profile.height')}</Text>
+                  <Text style={styles.detailValue}>{t('profile.heightCm', { cm: profile.height_cm })}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          {(profile.children || profile.smoking || profile.drinking) && (
+            <View style={styles.section}>
+              {profile.children && (
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t('profile.children')}</Text>
+                  <Text style={styles.detailValue}>{t(`children.${profile.children}`)}</Text>
+                </View>
+              )}
+              {ensureArray(profile.pets).length > 0 && (
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t('profile.pets')}</Text>
+                  <Text style={styles.detailValue}>
+                    {ensureArray(profile.pets).map((p) => t(`pets.${p}`)).join(', ')}
+                  </Text>
+                </View>
+              )}
+              {profile.smoking && (
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t('profile.smoking')}</Text>
+                  <Text style={styles.detailValue}>{t(`smoking.${profile.smoking}`)}</Text>
+                </View>
+              )}
+              {profile.drinking && (
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t('profile.drinking')}</Text>
+                  <Text style={styles.detailValue}>{t(`drinking.${profile.drinking}`)}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          {profile.hogwarts_house && (
+            <View style={styles.section}>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>{t('profile.hogwartsHouse')}</Text>
+                <Text style={styles.detailValue}>{t(`hogwarts.${profile.hogwarts_house}`)}</Text>
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -294,5 +379,35 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.bodyMedium,
     color: Colors.primaryDark,
+  },
+  interestTag: {
+    backgroundColor: '#E8F5E9',
+    borderWidth: 1,
+    borderColor: '#A5D6A7',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+  },
+  interestTagText: {
+    fontSize: 13,
+    fontFamily: Fonts.bodyMedium,
+    color: '#2E7D32',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  detailLabel: {
+    fontSize: 14,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.textSecondary,
+  },
+  detailValue: {
+    fontSize: 14,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.text,
+    flexShrink: 1,
+    textAlign: 'right',
   },
 });

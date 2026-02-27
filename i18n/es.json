@@ -76,7 +76,17 @@
     "dayPlaceholder": "DD",
     "monthPlaceholder": "MM",
     "yearPlaceholder": "AAAA",
-    "underageError": "Debes tener al menos 18 años"
+    "underageError": "Debes tener al menos 18 años",
+    "interests": "Intereses",
+    "children": "Hijos/as",
+    "zodiac": "Signo del zodiaco",
+    "zodiacAscendant": "Ascendente",
+    "pets": "Mascotas",
+    "smoking": "Tabaco",
+    "drinking": "Alcohol",
+    "height": "Altura",
+    "heightCm": "{{cm}} cm",
+    "hogwartsHouse": "Casa de Hogwarts"
   },
   "orientation": {
     "lesbian": "Lesbiana",
@@ -314,7 +324,7 @@
     "keepGoingTitle": "¡No te preocupes!",
     "keepGoingMessage": "Mantén tu racha diaria y seguirás ganando superlikes y rompehielos como recompensa. ¡Te esperamos mañana!",
     "understood": "Entendido",
-    "completeProfileTeaser": "¡Añade fotos y una bio para conseguir 7 días de Premium gratis!"
+    "completeProfileTeaser": "¡Completa tu perfil entero para conseguir 7 días de Premium gratis!"
   },
   "streak": {
     "title": "Racha diaria",
@@ -334,6 +344,70 @@
     "sent": "¡Superlike enviado!",
     "received": "¡Alguien te envió un superlike!",
     "receivedBadge": "Te ha dado superlike"
+  },
+  "interests": {
+    "travel": "Viajar",
+    "cooking": "Cocinar",
+    "music": "Música",
+    "hiking": "Senderismo",
+    "yoga": "Yoga",
+    "photography": "Fotografía",
+    "art": "Arte",
+    "gaming": "Videojuegos",
+    "reading": "Lectura",
+    "fitness": "Fitness",
+    "dancing": "Bailar",
+    "movies": "Cine",
+    "nature": "Naturaleza",
+    "wine": "Vino",
+    "coffee": "Café",
+    "cats": "Gatos",
+    "dogs": "Perros"
+  },
+  "children": {
+    "has_and_wants_more": "Tiene hijos/as y quiere más",
+    "has_and_doesnt_want_more": "Tiene hijos/as y no quiere más",
+    "doesnt_have_and_wants": "No tiene y quiere tener",
+    "doesnt_have_and_doesnt_want": "No tiene y no quiere",
+    "not_sure": "No lo tengo claro"
+  },
+  "zodiac": {
+    "aries": "♈ Aries",
+    "taurus": "♉ Tauro",
+    "gemini": "♊ Géminis",
+    "cancer": "♋ Cáncer",
+    "leo": "♌ Leo",
+    "virgo": "♍ Virgo",
+    "libra": "♎ Libra",
+    "scorpio": "♏ Escorpio",
+    "sagittarius": "♐ Sagitario",
+    "capricorn": "♑ Capricornio",
+    "aquarius": "♒ Acuario",
+    "pisces": "♓ Piscis"
+  },
+  "pets": {
+    "dog": "Perro",
+    "cat": "Gato",
+    "bird": "Pájaro",
+    "fish": "Pez",
+    "reptile": "Reptil",
+    "none": "Ninguna"
+  },
+  "smoking": {
+    "never": "Nunca",
+    "sometimes": "A veces",
+    "regularly": "Habitualmente"
+  },
+  "drinking": {
+    "never": "Nunca",
+    "sometimes": "A veces",
+    "regularly": "Habitualmente"
+  },
+  "hogwarts": {
+    "gryffindor": "Gryffindor",
+    "slytherin": "Slytherin",
+    "hufflepuff": "Hufflepuff",
+    "ravenclaw": "Ravenclaw"
   },
   "iceBreaker": {
     "title": "Rompehielos",

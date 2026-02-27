@@ -1,3 +1,4 @@
+import { IceBreakerModal } from "@/components/IceBreakerModal";
 import { MatchOverlay } from "@/components/MatchOverlay";
 import { ProfileCard } from "@/components/ProfileCard";
 import { Colors } from "@/constants/colors";
@@ -6,11 +7,12 @@ import { useDailyProfiles } from "@/hooks/useDailyProfiles";
 import { useStreak } from "@/hooks/useStreak";
 import { useAuthStore } from "@/stores/authStore";
 import { useDailyStatsStore } from "@/stores/dailyStatsStore";
+import { useIceBreakerStore } from "@/stores/iceBreakerStore";
 import { computeActivityLevel, useProfileStore } from "@/stores/profileStore";
 import { showToast } from "@/stores/toastStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -42,12 +44,15 @@ export default function TodayScreen() {
 
   useStreak(); // triggers fetch on mount
   const availableSuperlikes = useDailyStatsStore((s) => s.availableSuperlikes);
+  const availableIceBreakers = useDailyStatsStore((s) => s.availableIceBreakers);
   const remainingLikes = useDailyStatsStore((s) => s.remainingLikes);
   const reward = useDailyStatsStore((s) => s.reward);
   const isPremium = useAuthStore((s) => s.profile?.is_premium ?? false);
   const candidatePresence = useProfileStore((s) => s.candidatePresence);
   const superlikeSenders = useProfileStore((s) => s.superlikeSenders);
+  const sendIceBreaker = useIceBreakerStore((s) => s.sendIceBreaker);
   const shownRewardRef = useRef<string | null>(null);
+  const [iceBreakerModalVisible, setIceBreakerModalVisible] = useState(false);
 
   useEffect(() => {
     if (reward && reward !== shownRewardRef.current) {
@@ -69,6 +74,22 @@ export default function TodayScreen() {
 
   const handleKeepExploring = () => {
     clearMatchResult();
+  };
+
+  const handleSendIceBreaker = async (message: string) => {
+    if (!currentProfile) return;
+    setIceBreakerModalVisible(false);
+    const result = await sendIceBreaker(currentProfile.id, message);
+    if (result.success) {
+      showToast(t("iceBreaker.sent"), "success");
+      pass(); // advance to next candidate
+    } else if (result.errorKey === "no_ice_breakers_available") {
+      showToast(t("iceBreaker.noIceBreakers"), "error");
+    } else if (result.errorKey === "already_matched") {
+      showToast(t("iceBreaker.alreadyMatched"), "error");
+    } else {
+      showToast(t("common.error"), "error");
+    }
   };
 
   const photos = currentPhotos.map((p) => ({ uri: p.url }));
@@ -131,6 +152,23 @@ export default function TodayScreen() {
               <Ionicons name="close" size={32} color={Colors.textSecondary} />
             </TouchableOpacity>
 
+            {availableIceBreakers > 0 && (
+              <TouchableOpacity
+                style={[styles.actionButton, styles.iceBreakerButton]}
+                onPress={() => setIceBreakerModalVisible(true)}
+                activeOpacity={0.7}
+              >
+                <View>
+                  <Ionicons name="chatbubble-ellipses" size={28} color={Colors.primary} />
+                  <View style={styles.iceBreakerBadge}>
+                    <Text style={styles.iceBreakerBadgeText}>
+                      {availableIceBreakers}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            )}
+
             {availableSuperlikes > 0 && (
               <TouchableOpacity
                 style={[styles.actionButton, styles.superlikeButton]}
@@ -182,6 +220,13 @@ export default function TodayScreen() {
           </TouchableOpacity>
         </View>
       )}
+
+      <IceBreakerModal
+        visible={iceBreakerModalVisible}
+        onSend={handleSendIceBreaker}
+        onClose={() => setIceBreakerModalVisible(false)}
+        recipientName={currentProfile?.name ?? ""}
+      />
 
       <MatchOverlay
         visible={matchResult?.matched === true}
@@ -310,6 +355,28 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryPastel,
     borderWidth: 1,
     borderColor: Colors.primaryLight,
+  },
+  iceBreakerButton: {
+    backgroundColor: Colors.primaryPastel,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+  },
+  iceBreakerBadge: {
+    position: "absolute",
+    top: -4,
+    right: -8,
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  iceBreakerBadgeText: {
+    fontSize: 9,
+    fontFamily: Fonts.bodySemiBold,
+    color: "#FFFFFF",
   },
   superlikeButton: {
     backgroundColor: "#FFF8E1",
