@@ -283,7 +283,19 @@
     "years": "anos",
     "distance": "Distancia máxima",
     "distanceAll": "Sen límite de distancia",
-    "distanceClear": "Quitar límite"
+    "distanceClear": "Quitar límite",
+    "smoking": "Tabaco",
+    "drinking": "Alcohol",
+    "children": "Fillos/as",
+    "pets": "Mascotas",
+    "zodiacFilter": "Signo zodiacal",
+    "hogwartsFilter": "Casa de Hogwarts",
+    "height": "Altura",
+    "heightMin": "Mín",
+    "heightMax": "Máx",
+    "heightCm": "cm",
+    "includeUnspecified": "Incluír tamén as que non o especificaron",
+    "allValues": "Todas"
   },
   "settings": {
     "title": "Axustes",

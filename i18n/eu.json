@@ -283,7 +283,19 @@
     "years": "urte",
     "distance": "Gehienezko distantzia",
     "distanceAll": "Distantzia mugarik gabe",
-    "distanceClear": "Muga kendu"
+    "distanceClear": "Muga kendu",
+    "smoking": "Tabakoa",
+    "drinking": "Alkohola",
+    "children": "Seme-alabak",
+    "pets": "Maskotak",
+    "zodiacFilter": "Zodiako zeinua",
+    "hogwartsFilter": "Hogwarts etxea",
+    "height": "Altuera",
+    "heightMin": "Mín",
+    "heightMax": "Máx",
+    "heightCm": "cm",
+    "includeUnspecified": "Zehaztu ez dutenak ere erakutsi",
+    "allValues": "Denak"
   },
   "settings": {
     "title": "Ezarpenak",

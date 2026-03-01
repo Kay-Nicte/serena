@@ -7,13 +7,24 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Switch,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
-import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS } from '@/constants/config';
+import {
+  Config,
+  ORIENTATIONS,
+  LOOKING_FOR_OPTIONS,
+  SMOKING_OPTIONS,
+  DRINKING_OPTIONS,
+  CHILDREN_OPTIONS,
+  PET_OPTIONS,
+  ZODIAC_SIGNS,
+  HOGWARTS_HOUSES,
+} from '@/constants/config';
 import { Button } from '@/components/ui/Button';
 import { Tag } from '@/components/ui/Tag';
 import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
@@ -36,6 +47,25 @@ export default function DiscoveryPreferencesScreen() {
   const [distanceEnabled, setDistanceEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Advanced filters
+  const [smoking, setSmoking] = useState<string[]>([]);
+  const [drinking, setDrinking] = useState<string[]>([]);
+  const [children, setChildren] = useState<string[]>([]);
+  const [pets, setPets] = useState<string[]>([]);
+  const [zodiac, setZodiac] = useState<string[]>([]);
+  const [hogwarts, setHogwarts] = useState<string[]>([]);
+  const [minHeight, setMinHeight] = useState('');
+  const [maxHeight, setMaxHeight] = useState('');
+
+  // Include unspecified switches
+  const [smokingInclude, setSmokingInclude] = useState(true);
+  const [drinkingInclude, setDrinkingInclude] = useState(true);
+  const [childrenInclude, setChildrenInclude] = useState(true);
+  const [petsInclude, setPetsInclude] = useState(true);
+  const [zodiacInclude, setZodiacInclude] = useState(true);
+  const [hogwartsInclude, setHogwartsInclude] = useState(true);
+  const [heightInclude, setHeightInclude] = useState(true);
+
   useEffect(() => {
     if (preferences) {
       setMinAge(String(preferences.min_age));
@@ -49,6 +79,21 @@ export default function DiscoveryPreferencesScreen() {
         setDistanceEnabled(false);
         setMaxDistance(String(Config.discoveryDefaults.maxDistance));
       }
+      setSmoking(preferences.smoking ?? []);
+      setDrinking(preferences.drinking ?? []);
+      setChildren(preferences.children ?? []);
+      setPets(preferences.pets ?? []);
+      setZodiac(preferences.zodiac ?? []);
+      setHogwarts(preferences.hogwarts_house ?? []);
+      setMinHeight(preferences.min_height ? String(preferences.min_height) : '');
+      setMaxHeight(preferences.max_height ? String(preferences.max_height) : '');
+      setSmokingInclude(preferences.smoking_include_unspecified ?? true);
+      setDrinkingInclude(preferences.drinking_include_unspecified ?? true);
+      setChildrenInclude(preferences.children_include_unspecified ?? true);
+      setPetsInclude(preferences.pets_include_unspecified ?? true);
+      setZodiacInclude(preferences.zodiac_include_unspecified ?? true);
+      setHogwartsInclude(preferences.hogwarts_include_unspecified ?? true);
+      setHeightInclude(preferences.height_include_unspecified ?? true);
     }
   }, [preferences]);
 
@@ -64,11 +109,28 @@ export default function DiscoveryPreferencesScreen() {
     );
   };
 
+  const toggleArray = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    value: string
+  ) => {
+    setter((prev) =>
+      prev.includes(value) ? prev.filter((x) => x !== value) : [...prev, value]
+    );
+  };
+
   const handleSave = async () => {
     const min = parseInt(minAge, 10) || Config.discoveryDefaults.minAge;
     const max = parseInt(maxAge, 10) || Config.discoveryDefaults.maxAge;
 
     if (min < Config.minAge || max > Config.maxAge || min > max) {
+      showToast(t('common.error'), 'error');
+      return;
+    }
+
+    const parsedMinHeight = minHeight ? parseInt(minHeight, 10) : null;
+    const parsedMaxHeight = maxHeight ? parseInt(maxHeight, 10) : null;
+
+    if (parsedMinHeight && parsedMaxHeight && parsedMinHeight > parsedMaxHeight) {
       showToast(t('common.error'), 'error');
       return;
     }
@@ -81,6 +143,21 @@ export default function DiscoveryPreferencesScreen() {
         orientations: orientations.length > 0 ? orientations : null,
         looking_for: lookingFor.length > 0 ? lookingFor : null,
         max_distance: distanceEnabled ? (parseInt(maxDistance, 10) || Config.discoveryDefaults.maxDistance) : null,
+        smoking: smoking.length > 0 ? smoking : null,
+        drinking: drinking.length > 0 ? drinking : null,
+        children: children.length > 0 ? children : null,
+        pets: pets.length > 0 ? pets : null,
+        zodiac: zodiac.length > 0 ? zodiac : null,
+        hogwarts_house: hogwarts.length > 0 ? hogwarts : null,
+        min_height: parsedMinHeight,
+        max_height: parsedMaxHeight,
+        smoking_include_unspecified: smokingInclude,
+        drinking_include_unspecified: drinkingInclude,
+        children_include_unspecified: childrenInclude,
+        pets_include_unspecified: petsInclude,
+        zodiac_include_unspecified: zodiacInclude,
+        hogwarts_include_unspecified: hogwartsInclude,
+        height_include_unspecified: heightInclude,
       });
       await fetchCandidates();
       router.back();
@@ -90,6 +167,44 @@ export default function DiscoveryPreferencesScreen() {
       setSaving(false);
     }
   };
+
+  const renderFilterSection = (
+    label: string,
+    options: readonly string[],
+    selected: string[],
+    translationPrefix: string,
+    onToggle: (value: string) => void,
+    includeUnspecified: boolean,
+    onToggleInclude: (value: boolean) => void
+  ) => (
+    <View style={styles.section}>
+      <Text style={styles.sectionLabel}>{label}</Text>
+      <View style={styles.tags}>
+        {options.map((option) => (
+          <Tag
+            key={option}
+            label={t(`${translationPrefix}.${option}`)}
+            selected={selected.includes(option)}
+            onPress={() => onToggle(option)}
+          />
+        ))}
+      </View>
+      {selected.length === 0 && (
+        <Text style={styles.hint}>{t('discovery.allValues')}</Text>
+      )}
+      {selected.length > 0 && (
+        <View style={styles.includeRow}>
+          <Text style={styles.includeLabel}>{t('discovery.includeUnspecified')}</Text>
+          <Switch
+            value={includeUnspecified}
+            onValueChange={onToggleInclude}
+            trackColor={{ false: Colors.border, true: Colors.primaryLight }}
+            thumbColor={includeUnspecified ? Colors.primary : Colors.surface}
+          />
+        </View>
+      )}
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -114,12 +229,12 @@ export default function DiscoveryPreferencesScreen() {
           {/* Age Range */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>{t('discovery.ageRange')}</Text>
-            <View style={styles.ageRow}>
-              <View style={styles.ageField}>
-                <Text style={styles.ageLabel}>{t('discovery.minAge')}</Text>
-                <View style={styles.ageInputWrap}>
+            <View style={styles.rangeRow}>
+              <View style={styles.rangeField}>
+                <Text style={styles.rangeLabel}>{t('discovery.minAge')}</Text>
+                <View style={styles.rangeInputWrap}>
                   <TextInput
-                    style={styles.ageInput}
+                    style={styles.rangeInput}
                     keyboardType="number-pad"
                     maxLength={2}
                     value={minAge}
@@ -129,12 +244,12 @@ export default function DiscoveryPreferencesScreen() {
                   />
                 </View>
               </View>
-              <Text style={styles.ageSeparator}>—</Text>
-              <View style={styles.ageField}>
-                <Text style={styles.ageLabel}>{t('discovery.maxAge')}</Text>
-                <View style={styles.ageInputWrap}>
+              <Text style={styles.rangeSeparator}>—</Text>
+              <View style={styles.rangeField}>
+                <Text style={styles.rangeLabel}>{t('discovery.maxAge')}</Text>
+                <View style={styles.rangeInputWrap}>
                   <TextInput
-                    style={styles.ageInput}
+                    style={styles.rangeInput}
                     keyboardType="number-pad"
                     maxLength={2}
                     value={maxAge}
@@ -150,11 +265,11 @@ export default function DiscoveryPreferencesScreen() {
           {/* Distance */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>{t('discovery.distance')}</Text>
-            <View style={styles.ageRow}>
-              <View style={[styles.ageField, { flex: 2 }]}>
-                <View style={[styles.ageInputWrap, !distanceEnabled && styles.inputDisabled]}>
+            <View style={styles.rangeRow}>
+              <View style={[styles.rangeField, { flex: 2 }]}>
+                <View style={[styles.rangeInputWrap, !distanceEnabled && styles.inputDisabled]}>
                   <TextInput
-                    style={styles.ageInput}
+                    style={styles.rangeInput}
                     keyboardType="number-pad"
                     maxLength={3}
                     value={distanceEnabled ? maxDistance : ''}
@@ -168,7 +283,7 @@ export default function DiscoveryPreferencesScreen() {
                   />
                 </View>
               </View>
-              <Text style={styles.ageSeparator}>km</Text>
+              <Text style={styles.rangeSeparator}>km</Text>
             </View>
             <TouchableOpacity onPress={() => setDistanceEnabled(!distanceEnabled)}>
               <Text style={styles.hintLink}>
@@ -210,6 +325,120 @@ export default function DiscoveryPreferencesScreen() {
             </View>
             {lookingFor.length === 0 && (
               <Text style={styles.hint}>{t('discovery.lookingForAll')}</Text>
+            )}
+          </View>
+
+          {/* Smoking */}
+          {renderFilterSection(
+            t('discovery.smoking'),
+            SMOKING_OPTIONS,
+            smoking,
+            'smoking',
+            (v) => toggleArray(setSmoking, v),
+            smokingInclude,
+            setSmokingInclude
+          )}
+
+          {/* Drinking */}
+          {renderFilterSection(
+            t('discovery.drinking'),
+            DRINKING_OPTIONS,
+            drinking,
+            'drinking',
+            (v) => toggleArray(setDrinking, v),
+            drinkingInclude,
+            setDrinkingInclude
+          )}
+
+          {/* Children */}
+          {renderFilterSection(
+            t('discovery.children'),
+            CHILDREN_OPTIONS,
+            children,
+            'children',
+            (v) => toggleArray(setChildren, v),
+            childrenInclude,
+            setChildrenInclude
+          )}
+
+          {/* Pets */}
+          {renderFilterSection(
+            t('discovery.pets'),
+            PET_OPTIONS,
+            pets,
+            'pets',
+            (v) => toggleArray(setPets, v),
+            petsInclude,
+            setPetsInclude
+          )}
+
+          {/* Zodiac */}
+          {renderFilterSection(
+            t('discovery.zodiacFilter'),
+            ZODIAC_SIGNS,
+            zodiac,
+            'zodiac',
+            (v) => toggleArray(setZodiac, v),
+            zodiacInclude,
+            setZodiacInclude
+          )}
+
+          {/* Hogwarts House */}
+          {renderFilterSection(
+            t('discovery.hogwartsFilter'),
+            HOGWARTS_HOUSES,
+            hogwarts,
+            'hogwarts',
+            (v) => toggleArray(setHogwarts, v),
+            hogwartsInclude,
+            setHogwartsInclude
+          )}
+
+          {/* Height */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('discovery.height')}</Text>
+            <View style={styles.rangeRow}>
+              <View style={styles.rangeField}>
+                <Text style={styles.rangeLabel}>{t('discovery.heightMin')}</Text>
+                <View style={styles.rangeInputWrap}>
+                  <TextInput
+                    style={styles.rangeInput}
+                    keyboardType="number-pad"
+                    maxLength={3}
+                    value={minHeight}
+                    onChangeText={setMinHeight}
+                    placeholder="140"
+                    placeholderTextColor={Colors.textTertiary}
+                  />
+                </View>
+              </View>
+              <Text style={styles.rangeSeparator}>—</Text>
+              <View style={styles.rangeField}>
+                <Text style={styles.rangeLabel}>{t('discovery.heightMax')}</Text>
+                <View style={styles.rangeInputWrap}>
+                  <TextInput
+                    style={styles.rangeInput}
+                    keyboardType="number-pad"
+                    maxLength={3}
+                    value={maxHeight}
+                    onChangeText={setMaxHeight}
+                    placeholder="200"
+                    placeholderTextColor={Colors.textTertiary}
+                  />
+                </View>
+              </View>
+              <Text style={styles.rangeSeparator}>{t('discovery.heightCm')}</Text>
+            </View>
+            {(minHeight !== '' || maxHeight !== '') && (
+              <View style={styles.includeRow}>
+                <Text style={styles.includeLabel}>{t('discovery.includeUnspecified')}</Text>
+                <Switch
+                  value={heightInclude}
+                  onValueChange={setHeightInclude}
+                  trackColor={{ false: Colors.border, true: Colors.primaryLight }}
+                  thumbColor={heightInclude ? Colors.primary : Colors.surface}
+                />
+              </View>
             )}
           </View>
 
@@ -263,22 +492,22 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginLeft: 4,
   },
-  ageRow: {
+  rangeRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 12,
   },
-  ageField: {
+  rangeField: {
     flex: 1,
     gap: 4,
   },
-  ageLabel: {
+  rangeLabel: {
     fontSize: 12,
     fontFamily: Fonts.bodyMedium,
     color: Colors.textTertiary,
     marginLeft: 4,
   },
-  ageInputWrap: {
+  rangeInputWrap: {
     height: 52,
     borderRadius: 16,
     borderWidth: 1.5,
@@ -286,13 +515,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     justifyContent: 'center',
   },
-  ageInput: {
+  rangeInput: {
     textAlign: 'center',
     fontSize: 16,
     fontFamily: Fonts.body,
     color: Colors.text,
   },
-  ageSeparator: {
+  rangeSeparator: {
     fontSize: 18,
     fontFamily: Fonts.body,
     color: Colors.textTertiary,
@@ -317,6 +546,20 @@ const styles = StyleSheet.create({
   },
   inputDisabled: {
     opacity: 0.4,
+  },
+  includeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  includeLabel: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    flex: 1,
+    marginRight: 12,
   },
   saveButton: {
     marginTop: 4,

@@ -160,8 +160,12 @@ export default function ProfileScreen() {
   const handleAddPhoto = async (position: number) => {
     const uri = await pickImage();
     if (uri && user) {
-      await addPhoto(user.id, uri, position);
-      await fetchProfile();
+      try {
+        await addPhoto(user.id, uri, position);
+        await fetchProfile();
+      } catch (error: any) {
+        showToast(error?.message ?? t('common.error'), 'error');
+      }
     }
   };
 

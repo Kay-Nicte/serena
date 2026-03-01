@@ -283,7 +283,19 @@
     "years": "ans",
     "distance": "Distance maximale",
     "distanceAll": "Pas de limite de distance",
-    "distanceClear": "Retirer la limite"
+    "distanceClear": "Retirer la limite",
+    "smoking": "Tabac",
+    "drinking": "Alcool",
+    "children": "Enfants",
+    "pets": "Animaux",
+    "zodiacFilter": "Signe du zodiaque",
+    "hogwartsFilter": "Maison de Hogwarts",
+    "height": "Taille",
+    "heightMin": "Min",
+    "heightMax": "Max",
+    "heightCm": "cm",
+    "includeUnspecified": "Inclure aussi celles qui ne l'ont pas précisé",
+    "allValues": "Toutes"
   },
   "settings": {
     "title": "Paramètres",

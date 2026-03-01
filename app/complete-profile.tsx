@@ -93,10 +93,19 @@ export default function CompleteProfileScreen() {
     setPets((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
   };
 
+  const [photoLoading, setPhotoLoading] = useState(false);
+
   const handleAddPhoto = async (position: number) => {
     const uri = await pickImage();
     if (uri && user) {
-      await addPhoto(user.id, uri, position);
+      setPhotoLoading(true);
+      try {
+        await addPhoto(user.id, uri, position);
+      } catch (error: any) {
+        showToast(error?.message ?? t('common.error'), 'error');
+      } finally {
+        setPhotoLoading(false);
+      }
     }
   };
 

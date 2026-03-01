@@ -283,7 +283,19 @@
     "years": "anys",
     "distance": "Distància màxima",
     "distanceAll": "Sense límit de distància",
-    "distanceClear": "Treure límit"
+    "distanceClear": "Treure límit",
+    "smoking": "Tabac",
+    "drinking": "Alcohol",
+    "children": "Fills/es",
+    "pets": "Mascotes",
+    "zodiacFilter": "Signe zodiacal",
+    "hogwartsFilter": "Casa de Hogwarts",
+    "height": "Alçada",
+    "heightMin": "Mín",
+    "heightMax": "Màx",
+    "heightCm": "cm",
+    "includeUnspecified": "Inclou també les que no ho hagin especificat",
+    "allValues": "Totes"
   },
   "settings": {
     "title": "Ajustos",

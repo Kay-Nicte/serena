@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
-import { readAsStringAsync } from 'expo-file-system/legacy';
+import { readAsStringAsync, EncodingType } from 'expo-file-system/legacy';
 import { supabase } from './supabase';
 import { Config } from '@/constants/config';
 import { decode } from 'base64-arraybuffer';
@@ -26,7 +26,7 @@ export async function uploadPhoto(
   const path = `${userId}/${position}-${timestamp}.${extension}`;
 
   const base64 = await readAsStringAsync(uri, {
-    encoding: 'base64',
+    encoding: EncodingType.Base64,
   });
 
   const { error } = await supabase.storage
@@ -62,7 +62,7 @@ export async function uploadVerificationSelfie(
   const path = `${userId}/${timestamp}.jpg`;
 
   const base64 = await readAsStringAsync(uri, {
-    encoding: 'base64',
+    encoding: EncodingType.Base64,
   });
 
   const { error } = await supabase.storage
@@ -85,7 +85,7 @@ export async function uploadChatImage(
   const path = `${matchId}/${timestamp}.${extension}`;
 
   const base64 = await readAsStringAsync(uri, {
-    encoding: 'base64',
+    encoding: EncodingType.Base64,
   });
 
   const { error } = await supabase.storage
