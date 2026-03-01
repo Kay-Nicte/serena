@@ -232,6 +232,19 @@ export default function SettingsScreen() {
                 <Ionicons name="checkmark" size={20} color={Colors.primary} />
               )}
             </TouchableOpacity>
+
+            <View style={styles.separator} />
+
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => handleChangeLanguage('eu')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.rowLabel}>{t('settings.languageEu')}</Text>
+              {selectedLanguage === 'eu' && (
+                <Ionicons name="checkmark" size={20} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
 

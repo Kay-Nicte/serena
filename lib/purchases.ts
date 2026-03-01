@@ -15,24 +15,33 @@ let initialized = false;
 
 export async function initPurchases() {
   if (initialized || !API_KEY) return;
-  Purchases.configure({ apiKey: API_KEY });
-  initialized = true;
+  // Skip configuration with test keys in production builds
+  // RevenueCat shows a blocking dialog and kills the app otherwise
+  if (API_KEY.startsWith('test_')) return;
+  try {
+    Purchases.configure({ apiKey: API_KEY });
+    initialized = true;
+  } catch {
+    initialized = false;
+  }
 }
 
 export async function getOfferings(): Promise<PurchasesOffering | null> {
-  const offerings = await Purchases.getOfferings();
-  return offerings.current ?? null;
+  if (!initialized) return null;
+  try {
+    const offerings = await Purchases.getOfferings();
+    return offerings.current ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function purchasePackage(pkg: PurchasesPackage) {
   const { customerInfo } = await Purchases.purchasePackage(pkg);
 
-  // Determine premium_until from the active entitlement
   const entitlement = customerInfo.entitlements.active['Serenade Pro'];
   if (entitlement) {
     const premiumUntil = entitlement.expirationDate;
-
-    // Update Supabase immediately (webhook is the backup)
     await supabase.rpc('activate_premium_purchase', {
       premium_until_ts: premiumUntil,
     });
@@ -56,10 +65,18 @@ export async function restorePurchases() {
 
 export async function identifyUser(userId: string) {
   if (!initialized) return;
-  await Purchases.logIn(userId);
+  try {
+    await Purchases.logIn(userId);
+  } catch {
+    // Silently fail
+  }
 }
 
 export async function logoutUser() {
   if (!initialized) return;
-  await Purchases.logOut();
+  try {
+    await Purchases.logOut();
+  } catch {
+    // Silently fail
+  }
 }
