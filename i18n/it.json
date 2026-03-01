@@ -135,7 +135,9 @@
     "inactiveMonth": "1 mese fa",
     "inactiveMonths": "{{count}} mesi fa",
     "inactiveYear": "Più di 1 anno fa",
-    "inactiveYears": "Più di {{count}} anni fa"
+    "inactiveYears": "Più di {{count}} anni fa",
+    "inactiveWeek": "1 settimana fa",
+    "inactiveWeeks": "{{count}} settimane fa"
   },
   "matches": {
     "title": "Matches",
@@ -178,12 +180,16 @@
     "photoMessage": "📷 Foto",
     "today": "Oggi",
     "yesterday": "Ieri",
-    "matchedOn": "Match il {{date}}"
+    "matchedOn": "Match il {{date}}",
+    "shareDateLocation": "Condividi posizione",
+    "shareDateMessage": "Sono a un appuntamento tramite Serenade. La mia posizione attuale: {{link}}"
   },
   "notifications": {
     "permissionTitle": "Attiva le notifiche",
     "permissionMessage": "Ricevi notifiche su nuovi match e messaggi",
-    "pushNotAvailable": "Le notifiche push non sono disponibili su questo dispositivo"
+    "pushNotAvailable": "Le notifiche push non sono disponibili su questo dispositivo",
+    "staleMatchTitle": "Riallaccia i contatti!",
+    "staleMatchMessage": "È da un po' che non parli con {{name}}. Saluta!"
   },
   "errorBoundary": {
     "title": "Ops!",
@@ -515,5 +521,57 @@
     "promptTitle": "Ancora un passo!",
     "promptMessage": "Verifica la tua identità per permettere alle altre di vedere il tuo profilo e fare match con te.",
     "verified": "Verificata"
+  },
+  "starters": {
+    "travel": "Qual è l'ultimo posto in cui hai viaggiato?",
+    "cooking": "Qual è il tuo piatto forte?",
+    "music": "Che canzone hai in loop adesso?",
+    "hiking": "Qual è il miglior sentiero che hai percorso?",
+    "yoga": "Da quanto tempo pratichi yoga?",
+    "photography": "Cosa ami fotografare di più?",
+    "art": "Qual è l'ultima mostra che hai visitato?",
+    "gaming": "A che gioco stai giocando adesso?",
+    "reading": "Che libro stai leggendo?",
+    "fitness": "Qual è il tuo allenamento preferito?",
+    "dancing": "Qual è il tuo stile di ballo preferito?",
+    "movies": "Qual è l'ultimo film che ti ha colpita?",
+    "nature": "Qual è il tuo angolo preferito nella natura?",
+    "wine": "Rosso, bianco o rosé?",
+    "coffee": "Come prendi il caffè?",
+    "cats": "Il tuo gatto ha qualche abitudine buffa?",
+    "dogs": "Di che razza è il tuo cane?",
+    "zodiac": "Credi nella compatibilità zodiacale?",
+    "generic1": "Come va la giornata?",
+    "generic2": "Che serie stai guardando?",
+    "generic3": "Qual è stata la cosa più bella della tua settimana?",
+    "generic4": "Se potessi viaggiare ovunque domani, dove andresti?",
+    "generic5": "Com'è il tuo weekend ideale?"
+  },
+  "prompts": {
+    "title": "Prompt del profilo",
+    "addPrompt": "Aggiungi un prompt",
+    "selectPrompt": "Scegli un prompt",
+    "answerPlaceholder": "Scrivi la tua risposta...",
+    "prompt_perfect_sunday": "Una domenica perfetta...",
+    "prompt_red_flag": "La mia red flag è...",
+    "prompt_rewatched_show": "La serie che ho rivisto di più...",
+    "prompt_fridge_staple": "Quello che non manca mai nel mio frigo...",
+    "prompt_hidden_talent": "Il mio talento nascosto è...",
+    "prompt_random_fact": "Un fatto random su di me...",
+    "prompt_dinner_guest": "Se potessi cenare con qualcuno...",
+    "prompt_current_song": "La mia canzone del momento...",
+    "prompt_worst_cook": "La cosa peggiore che cucino...",
+    "prompt_guilty_pleasure": "Il mio guilty pleasure...",
+    "prompt_overly_excited": "Una cosa che mi emoziona troppo...",
+    "prompt_best_advice": "Il miglior consiglio che mi abbiano dato...",
+    "prompt_no_work": "Se non dovessi lavorare...",
+    "prompt_comfort_movie": "Il mio film comfort...",
+    "prompt_youll_like_me_if": "Ti piacerò se..."
+  },
+  "likes": {
+    "title": "Chi ti ha messo like",
+    "empty": "Nessuno ti ha ancora messo like. Tieni aggiornato il tuo profilo!",
+    "premiumCta": "Diventa Premium per vedere chi ti ha messo like",
+    "count": "{{count}} like"
   }
 }

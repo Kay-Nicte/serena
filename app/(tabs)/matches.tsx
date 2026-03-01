@@ -55,9 +55,14 @@ function MatchCard({ match, onPress, onLongPress, deletedLabel }: { match: Match
         </View>
       )}
       <View style={styles.matchInfo}>
-        <Text style={[styles.matchName, !match.otherUser.name && styles.matchNameDeleted]} numberOfLines={1}>
-          {match.otherUser.name ?? deletedLabel}
-        </Text>
+        <View style={styles.matchNameRow}>
+          <Text style={[styles.matchName, !match.otherUser.name && styles.matchNameDeleted]} numberOfLines={1}>
+            {match.otherUser.name ?? deletedLabel}
+          </Text>
+          {match.otherUser.is_verified && (
+            <Ionicons name="shield-checkmark" size={14} color={Colors.primary} />
+          )}
+        </View>
         <Text style={styles.matchDate} numberOfLines={1}>
           <Ionicons name="heart" size={11} color={Colors.primary} />{' '}
           {formatMatchDate(match.created_at)}
@@ -322,10 +327,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
+  matchNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   matchName: {
     fontSize: 15,
     fontFamily: Fonts.bodySemiBold,
     color: Colors.text,
+    flexShrink: 1,
   },
   matchNameDeleted: {
     color: Colors.textTertiary,

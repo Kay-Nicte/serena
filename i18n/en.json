@@ -135,7 +135,9 @@
     "inactiveMonth": "1 month ago",
     "inactiveMonths": "{{count}} months ago",
     "inactiveYear": "More than 1 year ago",
-    "inactiveYears": "More than {{count}} years ago"
+    "inactiveYears": "More than {{count}} years ago",
+    "inactiveWeek": "1 week ago",
+    "inactiveWeeks": "{{count}} weeks ago"
   },
   "matches": {
     "title": "Matches",
@@ -178,12 +180,16 @@
     "photoMessage": "📷 Photo",
     "today": "Today",
     "yesterday": "Yesterday",
-    "matchedOn": "Matched on {{date}}"
+    "matchedOn": "Matched on {{date}}",
+    "shareDateLocation": "Share location",
+    "shareDateMessage": "I'm on a date through Serenade. My current location: {{link}}"
   },
   "notifications": {
     "permissionTitle": "Enable notifications",
     "permissionMessage": "Get notified about new matches and messages",
-    "pushNotAvailable": "Push notifications are not available on this device"
+    "pushNotAvailable": "Push notifications are not available on this device",
+    "staleMatchTitle": "Catch up!",
+    "staleMatchMessage": "It's been a while since you talked to {{name}}. Say hi!"
   },
   "errorBoundary": {
     "title": "Oops!",
@@ -515,5 +521,57 @@
     "promptTitle": "One more step!",
     "promptMessage": "Verify your identity so others can see your profile and match with you.",
     "verified": "Verified"
+  },
+  "starters": {
+    "travel": "What's the last place you traveled to?",
+    "cooking": "What's your signature dish?",
+    "music": "What song is on repeat for you right now?",
+    "hiking": "What's the best trail you've ever hiked?",
+    "yoga": "How long have you been practicing yoga?",
+    "photography": "What do you love photographing most?",
+    "art": "What's the last exhibition you visited?",
+    "gaming": "What game are you playing right now?",
+    "reading": "What book are you reading?",
+    "fitness": "What's your favorite workout?",
+    "dancing": "What's your go-to dance style?",
+    "movies": "What's the last movie that blew your mind?",
+    "nature": "What's your favorite spot in nature?",
+    "wine": "Red, white, or rosé?",
+    "coffee": "How do you take your coffee?",
+    "cats": "Does your cat have any funny habits?",
+    "dogs": "What breed is your dog?",
+    "zodiac": "Do you believe in zodiac compatibility?",
+    "generic1": "How's your day going?",
+    "generic2": "What series are you binge-watching?",
+    "generic3": "What's the best thing that happened to you this week?",
+    "generic4": "If you could travel anywhere tomorrow, where would you go?",
+    "generic5": "What's your ideal weekend like?"
+  },
+  "prompts": {
+    "title": "Profile prompts",
+    "addPrompt": "Add a prompt",
+    "selectPrompt": "Choose a prompt",
+    "answerPlaceholder": "Write your answer...",
+    "prompt_perfect_sunday": "A perfect Sunday plan...",
+    "prompt_red_flag": "My red flag is...",
+    "prompt_rewatched_show": "The show I've rewatched the most...",
+    "prompt_fridge_staple": "What's always in my fridge...",
+    "prompt_hidden_talent": "My hidden talent is...",
+    "prompt_random_fact": "A random fact about me...",
+    "prompt_dinner_guest": "If I could have dinner with anyone...",
+    "prompt_current_song": "My song of the moment...",
+    "prompt_worst_cook": "The worst thing I cook...",
+    "prompt_guilty_pleasure": "My guilty pleasure...",
+    "prompt_overly_excited": "Something that excites me way too much...",
+    "prompt_best_advice": "The best advice I've ever gotten...",
+    "prompt_no_work": "If I didn't have to work...",
+    "prompt_comfort_movie": "My comfort movie...",
+    "prompt_youll_like_me_if": "You'll like me if..."
+  },
+  "likes": {
+    "title": "Who liked you",
+    "empty": "No one has liked you yet. Keep your profile updated!",
+    "premiumCta": "Go Premium to see who liked you",
+    "count": "{{count}} likes"
   }
 }

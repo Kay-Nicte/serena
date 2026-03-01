@@ -8,6 +8,7 @@ import { useStreak } from "@/hooks/useStreak";
 import { useAuthStore } from "@/stores/authStore";
 import { useDailyStatsStore } from "@/stores/dailyStatsStore";
 import { useIceBreakerStore } from "@/stores/iceBreakerStore";
+import { supabase } from "@/lib/supabase";
 import { computeActivityLevel, useProfileStore } from "@/stores/profileStore";
 import { showToast } from "@/stores/toastStore";
 import { checkToxicity } from "@/lib/moderation";
@@ -65,6 +66,13 @@ export default function TodayScreen() {
   const sendIceBreaker = useIceBreakerStore((s) => s.sendIceBreaker);
   const shownRewardRef = useRef<string | null>(null);
   const [iceBreakerModalVisible, setIceBreakerModalVisible] = useState(false);
+  const [pendingLikesCount, setPendingLikesCount] = useState(0);
+
+  useEffect(() => {
+    supabase.rpc('get_pending_likes').then(({ data }) => {
+      if (Array.isArray(data)) setPendingLikesCount(data.length);
+    });
+  }, []);
 
   useEffect(() => {
     if (reward && reward !== shownRewardRef.current) {
@@ -114,6 +122,18 @@ export default function TodayScreen() {
     <SafeAreaView style={styles.container} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.title}>{t("today.title")}</Text>
+        {pendingLikesCount > 0 && (
+          <TouchableOpacity
+            style={styles.whoLikedButton}
+            onPress={() => router.push("/who-liked-me")}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="heart" size={16} color={Colors.primary} />
+            <Text style={styles.whoLikedText}>
+              {t("likes.count", { count: pendingLikesCount })}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Verification banner */}
@@ -178,7 +198,7 @@ export default function TodayScreen() {
               profile={currentProfile}
               photos={photos}
               activityLevel={computeActivityLevel(
-                candidatePresence[currentProfile.id],
+                candidatePresence[currentProfile.id] ?? currentProfile.updated_at,
               )}
               lastSeen={
                 candidatePresence[currentProfile.id] ??
@@ -186,6 +206,7 @@ export default function TodayScreen() {
               }
               showActivityLevel={isPremium}
               isSuperlike={superlikeSenders.includes(currentProfile.id)}
+              showCompatibility
             />
           </ScrollView>
 
@@ -301,6 +322,22 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontFamily: Fonts.heading,
     color: Colors.text,
+  },
+  whoLikedButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: Colors.primaryPastel,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  whoLikedText: {
+    fontSize: 13,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.primary,
   },
   refreshButton: {
     padding: 8,

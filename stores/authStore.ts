@@ -11,6 +11,7 @@ import { useDiscoveryStore } from './discoveryStore';
 import { useBlockStore } from './blockStore';
 import { useDailyStatsStore } from './dailyStatsStore';
 import { useVerificationStore } from './verificationStore';
+import { usePromptStore } from './promptStore';
 import type { Orientation, LookingFor } from '@/constants/config';
 
 export interface Profile {
@@ -195,6 +196,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     useBlockStore.getState().reset();
     useDailyStatsStore.getState().reset();
     useVerificationStore.getState().reset();
+    usePromptStore.getState().reset();
     set({
       session: null,
       user: null,

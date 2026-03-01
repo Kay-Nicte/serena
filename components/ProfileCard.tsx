@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
-import type { Profile } from '@/stores/authStore';
+import { useAuthStore, type Profile } from '@/stores/authStore';
+import { usePromptStore, type ProfilePrompt } from '@/stores/promptStore';
 
 // Ensure orientation/looking_for are always clean string arrays
 function ensureArray(val: unknown): string[] {
@@ -24,6 +26,29 @@ function ensureArray(val: unknown): string[] {
 
 type ActivityLevel = 'today' | 'this_week' | 'this_month' | 'inactive';
 
+function computeCompatibility(myProfile: Profile | null, otherProfile: Profile): number | null {
+  if (!myProfile) return null;
+  const myInterests = new Set(ensureArray(myProfile.interests));
+  const otherInterests = ensureArray(otherProfile.interests);
+  const sharedInterests = otherInterests.filter((i) => myInterests.has(i));
+  const totalInterests = Math.max(myInterests.size, otherInterests.length, 1);
+
+  const myLF = new Set(ensureArray(myProfile.looking_for));
+  const otherLF = ensureArray(otherProfile.looking_for);
+  const sharedLF = otherLF.filter((lf) => myLF.has(lf));
+
+  const myOrient = new Set(ensureArray(myProfile.orientation));
+  const otherOrient = ensureArray(otherProfile.orientation);
+  const sharedOrient = otherOrient.filter((o) => myOrient.has(o));
+
+  const score =
+    (sharedInterests.length / totalInterests) * 60 +
+    (sharedLF.length > 0 ? 25 : 0) +
+    (sharedOrient.length > 0 ? 15 : 0);
+
+  return Math.round(score);
+}
+
 interface ProfileCardProps {
   profile: Profile;
   photos?: { uri: string }[];
@@ -31,6 +56,7 @@ interface ProfileCardProps {
   lastSeen?: string;
   showActivityLevel?: boolean;
   isSuperlike?: boolean;
+  showCompatibility?: boolean;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -58,25 +84,48 @@ const ACTIVITY_CONFIG: Record<ActivityLevel, { color: string; i18nKey: string }>
 function formatInactiveTime(lastSeen: string | undefined, t: (key: string, opts?: any) => string): string {
   if (!lastSeen) return t('today.activityInactive');
   const diff = Date.now() - new Date(lastSeen).getTime();
-  const months = Math.floor(diff / (30 * 24 * 3600000));
-  if (months <= 1) return t('today.inactiveMonth');
+  const days = Math.floor(diff / (24 * 3600000));
+  if (days < 30) {
+    const weeks = Math.floor(days / 7);
+    if (weeks <= 1) return t('today.inactiveWeek');
+    return t('today.inactiveWeeks', { count: weeks });
+  }
+  const months = Math.floor(days / 30);
+  if (months === 1) return t('today.inactiveMonth');
   if (months < 12) return t('today.inactiveMonths', { count: months });
   const years = Math.floor(months / 12);
   if (years === 1) return t('today.inactiveYear');
   return t('today.inactiveYears', { count: years });
 }
 
-export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActivityLevel, isSuperlike }: ProfileCardProps) {
+export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActivityLevel, isSuperlike, showCompatibility }: ProfileCardProps) {
   const { t } = useTranslation();
   const age = calculateAge(profile.birth_date);
+  const myProfile = useAuthStore((s) => s.profile);
+  const compatibility = showCompatibility ? computeCompatibility(myProfile, profile) : null;
+  const [prompts, setPrompts] = useState<ProfilePrompt[]>([]);
+
+  useEffect(() => {
+    if (profile.id && profile.id !== myProfile?.id) {
+      usePromptStore.getState().fetchPromptsForUser(profile.id).then(setPrompts);
+    }
+  }, [profile.id]);
 
   return (
     <View style={styles.card}>
-      <PhotoCarousel
-        photos={photos ?? []}
-        fallbackUri={profile.avatar_url}
-        width={CARD_WIDTH}
-      />
+      <View>
+        <PhotoCarousel
+          photos={photos ?? []}
+          fallbackUri={profile.avatar_url}
+          width={CARD_WIDTH}
+        />
+        {compatibility !== null && compatibility >= 30 && (
+          <View style={styles.compatBadge}>
+            <Ionicons name="heart" size={12} color={Colors.primary} />
+            <Text style={styles.compatText}>{compatibility}%</Text>
+          </View>
+        )}
+      </View>
 
       {isSuperlike && (
         <View style={styles.superlikeBanner}>
@@ -91,6 +140,9 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
           <Text style={styles.name} numberOfLines={1}>
             {profile.name}
           </Text>
+          {profile.is_verified && (
+            <Ionicons name="shield-checkmark" size={20} color={Colors.primary} style={{ marginLeft: 4 }} />
+          )}
           {age !== null && <Text style={styles.age}>{age}</Text>}
         </View>
 
@@ -120,6 +172,17 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
         {profile.bio ? (
           <Text style={styles.bio}>{profile.bio}</Text>
         ) : null}
+
+        {prompts.length > 0 && (
+          <View style={styles.promptsSection}>
+            {prompts.map((p) => (
+              <View key={p.id} style={styles.promptItem}>
+                <Text style={styles.promptQuestion}>{t(`prompts.prompt_${p.prompt_key}`)}</Text>
+                <Text style={styles.promptAnswer}>{p.answer}</Text>
+              </View>
+            ))}
+          </View>
+        )}
 
         <View style={styles.tags}>
           {ensureArray(profile.orientation).map((o, i) => (
@@ -273,6 +336,44 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
+  },
+  compatBadge: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  compatText: {
+    fontSize: 14,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.primary,
+  },
+  promptsSection: {
+    gap: 10,
+  },
+  promptItem: {
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  promptQuestion: {
+    fontSize: 13,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.textTertiary,
+    marginBottom: 4,
+  },
+  promptAnswer: {
+    fontSize: 15,
+    fontFamily: Fonts.body,
+    color: Colors.text,
+    lineHeight: 22,
   },
   superlikeBanner: {
     backgroundColor: '#FFF8E1',

@@ -48,6 +48,7 @@ import { showToast } from '@/stores/toastStore';
 import { useStreak } from '@/hooks/useStreak';
 import { useDailyStatsStore } from '@/stores/dailyStatsStore';
 import { supabase } from '@/lib/supabase';
+import { usePromptStore, type ProfilePrompt } from '@/stores/promptStore';
 
 const LOOKING_FOR = LOOKING_FOR_OPTIONS;
 
@@ -119,6 +120,24 @@ export default function ProfileScreen() {
   const [saving, setSaving] = useState(false);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
   const [trialGranted, setTrialGranted] = useState(false);
+
+  // Prompts state
+  const { myPrompts, fetchMyPrompts, upsertPrompt, deletePrompt: deletePromptStore } = usePromptStore();
+  const [editingPromptPosition, setEditingPromptPosition] = useState<number | null>(null);
+  const [editingPromptKey, setEditingPromptKey] = useState<string | null>(null);
+  const [editingPromptAnswer, setEditingPromptAnswer] = useState('');
+  const [showPromptPicker, setShowPromptPicker] = useState(false);
+
+  const PROMPT_KEYS = [
+    'perfect_sunday', 'red_flag', 'rewatched_show', 'fridge_staple',
+    'hidden_talent', 'random_fact', 'dinner_guest', 'current_song',
+    'worst_cook', 'guilty_pleasure', 'overly_excited', 'best_advice',
+    'no_work', 'comfort_movie', 'youll_like_me_if',
+  ];
+
+  useEffect(() => {
+    fetchMyPrompts();
+  }, []);
 
   const isUnderage = (() => {
     const d = parseInt(day, 10);
@@ -479,6 +498,19 @@ export default function ProfileScreen() {
                 </View>
               )}
             </View>
+
+            {/* Profile Prompts — View Mode */}
+            {myPrompts.length > 0 && (
+              <View style={styles.promptsViewSection}>
+                <Text style={styles.promptsSectionTitle}>{t('prompts.title')}</Text>
+                {myPrompts.map((p) => (
+                  <View key={p.id} style={styles.promptViewItem}>
+                    <Text style={styles.promptViewQuestion}>{t(`prompts.prompt_${p.prompt_key}`)}</Text>
+                    <Text style={styles.promptViewAnswer}>{p.answer}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
 
           {/* Verification banner */}
@@ -896,6 +928,114 @@ export default function ProfileScreen() {
                 <Tag key={h} label={t(`hogwarts.${h}`)} selected={hogwartsHouse === h} onPress={() => toggleSingleSelect(hogwartsHouse, h, setHogwartsHouse)} />
               ))}
             </View>
+          </View>
+
+          {/* Profile Prompts — Edit Mode */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('prompts.title')}</Text>
+            {[0, 1, 2].map((pos) => {
+              const existing = myPrompts.find((p) => p.position === pos);
+              return (
+                <View key={pos} style={styles.promptEditSlot}>
+                  {existing ? (
+                    <TouchableOpacity
+                      style={styles.promptEditFilled}
+                      onPress={() => {
+                        setEditingPromptPosition(pos);
+                        setEditingPromptKey(existing.prompt_key);
+                        setEditingPromptAnswer(existing.answer);
+                        setShowPromptPicker(false);
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.promptEditHeader}>
+                        <Text style={styles.promptEditQuestion} numberOfLines={1}>
+                          {t(`prompts.prompt_${existing.prompt_key}`)}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() => deletePromptStore(pos)}
+                          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        >
+                          <Ionicons name="close-circle" size={18} color={Colors.textTertiary} />
+                        </TouchableOpacity>
+                      </View>
+                      <Text style={styles.promptEditAnswer} numberOfLines={2}>{existing.answer}</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.promptEditEmpty}
+                      onPress={() => {
+                        setEditingPromptPosition(pos);
+                        setEditingPromptKey(null);
+                        setEditingPromptAnswer('');
+                        setShowPromptPicker(true);
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="add-circle-outline" size={22} color={Colors.primary} />
+                      <Text style={styles.promptEditAddText}>{t('prompts.addPrompt')}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              );
+            })}
+
+            {/* Prompt picker / editor inline */}
+            {editingPromptPosition !== null && (
+              <View style={styles.promptEditor}>
+                {showPromptPicker || !editingPromptKey ? (
+                  <View style={styles.promptPickerList}>
+                    <Text style={styles.promptPickerTitle}>{t('prompts.selectPrompt')}</Text>
+                    {PROMPT_KEYS.filter((k) => !myPrompts.some((p) => p.prompt_key === k)).map((key) => (
+                      <TouchableOpacity
+                        key={key}
+                        style={styles.promptPickerItem}
+                        onPress={() => {
+                          setEditingPromptKey(key);
+                          setShowPromptPicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.promptPickerItemText}>{t(`prompts.prompt_${key}`)}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                ) : (
+                  <View style={styles.promptAnswerEditor}>
+                    <Text style={styles.promptAnswerLabel}>{t(`prompts.prompt_${editingPromptKey}`)}</Text>
+                    <TextInput
+                      style={styles.promptAnswerInput}
+                      value={editingPromptAnswer}
+                      onChangeText={setEditingPromptAnswer}
+                      placeholder={t('prompts.answerPlaceholder')}
+                      placeholderTextColor={Colors.textTertiary}
+                      multiline
+                      maxLength={200}
+                    />
+                    <View style={styles.promptAnswerActions}>
+                      <TouchableOpacity
+                        onPress={() => setEditingPromptPosition(null)}
+                        style={styles.promptCancelButton}
+                      >
+                        <Text style={styles.promptCancelText}>{t('common.cancel')}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={async () => {
+                          if (editingPromptKey && editingPromptAnswer.trim() && editingPromptPosition !== null) {
+                            await upsertPrompt(editingPromptKey, editingPromptAnswer.trim(), editingPromptPosition);
+                            setEditingPromptPosition(null);
+                          }
+                        }}
+                        style={[styles.promptSaveButton, !editingPromptAnswer.trim() && { opacity: 0.5 }]}
+                        disabled={!editingPromptAnswer.trim()}
+                      >
+                        <Text style={styles.promptSaveText}>{t('common.save')}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            )}
           </View>
 
           <Button
@@ -1417,6 +1557,152 @@ const styles = StyleSheet.create({
   },
   modalButtonText: {
     fontSize: 16,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.textOnPrimary,
+  },
+  // Prompts view styles
+  promptsViewSection: {
+    marginTop: 12,
+    gap: 10,
+  },
+  promptsSectionTitle: {
+    fontSize: 16,
+    fontFamily: Fonts.heading,
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  promptViewItem: {
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  promptViewQuestion: {
+    fontSize: 13,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.textTertiary,
+    marginBottom: 4,
+  },
+  promptViewAnswer: {
+    fontSize: 15,
+    fontFamily: Fonts.body,
+    color: Colors.text,
+    lineHeight: 22,
+  },
+  // Prompts edit styles
+  promptEditSlot: {
+    marginBottom: 8,
+  },
+  promptEditFilled: {
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  promptEditHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  promptEditQuestion: {
+    fontSize: 13,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.textTertiary,
+    flex: 1,
+  },
+  promptEditAnswer: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.text,
+    marginTop: 4,
+  },
+  promptEditEmpty: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    borderStyle: 'dashed',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  promptEditAddText: {
+    fontSize: 14,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.primary,
+  },
+  promptEditor: {
+    marginTop: 8,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+    padding: 12,
+  },
+  promptPickerList: {
+    gap: 4,
+  },
+  promptPickerTitle: {
+    fontSize: 14,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  promptPickerItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: Colors.surfaceSecondary,
+    marginBottom: 4,
+  },
+  promptPickerItemText: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.text,
+  },
+  promptAnswerEditor: {
+    gap: 8,
+  },
+  promptAnswerLabel: {
+    fontSize: 14,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.textSecondary,
+  },
+  promptAnswerInput: {
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 15,
+    fontFamily: Fonts.body,
+    color: Colors.text,
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  promptAnswerActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  promptCancelButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  promptCancelText: {
+    fontSize: 14,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.textSecondary,
+  },
+  promptSaveButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+  },
+  promptSaveText: {
+    fontSize: 14,
     fontFamily: Fonts.bodySemiBold,
     color: Colors.textOnPrimary,
   },

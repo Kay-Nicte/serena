@@ -135,7 +135,9 @@
     "inactiveMonth": "Duela hilabete 1",
     "inactiveMonths": "Duela {{count}} hilabete",
     "inactiveYear": "Duela urte 1 baino gehiago",
-    "inactiveYears": "Duela {{count}} urte baino gehiago"
+    "inactiveYears": "Duela {{count}} urte baino gehiago",
+    "inactiveWeek": "Duela aste 1",
+    "inactiveWeeks": "Duela {{count}} aste"
   },
   "matches": {
     "title": "Match-ak",
@@ -178,12 +180,16 @@
     "photoMessage": "Argazkia",
     "today": "Gaur",
     "yesterday": "Atzo",
-    "matchedOn": "Match-a {{date}}-(e)an"
+    "matchedOn": "Match-a {{date}}-(e)an",
+    "shareDateLocation": "Kokapena partekatu",
+    "shareDateMessage": "Serenade bidez zita batean nago. Nire uneko kokapena: {{link}}"
   },
   "notifications": {
     "permissionTitle": "Jakinarazpenak aktibatu",
     "permissionMessage": "Jaso jakinarazpenak match eta mezu berriei buruz",
-    "pushNotAvailable": "Push jakinarazpenak ez daude eskuragarri gailu honetan"
+    "pushNotAvailable": "Push jakinarazpenak ez daude eskuragarri gailu honetan",
+    "staleMatchTitle": "Jarri egunean!",
+    "staleMatchMessage": "Aspaldi ez duzue hitz egin {{name}} rekin. Esan kaixo!"
   },
   "errorBoundary": {
     "title": "Hara!",
@@ -515,5 +521,57 @@
     "promptTitle": "Urrats bat gehiago!",
     "promptMessage": "Egiaztatu zure identitatea besteek zure profila ikusi eta zurekin match egin ahal izateko.",
     "verified": "Egiaztatua"
+  },
+  "starters": {
+    "travel": "Zein da bidaiatu duzun azken tokia?",
+    "cooking": "Zein da zure errezeta nagusia?",
+    "music": "Zein abesti duzu begiztan orain?",
+    "hiking": "Zein da egin duzun bide onena?",
+    "yoga": "Zenbat denbora daramazu yoga praktikatzen?",
+    "photography": "Zer argazkilaritza gustuko duzu gehien?",
+    "art": "Zein da bisitatu duzun azken erakusketa?",
+    "gaming": "Zein jokora jolasten ari zara orain?",
+    "reading": "Zer liburu irakurtzen ari zara?",
+    "fitness": "Zein da zure ariketa gogokoena?",
+    "dancing": "Zein da zure dantza estilo gogokoena?",
+    "movies": "Zein da harritu zaituen azken filma?",
+    "nature": "Zein da zure txoko gogokoena naturan?",
+    "wine": "Gorria, zuria ala arrosada?",
+    "coffee": "Nola hartzen duzu kafea?",
+    "cats": "Zure katuak ohitura barregarririk ba al du?",
+    "dogs": "Zein arrazatakoa da zure txakurra?",
+    "zodiac": "Zodiakoaren bateragarritasunean sinisten al duzu?",
+    "generic1": "Zer moduz eguna?",
+    "generic2": "Zer serie ikusten ari zara?",
+    "generic3": "Zein izan da zure asteko momenturik onena?",
+    "generic4": "Bihar edozein tokitara bidaia bazinezake, nora joango zinateke?",
+    "generic5": "Nolakoa da zure asteburua ideala?"
+  },
+  "prompts": {
+    "title": "Profilaren galderak",
+    "addPrompt": "Galdera gehitu",
+    "selectPrompt": "Aukeratu galdera bat",
+    "answerPlaceholder": "Idatzi zure erantzuna...",
+    "prompt_perfect_sunday": "Igande plan perfektua...",
+    "prompt_red_flag": "Nire red flag da...",
+    "prompt_rewatched_show": "Gehien berrikusi dudan seriea...",
+    "prompt_fridge_staple": "Nire hozkailuan beti dagoena...",
+    "prompt_hidden_talent": "Nire ezkutuko talentua da...",
+    "prompt_random_fact": "Niri buruzko datu ausazkoa...",
+    "prompt_dinner_guest": "Norbaitekin afaldu ahal banu...",
+    "prompt_current_song": "Nire momentuko abestia...",
+    "prompt_worst_cook": "Txarren prestatzen dudan gauza...",
+    "prompt_guilty_pleasure": "Nire guilty pleasure...",
+    "prompt_overly_excited": "Gehiegi ilusionatzen nauen zerbait...",
+    "prompt_best_advice": "Eman didaten aholkurik onena...",
+    "prompt_no_work": "Lan egin behar ez banu...",
+    "prompt_comfort_movie": "Nire comfort movie...",
+    "prompt_youll_like_me_if": "Gustuko izango nauzu..."
+  },
+  "likes": {
+    "title": "Nork eman dizu like",
+    "empty": "Inork ez dizu oraindik like eman. Mantendu zure profila eguneratuta!",
+    "premiumCta": "Egin zaitez Premium nork eman dizun like ikusteko",
+    "count": "{{count}} like"
   }
 }

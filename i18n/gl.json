@@ -135,7 +135,9 @@
     "inactiveMonth": "Hai 1 mes",
     "inactiveMonths": "Hai {{count}} meses",
     "inactiveYear": "Hai máis de 1 ano",
-    "inactiveYears": "Hai máis de {{count}} anos"
+    "inactiveYears": "Hai máis de {{count}} anos",
+    "inactiveWeek": "Hai 1 semana",
+    "inactiveWeeks": "Hai {{count}} semanas"
   },
   "matches": {
     "title": "Matches",
@@ -178,12 +180,16 @@
     "photoMessage": "📷 Foto",
     "today": "Hoxe",
     "yesterday": "Onte",
-    "matchedOn": "Match o {{date}}"
+    "matchedOn": "Match o {{date}}",
+    "shareDateLocation": "Compartir ubicación",
+    "shareDateMessage": "Estou nunha cita a través de Serenade. A miña ubicación actual: {{link}}"
   },
   "notifications": {
     "permissionTitle": "Activar notificacións",
     "permissionMessage": "Recibe notificacións sobre novos matches e mensaxes",
-    "pushNotAvailable": "As notificacións push non están dispoñibles neste dispositivo"
+    "pushNotAvailable": "As notificacións push non están dispoñibles neste dispositivo",
+    "staleMatchTitle": "Ponte ao día!",
+    "staleMatchMessage": "Levades tempo sen falar con {{name}}. Dille ola!"
   },
   "errorBoundary": {
     "title": "Vaites!",
@@ -515,5 +521,57 @@
     "promptTitle": "Un paso máis!",
     "promptMessage": "Verifica a túa identidade para que as demais poidan ver o teu perfil e facer match contigo.",
     "verified": "Verificada"
+  },
+  "starters": {
+    "travel": "Cal é o último sitio ao que viaxaches?",
+    "cooking": "Cal é a túa receita estrela?",
+    "music": "Que canción tes en bucle agora?",
+    "hiking": "Cal é a mellor ruta que fixeches?",
+    "yoga": "Canto tempo levas practicando yoga?",
+    "photography": "Que é o que máis che gusta fotografar?",
+    "art": "Cal é a última exposición que visitaches?",
+    "gaming": "A que estás xogando agora?",
+    "reading": "Que libro estás lendo?",
+    "fitness": "Cal é o teu exercicio favorito?",
+    "dancing": "Cal é o teu estilo de baile favorito?",
+    "movies": "Cal é a última peli que te deixou flipando?",
+    "nature": "Cal é o teu recuncho favorito na natureza?",
+    "wine": "Tinto, branco ou rosado?",
+    "coffee": "Como tomas o café?",
+    "cats": "O teu gato ten algunha manía graciosa?",
+    "dogs": "De que raza é o teu can?",
+    "zodiac": "Cres na compatibilidade zodiacal?",
+    "generic1": "Que tal o día?",
+    "generic2": "Que serie estás vendo?",
+    "generic3": "Que foi o mellor da túa semana?",
+    "generic4": "Se puideses viaxar a calquera sitio mañá, onde irías?",
+    "generic5": "Como é o teu fin de semana ideal?"
+  },
+  "prompts": {
+    "title": "Prompts de perfil",
+    "addPrompt": "Engadir prompt",
+    "selectPrompt": "Elixe un prompt",
+    "answerPlaceholder": "Escribe a túa resposta...",
+    "prompt_perfect_sunday": "Un plan perfecto de domingo...",
+    "prompt_red_flag": "A miña red flag é...",
+    "prompt_rewatched_show": "A serie que máis revín...",
+    "prompt_fridge_staple": "O que nunca falta na miña neveira...",
+    "prompt_hidden_talent": "O meu talento oculto é...",
+    "prompt_random_fact": "Un dato random sobre min...",
+    "prompt_dinner_guest": "Se puidese cear con alguén...",
+    "prompt_current_song": "A miña canción do momento...",
+    "prompt_worst_cook": "O peor que cociño...",
+    "prompt_guilty_pleasure": "O meu guilty pleasure...",
+    "prompt_overly_excited": "Algo que me emociona demasiado...",
+    "prompt_best_advice": "O mellor consello que me deron...",
+    "prompt_no_work": "Se non tivese que traballar...",
+    "prompt_comfort_movie": "A miña comfort movie...",
+    "prompt_youll_like_me_if": "Caereiche ben se..."
+  },
+  "likes": {
+    "title": "Quen che deu like",
+    "empty": "Ninguén che deu like aínda. Mantén o teu perfil actualizado!",
+    "premiumCta": "Faite Premium para ver quen che deu like",
+    "count": "{{count}} likes"
   }
 }

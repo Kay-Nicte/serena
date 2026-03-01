@@ -135,7 +135,9 @@
     "inactiveMonth": "Fa 1 mes",
     "inactiveMonths": "Fa {{count}} mesos",
     "inactiveYear": "Fa més d'1 any",
-    "inactiveYears": "Fa més de {{count}} anys"
+    "inactiveYears": "Fa més de {{count}} anys",
+    "inactiveWeek": "Fa 1 setmana",
+    "inactiveWeeks": "Fa {{count}} setmanes"
   },
   "matches": {
     "title": "Matches",
@@ -178,12 +180,16 @@
     "photoMessage": "Foto",
     "today": "Avui",
     "yesterday": "Ahir",
-    "matchedOn": "Match el {{date}}"
+    "matchedOn": "Match el {{date}}",
+    "shareDateLocation": "Compartir ubicació",
+    "shareDateMessage": "Estic en una cita a través de Serenade. La meva ubicació actual: {{link}}"
   },
   "notifications": {
     "permissionTitle": "Activar notificacions",
     "permissionMessage": "Rep notificacions sobre nous matches i missatges",
-    "pushNotAvailable": "Les notificacions push no estan disponibles en aquest dispositiu"
+    "pushNotAvailable": "Les notificacions push no estan disponibles en aquest dispositiu",
+    "staleMatchTitle": "Posa't al dia!",
+    "staleMatchMessage": "Fa temps que no parleu amb {{name}}. Digues hola!"
   },
   "errorBoundary": {
     "title": "Vaja!",
@@ -515,5 +521,57 @@
     "promptTitle": "Un pas més!",
     "promptMessage": "Verifica la teva identitat perquè les altres puguin veure el teu perfil i fer match amb tu.",
     "verified": "Verificada"
+  },
+  "starters": {
+    "travel": "Quin és l'últim lloc on has viatjat?",
+    "cooking": "Quina és la teva recepta estrella?",
+    "music": "Quina cançó tens en bucle ara?",
+    "hiking": "Quina és la millor ruta que has fet?",
+    "yoga": "Quant de temps portes practicant yoga?",
+    "photography": "Què és el que més t'agrada fotografiar?",
+    "art": "Quina és l'última exposició que has visitat?",
+    "gaming": "A quin joc estàs jugant ara?",
+    "reading": "Quin llibre estàs llegint?",
+    "fitness": "Quin és el teu exercici preferit?",
+    "dancing": "Quin és el teu estil de ball preferit?",
+    "movies": "Quina és l'última pel·li que t'ha deixat flipant?",
+    "nature": "Quin és el teu racó preferit a la natura?",
+    "wine": "Negre, blanc o rosat?",
+    "coffee": "Com prens el cafè?",
+    "cats": "El teu gat té alguna mania graciosa?",
+    "dogs": "De quina raça és el teu gos?",
+    "zodiac": "Creus en la compatibilitat zodiacal?",
+    "generic1": "Què tal el dia?",
+    "generic2": "Quina sèrie estàs veient?",
+    "generic3": "Quina ha estat la millor cosa de la teva setmana?",
+    "generic4": "Si poguessis viatjar a qualsevol lloc demà, on iries?",
+    "generic5": "Com és el teu cap de setmana ideal?"
+  },
+  "prompts": {
+    "title": "Prompts de perfil",
+    "addPrompt": "Afegir prompt",
+    "selectPrompt": "Tria un prompt",
+    "answerPlaceholder": "Escriu la teva resposta...",
+    "prompt_perfect_sunday": "Un pla perfecte de diumenge...",
+    "prompt_red_flag": "La meva red flag és...",
+    "prompt_rewatched_show": "La sèrie que més he revist...",
+    "prompt_fridge_staple": "El que no falta mai a la meva nevera...",
+    "prompt_hidden_talent": "El meu talent ocult és...",
+    "prompt_random_fact": "Un fet random sobre mi...",
+    "prompt_dinner_guest": "Si pogués sopar amb algú...",
+    "prompt_current_song": "La meva cançó del moment...",
+    "prompt_worst_cook": "El pitjor que cuino...",
+    "prompt_guilty_pleasure": "El meu guilty pleasure...",
+    "prompt_overly_excited": "Alguna cosa que m'emociona massa...",
+    "prompt_best_advice": "El millor consell que m'han donat...",
+    "prompt_no_work": "Si no hagués de treballar...",
+    "prompt_comfort_movie": "La meva comfort movie...",
+    "prompt_youll_like_me_if": "Et cauré bé si..."
+  },
+  "likes": {
+    "title": "Qui t'ha donat like",
+    "empty": "Ningú t'ha donat like encara. Mantén el teu perfil actualitzat!",
+    "premiumCta": "Fes-te Premium per veure qui t'ha donat like",
+    "count": "{{count}} likes"
   }
 }

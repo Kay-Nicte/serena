@@ -9,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
   Keyboard,
+  Share,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -32,6 +33,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { Message } from '@/stores/chatStore';
 import { checkToxicity } from '@/lib/moderation';
+import { getStarters } from '@/lib/conversationStarters';
+import { getCurrentLocation, requestLocationPermission } from '@/lib/location';
 
 type ChatItem =
   | { type: 'match-separator'; id: string; label: string }
@@ -73,6 +76,7 @@ export default function ChatScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const isPremium = useAuthStore((s) => s.profile?.is_premium ?? false);
+  const myProfile = useAuthStore((s) => s.profile);
   const { messages, isLoading, sendMessage, markAsRead } = useChat(matchId!);
   const { isTablet, chatMaxWidth } = useResponsive();
   const flatListRef = useRef<FlatList>(null);
@@ -80,6 +84,8 @@ export default function ChatScreen() {
   const [otherUserId, setOtherUserId] = useState<string | null>(null);
   const [otherUserName, setOtherUserName] = useState<string>('');
   const [otherUserAvatar, setOtherUserAvatar] = useState<string | null>(null);
+  const [otherUserVerified, setOtherUserVerified] = useState(false);
+  const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [matchCreatedAt, setMatchCreatedAt] = useState<string | null>(null);
   const [otherPresence, setOtherPresence] = useState<UserPresence | null>(null);
   const [isBlockedByOther, setIsBlockedByOther] = useState(false);
@@ -122,12 +128,14 @@ export default function ChatScreen() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('name, avatar_url')
+        .select('name, avatar_url, is_verified, interests, looking_for, orientation, zodiac')
         .eq('id', otherId)
         .single();
 
       setOtherUserName(profile?.name ?? t('matches.deletedUser'));
       setOtherUserAvatar(profile?.avatar_url ?? null);
+      setOtherUserVerified(profile?.is_verified ?? false);
+      setOtherUserProfile(profile);
 
       // Check if the other user has blocked us (via SECURITY DEFINER RPC)
       const { data: blockedByOther } = await supabase.rpc('is_blocked_by', {
@@ -378,7 +386,12 @@ export default function ChatScreen() {
             </View>
           )}
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle} numberOfLines={1}>{otherUserName}</Text>
+            <View style={styles.headerTitleRow}>
+              <Text style={styles.headerTitle} numberOfLines={1}>{otherUserName}</Text>
+              {otherUserVerified && (
+                <Ionicons name="shield-checkmark" size={16} color={Colors.primary} style={{ marginLeft: 4 }} />
+              )}
+            </View>
             {subtitleText ? (
               <View style={styles.statusRow}>
                 {isOnline && <View style={styles.onlineDot} />}
@@ -389,6 +402,21 @@ export default function ChatScreen() {
               <Text style={styles.matchDateHeader}>{matchDateText}</Text>
             ) : null}
           </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
+            const granted = await requestLocationPermission();
+            if (!granted) return;
+            const coords = await getCurrentLocation();
+            if (!coords) return;
+            const link = `https://maps.google.com/?q=${coords.latitude},${coords.longitude}`;
+            const message = t('chat.shareDateMessage', { link });
+            Share.share({ message });
+          }}
+          style={styles.menuButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="shield-outline" size={20} color={Colors.primary} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleShowMenu}
@@ -458,6 +486,21 @@ export default function ChatScreen() {
             ListFooterComponent={messages.length === 0 ? (
               <View style={styles.emptyFooter}>
                 <Text style={styles.emptyText}>{t('chat.noMessages')}</Text>
+                {myProfile && otherUserProfile && (
+                  <View style={styles.startersContainer}>
+                    {getStarters(myProfile, otherUserProfile).map((key) => (
+                      <TouchableOpacity
+                        key={key}
+                        style={styles.starterCard}
+                        onPress={() => handleSend(t(key))}
+                        activeOpacity={0.7}
+                      >
+                        <Ionicons name="chatbubble-outline" size={14} color={Colors.primary} />
+                        <Text style={styles.starterText}>{t(key)}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
               </View>
             ) : null}
             contentContainerStyle={[
@@ -560,6 +603,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   headerTitle: {
     fontSize: 17,
     fontFamily: Fonts.bodySemiBold,
@@ -606,7 +653,29 @@ const styles = StyleSheet.create({
   emptyFooter: {
     alignItems: 'center',
     paddingVertical: 24,
-    paddingHorizontal: 40,
+    paddingHorizontal: 24,
+  },
+  startersContainer: {
+    marginTop: 16,
+    gap: 8,
+    width: '100%',
+  },
+  starterCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.primaryPastel,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  starterText: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.text,
   },
   messagesListEmpty: {
     flexGrow: 1,

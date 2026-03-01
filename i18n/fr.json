@@ -135,7 +135,9 @@
     "inactiveMonth": "Il y a 1 mois",
     "inactiveMonths": "Il y a {{count}} mois",
     "inactiveYear": "Il y a plus d'1 an",
-    "inactiveYears": "Il y a plus de {{count}} ans"
+    "inactiveYears": "Il y a plus de {{count}} ans",
+    "inactiveWeek": "Il y a 1 semaine",
+    "inactiveWeeks": "Il y a {{count}} semaines"
   },
   "matches": {
     "title": "Matches",
@@ -178,12 +180,16 @@
     "photoMessage": "📷 Photo",
     "today": "Aujourd'hui",
     "yesterday": "Hier",
-    "matchedOn": "Match le {{date}}"
+    "matchedOn": "Match le {{date}}",
+    "shareDateLocation": "Partager ma position",
+    "shareDateMessage": "Je suis à un rendez-vous via Serenade. Ma position actuelle : {{link}}"
   },
   "notifications": {
     "permissionTitle": "Activer les notifications",
     "permissionMessage": "Reçois des notifications pour les nouveaux matches et messages",
-    "pushNotAvailable": "Les notifications push ne sont pas disponibles sur cet appareil"
+    "pushNotAvailable": "Les notifications push ne sont pas disponibles sur cet appareil",
+    "staleMatchTitle": "Rattrapez le temps perdu !",
+    "staleMatchMessage": "Ça fait un moment que vous n'avez pas parlé à {{name}}. Dites bonjour !"
   },
   "errorBoundary": {
     "title": "Oups !",
@@ -515,5 +521,57 @@
     "promptTitle": "Plus qu'une étape !",
     "promptMessage": "Vérifie ton identité pour que les autres puissent voir ton profil et matcher avec toi.",
     "verified": "Vérifiée"
+  },
+  "starters": {
+    "travel": "Quel est le dernier endroit où tu as voyagé ?",
+    "cooking": "Quel est ton plat signature ?",
+    "music": "Quelle chanson as-tu en boucle en ce moment ?",
+    "hiking": "Quel est le meilleur sentier que tu aies parcouru ?",
+    "yoga": "Depuis combien de temps tu pratiques le yoga ?",
+    "photography": "Qu'est-ce que tu aimes le plus photographier ?",
+    "art": "Quelle est la dernière expo que tu as visitée ?",
+    "gaming": "À quel jeu tu joues en ce moment ?",
+    "reading": "Quel livre es-tu en train de lire ?",
+    "fitness": "Quel est ton entraînement préféré ?",
+    "dancing": "Quel est ton style de danse préféré ?",
+    "movies": "Quel est le dernier film qui t'a bluffée ?",
+    "nature": "Quel est ton coin préféré dans la nature ?",
+    "wine": "Rouge, blanc ou rosé ?",
+    "coffee": "Comment tu prends ton café ?",
+    "cats": "Ton chat a des habitudes marrantes ?",
+    "dogs": "C'est quoi la race de ton chien ?",
+    "zodiac": "Tu crois à la compatibilité astrologique ?",
+    "generic1": "Comment se passe ta journée ?",
+    "generic2": "Quelle série tu regardes en ce moment ?",
+    "generic3": "Quel a été le meilleur moment de ta semaine ?",
+    "generic4": "Si tu pouvais voyager n'importe où demain, tu irais où ?",
+    "generic5": "C'est quoi ton week-end idéal ?"
+  },
+  "prompts": {
+    "title": "Prompts de profil",
+    "addPrompt": "Ajouter un prompt",
+    "selectPrompt": "Choisis un prompt",
+    "answerPlaceholder": "Écris ta réponse...",
+    "prompt_perfect_sunday": "Un dimanche parfait...",
+    "prompt_red_flag": "Mon red flag c'est...",
+    "prompt_rewatched_show": "La série que j'ai le plus revue...",
+    "prompt_fridge_staple": "Ce qui ne manque jamais dans mon frigo...",
+    "prompt_hidden_talent": "Mon talent caché c'est...",
+    "prompt_random_fact": "Un fait random sur moi...",
+    "prompt_dinner_guest": "Si je pouvais dîner avec quelqu'un...",
+    "prompt_current_song": "Ma chanson du moment...",
+    "prompt_worst_cook": "Le pire truc que je cuisine...",
+    "prompt_guilty_pleasure": "Mon plaisir coupable...",
+    "prompt_overly_excited": "Un truc qui m'excite beaucoup trop...",
+    "prompt_best_advice": "Le meilleur conseil qu'on m'ait donné...",
+    "prompt_no_work": "Si je n'avais pas à travailler...",
+    "prompt_comfort_movie": "Mon film réconfort...",
+    "prompt_youll_like_me_if": "Tu m'aimeras bien si..."
+  },
+  "likes": {
+    "title": "Qui t'a liké",
+    "empty": "Personne ne t'a encore liké. Garde ton profil à jour !",
+    "premiumCta": "Passe en Premium pour voir qui t'a liké",
+    "count": "{{count}} likes"
   }
 }
