@@ -11,12 +11,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   userInterfaceStyle: 'light',
   newArchEnabled: true,
   ios: {
+    bundleIdentifier: 'com.ixabel.serenade',
     supportsTablet: true,
     infoPlist: {
       NSCameraUsageDescription:
         'Serenade necesita acceso a tu cámara para tomar fotos de perfil.',
       NSPhotoLibraryUsageDescription:
         'Serenade necesita acceso a tu galería para seleccionar fotos de perfil.',
+      NSLocationWhenInUseUsageDescription:
+        'Serenade necesita tu ubicación para compartirla en citas seguras y mostrar perfiles cercanos.',
     },
   },
   android: {
@@ -64,6 +67,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     '@react-native-community/datetimepicker',
+    [
+      'expo-location',
+      {
+        locationWhenInUsePermission:
+          'Serenade necesita tu ubicación para compartirla en citas seguras y mostrar perfiles cercanos.',
+      },
+    ],
     [
       'expo-notifications',
       {
