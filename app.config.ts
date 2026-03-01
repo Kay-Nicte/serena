@@ -20,6 +20,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
   },
   android: {
+    package: 'com.ixabel.serenade',
     adaptiveIcon: {
       backgroundColor: '#E6A8B4',
       foregroundImage: './assets/images/android-icon-foreground.png',
@@ -38,6 +39,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     favicon: './assets/images/favicon.png',
   },
   plugins: [
+    'expo-dev-client',
     'expo-router',
     [
       'expo-splash-screen',
@@ -76,8 +78,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    revenueCatAppleKey: process.env.EXPO_PUBLIC_REVENUECAT_APPLE_KEY,
+    revenueCatGoogleKey: process.env.EXPO_PUBLIC_REVENUECAT_GOOGLE_KEY,
     eas: {
-      projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
+      projectId: '98901d6c-f25e-401c-bbc2-bda2120a90a8',
     },
   },
 });

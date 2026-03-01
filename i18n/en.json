@@ -52,7 +52,9 @@
     "verifyEmailHint": "Check your inbox and click the link to activate your account. If you can't find it, check your spam folder.",
     "verifyEmailResend": "Resend email",
     "verifyEmailResent": "Email resent",
-    "verifyEmailResentMessage": "We've sent a new verification link to your email."
+    "verifyEmailResentMessage": "We've sent a new verification link to your email.",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google"
   },
   "profile": {
     "completeTitle": "Complete your profile",
@@ -88,7 +90,12 @@
     "drinking": "Drinking",
     "height": "Height",
     "heightCm": "{{cm}} cm",
-    "hogwartsHouse": "Hogwarts house"
+    "hogwartsHouse": "Hogwarts house",
+    "hometown": "From",
+    "hometownPlaceholder": "e.g. Barcelona",
+    "hometownSearching": "Searching...",
+    "hometownNoResults": "No cities found",
+    "hometownGpsError": "Could not detect your city"
   },
   "orientation": {
     "lesbian": "Lesbian",
@@ -159,6 +166,9 @@
     "noMessages": "No messages yet. Say hello!",
     "errorFetching": "Could not load messages.",
     "errorSending": "Message could not be sent. Try again.",
+    "toxicMessage": "This message contains inappropriate content. Please be respectful.",
+    "filterTitle": "Serenade Filter active",
+    "filterMessage": "A message was blocked for inappropriate content. Your safety comes first.",
     "typing": "Typing",
     "online": "Online",
     "lastSeenNow": "Last seen just now",
@@ -340,7 +350,24 @@
     "upsellTitle": "Serenade Premium",
     "upsellDescription": "10 profiles per day, see who liked you, and advanced filters",
     "viewPlans": "View plans",
-    "comingSoon": "Premium plans coming soon!"
+    "comingSoon": "Premium plans coming soon!",
+    "choosePlan": "Choose your plan",
+    "monthlyPlan": "Monthly",
+    "3monthPlan": "3 Months",
+    "yearlyPlan": "Yearly",
+    "bestValue": "Best value",
+    "subscribe": "Subscribe",
+    "restorePurchases": "Restore purchases",
+    "purchaseSuccess": "Welcome to Premium!",
+    "purchaseError": "Something went wrong. Please try again.",
+    "restoreSuccess": "Your purchases have been restored!",
+    "restoreNone": "No previous purchases found.",
+    "noPlansAvailable": "Plans are not available right now. Please try again later.",
+    "redeemTitle": "Got a code?",
+    "redeemPlaceholder": "Enter code",
+    "redeem": "Redeem",
+    "codeSuccess": "Code redeemed! Welcome to Premium!",
+    "invalidCode": "Invalid code. Please check and try again."
   },
   "streak": {
     "title": "Daily Streak",

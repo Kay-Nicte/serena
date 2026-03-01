@@ -76,28 +76,32 @@ function IceBreakerCard({
   iceBreaker,
   onAccept,
   onDecline,
+  onViewProfile,
 }: {
   iceBreaker: IceBreaker;
   onAccept: () => void;
   onDecline: () => void;
+  onViewProfile: () => void;
 }) {
   return (
     <View style={styles.ibCard}>
-      {iceBreaker.sender.avatar_url ? (
-        <Image
-          source={{ uri: iceBreaker.sender.avatar_url }}
-          style={styles.ibAvatar}
-          contentFit="cover"
-          transition={200}
-        />
-      ) : (
-        <View style={[styles.ibAvatar, styles.ibAvatarPlaceholder]}>
-          <Ionicons name="person" size={24} color={Colors.primaryLight} />
-        </View>
-      )}
-      <Text style={styles.ibName} numberOfLines={1}>
-        {iceBreaker.sender.name ?? ''}
-      </Text>
+      <TouchableOpacity onPress={onViewProfile} activeOpacity={0.7}>
+        {iceBreaker.sender.avatar_url ? (
+          <Image
+            source={{ uri: iceBreaker.sender.avatar_url }}
+            style={styles.ibAvatar}
+            contentFit="cover"
+            transition={200}
+          />
+        ) : (
+          <View style={[styles.ibAvatar, styles.ibAvatarPlaceholder]}>
+            <Ionicons name="person" size={24} color={Colors.primaryLight} />
+          </View>
+        )}
+        <Text style={styles.ibName} numberOfLines={1}>
+          {iceBreaker.sender.name ?? ''}
+        </Text>
+      </TouchableOpacity>
       <Text style={styles.ibMessage} numberOfLines={2}>
         {iceBreaker.message}
       </Text>
@@ -210,6 +214,7 @@ export default function MatchesScreen() {
               iceBreaker={ib}
               onAccept={() => handleAcceptIceBreaker(ib)}
               onDecline={() => handleDeclineIceBreaker(ib)}
+              onViewProfile={() => router.push({ pathname: '/match-profile', params: { userId: ib.sender.id } })}
             />
           ))}
         </ScrollView>

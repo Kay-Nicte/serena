@@ -6,15 +6,17 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
-import { signIn } from '@/lib/auth';
+import { signIn, signInWithGoogle } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { showToast } from '@/stores/toastStore';
 
@@ -26,6 +28,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const validate = () => {
@@ -107,6 +110,41 @@ export default function LoginScreen() {
               <Text style={styles.linkHighlight}>{t('auth.register')}</Text>
             </Text>
           </TouchableOpacity>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>{t('auth.or')}</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={async () => {
+              setGoogleLoading(true);
+              try {
+                await signInWithGoogle();
+                await fetchProfile();
+              } catch (e: unknown) {
+                const msg = e instanceof Error ? e.message : '';
+                if (!msg.includes('cancelled')) {
+                  showToast(t('auth.errorGeneric'), 'error');
+                }
+              } finally {
+                setGoogleLoading(false);
+              }
+            }}
+            activeOpacity={0.7}
+            disabled={googleLoading}
+          >
+            {googleLoading ? (
+              <ActivityIndicator size="small" color={Colors.text} />
+            ) : (
+              <>
+                <Ionicons name="logo-google" size={20} color={Colors.primaryDark} />
+                <Text style={styles.googleButtonText}>{t('auth.continueWithGoogle')}</Text>
+              </>
+            )}
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -158,5 +196,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.bodyMedium,
     color: Colors.primary,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginVertical: 4,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.border,
+  },
+  dividerText: {
+    fontSize: 13,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.textTertiary,
+    textTransform: 'lowercase',
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: Colors.primaryPastel,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    borderRadius: 12,
+    paddingVertical: 14,
+  },
+  googleButtonText: {
+    fontSize: 15,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.primaryDark,
   },
 });

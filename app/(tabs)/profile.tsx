@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -41,6 +42,7 @@ import { useDiscoveryPreferences } from '@/hooks/useDiscoveryPreferences';
 import { pickImage } from '@/lib/storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { requestLocationPermission, reverseGeocodeCity, searchCities, type CitySuggestion } from '@/lib/location';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showToast } from '@/stores/toastStore';
 import { useStreak } from '@/hooks/useStreak';
@@ -108,6 +110,12 @@ export default function ProfileScreen() {
   const [drinkingVal, setDrinkingVal] = useState<string | null>(null);
   const [heightCm, setHeightCm] = useState<string>('');
   const [hogwartsHouse, setHogwartsHouse] = useState<string | null>(null);
+  const [hometown, setHometown] = useState('');
+  const [citySuggestions, setCitySuggestions] = useState<CitySuggestion[]>([]);
+  const [citySearching, setCitySearching] = useState(false);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const citySearchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [saving, setSaving] = useState(false);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
   const [trialGranted, setTrialGranted] = useState(false);
@@ -139,6 +147,7 @@ export default function ProfileScreen() {
       setDrinkingVal(profile.drinking ?? null);
       setHeightCm(profile.height_cm ? String(profile.height_cm) : '');
       setHogwartsHouse(profile.hogwarts_house ?? null);
+      setHometown(profile.hometown ?? '');
       if (profile.birth_date) {
         const [y, m, d] = profile.birth_date.split('-');
         setYear(y);
@@ -179,6 +188,62 @@ export default function ProfileScreen() {
     setPets((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
   };
 
+  // Hometown autocomplete + GPS handlers
+  useEffect(() => {
+    return () => {
+      if (citySearchTimerRef.current) clearTimeout(citySearchTimerRef.current);
+    };
+  }, []);
+
+  const handleHometownChange = (text: string) => {
+    setHometown(text);
+    if (citySearchTimerRef.current) clearTimeout(citySearchTimerRef.current);
+
+    if (text.trim().length < 2) {
+      setCitySuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setShowSuggestions(true);
+    setCitySearching(true);
+
+    citySearchTimerRef.current = setTimeout(async () => {
+      const results = await searchCities(text);
+      setCitySuggestions(results);
+      setCitySearching(false);
+    }, 500);
+  };
+
+  const handleSelectCity = (suggestion: CitySuggestion) => {
+    setHometown(suggestion.display);
+    setCitySuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  const handleGpsDetect = async () => {
+    setGpsLoading(true);
+    try {
+      const granted = await requestLocationPermission();
+      if (!granted) {
+        showToast(t('profile.hometownGpsError'), 'error');
+        return;
+      }
+      const city = await reverseGeocodeCity();
+      if (city) {
+        setHometown(city);
+        setShowSuggestions(false);
+        setCitySuggestions([]);
+      } else {
+        showToast(t('profile.hometownGpsError'), 'error');
+      }
+    } catch {
+      showToast(t('profile.hometownGpsError'), 'error');
+    } finally {
+      setGpsLoading(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!name.trim() || isUnderage) return;
     setSaving(true);
@@ -203,6 +268,7 @@ export default function ProfileScreen() {
         drinking: drinkingVal,
         height_cm: heightCm ? parseInt(heightCm, 10) || null : null,
         hogwarts_house: hogwartsHouse,
+        hometown: hometown.trim() || null,
       } as any);
 
       // Try to activate premium trial if user hasn't had it yet
@@ -280,7 +346,45 @@ export default function ProfileScreen() {
               <Text style={styles.bio}>{profile.bio}</Text>
             ) : null}
 
+            {/* Premium trial teaser — profile incomplete + never had premium */}
+            {!isPremium && !premiumUntil && !isProfileFullyComplete && (
+              <TouchableOpacity
+                style={styles.premiumTeaser}
+                onPress={() => setEditing(true)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="diamond" size={20} color="#E0A800" />
+                <Text style={styles.premiumTeaserText}>{t('premium.completeProfileTeaser')}</Text>
+                <Ionicons name="chevron-forward" size={18} color="#9A7800" />
+              </TouchableOpacity>
+            )}
+
+            {/* Premium Upsell — only when profile is complete or trial already used */}
+            {!isPremium && (isProfileFullyComplete || !!premiumUntil) && (
+              <View style={styles.premiumUpsell}>
+                <Text style={styles.premiumUpsellTitle}>
+                  {t('premium.upsellTitle')} {'✨'}
+                </Text>
+                <Text style={styles.premiumUpsellDescription}>
+                  {t('premium.upsellDescription')}
+                </Text>
+                <TouchableOpacity
+                  style={styles.premiumUpsellButton}
+                  onPress={() => router.push('/premium')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.premiumUpsellButtonText}>{t('premium.viewPlans')}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             <View style={styles.info}>
+              {profile?.hometown && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>{t('profile.hometown')}</Text>
+                  <Text style={styles.infoValue}>{profile.hometown}</Text>
+                </View>
+              )}
               {profile?.birth_date && (() => {
                 const birth = new Date(profile.birth_date);
                 const today = new Date();
@@ -408,38 +512,6 @@ export default function ProfileScreen() {
                 <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
               )}
             </TouchableOpacity>
-          )}
-
-          {/* Premium trial teaser — profile incomplete + never had premium */}
-          {!isPremium && !premiumUntil && !isProfileFullyComplete && (
-            <TouchableOpacity
-              style={styles.premiumTeaser}
-              onPress={() => setEditing(true)}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="diamond" size={20} color="#E0A800" />
-              <Text style={styles.premiumTeaserText}>{t('premium.completeProfileTeaser')}</Text>
-              <Ionicons name="chevron-forward" size={18} color="#9A7800" />
-            </TouchableOpacity>
-          )}
-
-          {/* Premium Upsell — only when profile is complete or trial already used */}
-          {!isPremium && (isProfileFullyComplete || !!premiumUntil) && (
-            <View style={styles.premiumUpsell}>
-              <Text style={styles.premiumUpsellTitle}>
-                {t('premium.upsellTitle')} {'✨'}
-              </Text>
-              <Text style={styles.premiumUpsellDescription}>
-                {t('premium.upsellDescription')}
-              </Text>
-              <TouchableOpacity
-                style={styles.premiumUpsellButton}
-                onPress={() => showToast(t('premium.comingSoon'), 'info')}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.premiumUpsellButtonText}>{t('premium.viewPlans')}</Text>
-              </TouchableOpacity>
-            </View>
           )}
 
           {/* Streak Card */}
@@ -573,6 +645,69 @@ export default function ProfileScreen() {
             placeholder={t('profile.namePlaceholder')}
             maxLength={Config.maxNameLength}
           />
+
+          {/* Hometown */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('profile.hometown')}</Text>
+            <View style={styles.hometownInputWrapper}>
+              <TextInput
+                style={styles.hometownInput}
+                value={hometown}
+                onChangeText={handleHometownChange}
+                placeholder={t('profile.hometownPlaceholder')}
+                placeholderTextColor={Colors.textTertiary}
+                onFocus={() => {
+                  if (hometown.trim().length >= 2 && citySuggestions.length > 0) {
+                    setShowSuggestions(true);
+                  }
+                }}
+                onBlur={() => {
+                  setTimeout(() => setShowSuggestions(false), 200);
+                }}
+              />
+              <TouchableOpacity
+                onPress={handleGpsDetect}
+                style={styles.gpsButton}
+                hitSlop={8}
+                disabled={gpsLoading}
+              >
+                {gpsLoading ? (
+                  <ActivityIndicator size="small" color={Colors.primary} />
+                ) : (
+                  <Ionicons name="navigate-outline" size={20} color={Colors.primary} />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {showSuggestions && (
+              <View style={styles.suggestionsContainer}>
+                {citySearching ? (
+                  <View style={styles.suggestionItem}>
+                    <ActivityIndicator size="small" color={Colors.textTertiary} />
+                    <Text style={styles.suggestionText}>{t('profile.hometownSearching')}</Text>
+                  </View>
+                ) : citySuggestions.length === 0 && hometown.trim().length >= 2 ? (
+                  <View style={styles.suggestionItem}>
+                    <Text style={styles.suggestionTextMuted}>{t('profile.hometownNoResults')}</Text>
+                  </View>
+                ) : (
+                  citySuggestions.map((s, idx) => (
+                    <TouchableOpacity
+                      key={`${s.display}-${idx}`}
+                      style={[
+                        styles.suggestionItem,
+                        idx < citySuggestions.length - 1 && styles.suggestionItemBorder,
+                      ]}
+                      onPress={() => handleSelectCity(s)}
+                    >
+                      <Ionicons name="location-outline" size={16} color={Colors.textTertiary} />
+                      <Text style={styles.suggestionText}>{s.display}</Text>
+                    </TouchableOpacity>
+                  ))
+                )}
+              </View>
+            )}
+          </View>
 
           {/* Birth Date */}
           <View style={styles.section}>
@@ -998,6 +1133,59 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: 4,
+  },
+  hometownInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 52,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  hometownInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontFamily: Fonts.body,
+    color: Colors.text,
+    height: 52,
+  },
+  gpsButton: {
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 52,
+  },
+  suggestionsContainer: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    overflow: 'hidden',
+    marginTop: 4,
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  suggestionItemBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
+  },
+  suggestionText: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.text,
+    flex: 1,
+  },
+  suggestionTextMuted: {
+    fontSize: 14,
+    fontFamily: Fonts.body,
+    color: Colors.textTertiary,
   },
   streakCard: {
     padding: 20,

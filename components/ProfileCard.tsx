@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
@@ -109,6 +110,13 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
           </View>
         )}
 
+        {profile.hometown ? (
+          <View style={styles.hometownRow}>
+            <Ionicons name="location-outline" size={14} color={Colors.textSecondary} />
+            <Text style={styles.hometownText}>{profile.hometown}</Text>
+          </View>
+        ) : null}
+
         {profile.bio ? (
           <Text style={styles.bio}>{profile.bio}</Text>
         ) : null}
@@ -206,6 +214,16 @@ const styles = StyleSheet.create({
   activityText: {
     fontSize: 13,
     fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+  },
+  hometownRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  hometownText: {
+    fontSize: 14,
+    fontFamily: Fonts.bodyMedium,
     color: Colors.textSecondary,
   },
   bio: {

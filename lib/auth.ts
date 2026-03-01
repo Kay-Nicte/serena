@@ -1,4 +1,6 @@
 import { supabase } from './supabase';
+import * as WebBrowser from 'expo-web-browser';
+import { makeRedirectUri } from 'expo-auth-session';
 
 export async function signUp(email: string, password: string) {
   const { data, error } = await supabase.auth.signUp({ email, password });
@@ -83,6 +85,46 @@ export async function deleteAccount() {
     console.error('[DeleteAccount] RPC error:', JSON.stringify(error));
     throw error;
   }
+}
+
+export async function signInWithGoogle() {
+  const redirectTo = makeRedirectUri();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+      skipBrowserRedirect: true,
+    },
+  });
+
+  if (error) throw error;
+  if (!data.url) throw new Error('No OAuth URL returned');
+
+  const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+
+  if (result.type !== 'success' || !result.url) {
+    throw new Error('Google sign-in was cancelled');
+  }
+
+  // Extract tokens from the redirect URL fragment (#access_token=...&refresh_token=...)
+  const url = new URL(result.url);
+  const fragment = url.hash.substring(1); // remove leading #
+  const params = new URLSearchParams(fragment);
+
+  const access_token = params.get('access_token');
+  const refresh_token = params.get('refresh_token');
+
+  if (!access_token || !refresh_token) {
+    throw new Error('Missing tokens in OAuth redirect');
+  }
+
+  const { error: sessionError } = await supabase.auth.setSession({
+    access_token,
+    refresh_token,
+  });
+
+  if (sessionError) throw sessionError;
 }
 
 export async function sendPasswordResetEmail(email: string) {

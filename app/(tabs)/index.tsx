@@ -10,6 +10,7 @@ import { useDailyStatsStore } from "@/stores/dailyStatsStore";
 import { useIceBreakerStore } from "@/stores/iceBreakerStore";
 import { computeActivityLevel, useProfileStore } from "@/stores/profileStore";
 import { showToast } from "@/stores/toastStore";
+import { checkToxicity } from "@/lib/moderation";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -89,6 +90,10 @@ export default function TodayScreen() {
 
   const handleSendIceBreaker = async (message: string) => {
     if (!currentProfile) return;
+    if (checkToxicity(message).toxic) {
+      showToast(t("chat.toxicMessage"), "error");
+      return;
+    }
     setIceBreakerModalVisible(false);
     const result = await sendIceBreaker(currentProfile.id, message);
     if (result.success) {

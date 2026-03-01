@@ -1,14 +1,36 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
+import { signInWithGoogle } from '@/lib/auth';
+import { useAuthStore } from '@/stores/authStore';
+import { showToast } from '@/stores/toastStore';
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const fetchProfile = useAuthStore((s) => s.fetchProfile);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    try {
+      await signInWithGoogle();
+      await fetchProfile();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : '';
+      if (!msg.includes('cancelled')) {
+        showToast(t('auth.errorGeneric'), 'error');
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -28,6 +50,28 @@ export default function WelcomeScreen() {
             onPress={() => router.push('/(auth)/register')}
             variant="outline"
           />
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>{t('auth.or')}</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={handleGoogle}
+            activeOpacity={0.7}
+            disabled={googleLoading}
+          >
+            {googleLoading ? (
+              <ActivityIndicator size="small" color={Colors.text} />
+            ) : (
+              <>
+                <Ionicons name="logo-google" size={20} color={Colors.primaryDark} />
+                <Text style={styles.googleButtonText}>{t('auth.continueWithGoogle')}</Text>
+              </>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -66,5 +110,38 @@ const styles = StyleSheet.create({
   },
   buttons: {
     gap: 12,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginVertical: 4,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.border,
+  },
+  dividerText: {
+    fontSize: 13,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.textTertiary,
+    textTransform: 'lowercase',
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: Colors.primaryPastel,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    borderRadius: 12,
+    paddingVertical: 14,
+  },
+  googleButtonText: {
+    fontSize: 15,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.primaryDark,
   },
 });

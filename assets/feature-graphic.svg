@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF0F3"/>
+      <stop offset="100%" style="stop-color:#E6A8B4"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#D4849A"/>
+      <stop offset="100%" style="stop-color:#7B4A5C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="500" fill="url(#bg)" rx="0"/>
+
+  <!-- Decorative circles -->
+  <circle cx="120" cy="80" r="60" fill="#E6A8B4" opacity="0.3"/>
+  <circle cx="80" cy="420" r="90" fill="#D4849A" opacity="0.15"/>
+  <circle cx="920" cy="100" r="70" fill="#D4849A" opacity="0.2"/>
+  <circle cx="950" cy="400" r="50" fill="#E6A8B4" opacity="0.25"/>
+  <circle cx="512" cy="450" r="40" fill="#D4849A" opacity="0.1"/>
+
+  <!-- Hearts decoration -->
+  <text x="180" y="150" font-size="40" fill="#D4849A" opacity="0.3">&#x2665;</text>
+  <text x="820" y="380" font-size="50" fill="#D4849A" opacity="0.25">&#x2665;</text>
+  <text x="700" y="120" font-size="30" fill="#7B4A5C" opacity="0.15">&#x2665;</text>
+  <text x="300" y="420" font-size="35" fill="#7B4A5C" opacity="0.15">&#x2665;</text>
+
+  <!-- App name -->
+  <text x="512" y="200" text-anchor="middle" font-family="Georgia, 'Playfair Display', serif" font-size="72" font-weight="bold" fill="#7B4A5C">Serenade</text>
+
+  <!-- Divider line -->
+  <line x1="412" y1="225" x2="612" y2="225" stroke="url(#accent)" stroke-width="2" opacity="0.5"/>
+
+  <!-- Tagline -->
+  <text x="512" y="275" text-anchor="middle" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="28" fill="#7B4A5C" opacity="0.85">Conecta con mujeres cerca de ti</text>
+
+  <!-- Features row -->
+  <text x="260" y="350" text-anchor="middle" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="18" fill="#7B4A5C" opacity="0.7">&#x2665; Matches diarios</text>
+  <text x="512" y="350" text-anchor="middle" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="18" fill="#7B4A5C" opacity="0.7">&#x1F4AC; Chat privado</text>
+  <text x="764" y="350" text-anchor="middle" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="18" fill="#7B4A5C" opacity="0.7">&#x2728; Solo para nosotras</text>
+
+  <!-- Subtitle -->
+  <text x="512" y="400" text-anchor="middle" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="16" fill="#7B4A5C" opacity="0.5">Donde las conexiones de verdad empiezan</text>
+</svg>

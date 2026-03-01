@@ -35,6 +35,7 @@ export interface Profile {
   drinking: string | null;
   height_cm: number | null;
   hogwarts_house: string | null;
+  hometown: string | null;
   is_verified: boolean;
   verification_status: string;
   created_at: string;
@@ -170,6 +171,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await removePushTokenFromServer();
     } catch {
       // Push token cleanup is best-effort; don't block sign out
+    }
+    try {
+      const { logoutUser } = await import('@/lib/purchases');
+      await logoutUser();
+    } catch {
+      // RevenueCat cleanup is best-effort
     }
     try {
       await auth.signOut();

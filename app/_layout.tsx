@@ -12,6 +12,8 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useLocation } from '@/hooks/useLocation';
 import { usePresence } from '@/hooks/usePresence';
 import { useStreak } from '@/hooks/useStreak';
+import { initPurchases, identifyUser } from '@/lib/purchases';
+import { useAuthStore } from '@/stores/authStore';
 import { useBlockStore } from '@/stores/blockStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { OfflineBanner } from '@/components/OfflineBanner';
@@ -35,8 +37,17 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   useStreak();
 
   useEffect(() => {
+    initPurchases();
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) {
       useBlockStore.getState().fetchBlockedUsers();
+      // Identify user in RevenueCat for subscription tracking
+      const session = useAuthStore.getState().session;
+      if (session?.user?.id) {
+        identifyUser(session.user.id);
+      }
     }
   }, [isAuthenticated]);
 
@@ -122,6 +133,7 @@ export default function RootLayout() {
           <Stack.Screen name="match-profile" options={{ presentation: 'modal' }} />
           <Stack.Screen name="verify-identity" options={{ presentation: 'modal' }} />
           <Stack.Screen name="admin-verification" />
+          <Stack.Screen name="premium" options={{ presentation: 'modal' }} />
         </Stack>
         <StatusBar style="dark" />
       </AuthGuard>

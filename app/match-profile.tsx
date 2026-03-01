@@ -38,6 +38,7 @@ interface ProfileData {
   drinking: string | null;
   height_cm: number | null;
   hogwarts_house: string | null;
+  hometown: string | null;
 }
 
 function ensureArray(val: unknown): string[] {
@@ -89,7 +90,7 @@ export default function MatchProfileScreen() {
       try {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('id, name, birth_date, bio, orientation, looking_for, avatar_url, interests, children, zodiac, zodiac_ascendant, pets, smoking, drinking, height_cm, hogwarts_house')
+          .select('id, name, birth_date, bio, orientation, looking_for, avatar_url, interests, children, zodiac, zodiac_ascendant, pets, smoking, drinking, height_cm, hogwarts_house, hometown')
           .eq('id', userId)
           .single();
 
@@ -265,6 +266,15 @@ export default function MatchProfileScreen() {
                   <Text style={styles.detailValue}>{t(`drinking.${profile.drinking}`)}</Text>
                 </View>
               )}
+            </View>
+          )}
+
+          {profile.hometown && (
+            <View style={styles.section}>
+              <View style={styles.detailRow}>
+                <Text style={styles.detailLabel}>{t('profile.hometown')}</Text>
+                <Text style={styles.detailValue}>{profile.hometown}</Text>
+              </View>
             </View>
           )}
 

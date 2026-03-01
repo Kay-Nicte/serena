@@ -31,11 +31,13 @@ import { subscribeToPresence, getPresence, type UserPresence } from '@/lib/prese
 import { useAuthStore } from '@/stores/authStore';
 import { useResponsive } from '@/hooks/useResponsive';
 import type { Message } from '@/stores/chatStore';
+import { checkToxicity } from '@/lib/moderation';
 
 type ChatItem =
   | { type: 'match-separator'; id: string; label: string }
   | { type: 'date-separator'; id: string; label: string }
-  | { type: 'message'; id: string; data: Message };
+  | { type: 'message'; id: string; data: Message }
+  | { type: 'filter-notice'; id: string };
 
 function formatLastSeen(isoDate: string, t: (key: string) => string): string {
   const date = new Date(isoDate);
@@ -81,6 +83,7 @@ export default function ChatScreen() {
   const [matchCreatedAt, setMatchCreatedAt] = useState<string | null>(null);
   const [otherPresence, setOtherPresence] = useState<UserPresence | null>(null);
   const [isBlockedByOther, setIsBlockedByOther] = useState(false);
+  const [filterNotices, setFilterNotices] = useState<string[]>([]);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -174,6 +177,13 @@ export default function ChatScreen() {
   }, []);
 
   const handleSend = useCallback(async (content: string, imageUrl?: string) => {
+    if (content && checkToxicity(content).toxic) {
+      setFilterNotices((prev) => [...prev, `filter-${Date.now()}`]);
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+      return;
+    }
     await sendMessage(content, imageUrl);
   }, [sendMessage]);
 
@@ -332,8 +342,13 @@ export default function ChatScreen() {
       items.push({ type: 'message', id: msg.id, data: msg });
     }
 
+    // Append filter notices at the end
+    for (const noticeId of filterNotices) {
+      items.push({ type: 'filter-notice', id: noticeId });
+    }
+
     return items;
-  }, [messages, matchCreatedAt, t]);
+  }, [messages, matchCreatedAt, filterNotices, t]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -413,6 +428,19 @@ export default function ChatScreen() {
                     <View style={styles.dateSeparatorLine} />
                     <Text style={styles.dateSeparatorText}>{item.label}</Text>
                     <View style={styles.dateSeparatorLine} />
+                  </View>
+                );
+              }
+              if (item.type === 'filter-notice') {
+                return (
+                  <View style={styles.filterNoticeContainer}>
+                    <View style={styles.filterNoticeBubble}>
+                      <View style={styles.filterNoticeHeader}>
+                        <Ionicons name="shield-checkmark" size={16} color={Colors.primary} />
+                        <Text style={styles.filterNoticeTitle}>{t('chat.filterTitle')}</Text>
+                      </View>
+                      <Text style={styles.filterNoticeText}>{t('chat.filterMessage')}</Text>
+                    </View>
                   </View>
                 );
               }
@@ -615,5 +643,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.bodyMedium,
     color: Colors.textTertiary,
+  },
+  filterNoticeContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginVertical: 8,
+  },
+  filterNoticeBubble: {
+    backgroundColor: Colors.primaryPastel,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.primaryLight,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    maxWidth: '85%',
+  },
+  filterNoticeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  filterNoticeTitle: {
+    fontSize: 13,
+    fontFamily: Fonts.bodySemiBold,
+    color: Colors.primary,
+  },
+  filterNoticeText: {
+    fontSize: 13,
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    lineHeight: 18,
   },
 });

@@ -52,7 +52,9 @@
     "verifyEmailHint": "Revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta. Si no lo encuentras, revisa la carpeta de spam.",
     "verifyEmailResend": "Reenviar correo",
     "verifyEmailResent": "Correo reenviado",
-    "verifyEmailResentMessage": "Hemos enviado un nuevo enlace de verificación a tu correo."
+    "verifyEmailResentMessage": "Hemos enviado un nuevo enlace de verificación a tu correo.",
+    "or": "o",
+    "continueWithGoogle": "Continuar con Google"
   },
   "profile": {
     "completeTitle": "Completa tu perfil",
@@ -88,7 +90,12 @@
     "drinking": "Alcohol",
     "height": "Altura",
     "heightCm": "{{cm}} cm",
-    "hogwartsHouse": "Casa de Hogwarts"
+    "hogwartsHouse": "Casa de Hogwarts",
+    "hometown": "De dónde soy",
+    "hometownPlaceholder": "Ej: Barcelona",
+    "hometownSearching": "Buscando...",
+    "hometownNoResults": "No se encontraron ciudades",
+    "hometownGpsError": "No se pudo detectar tu ciudad"
   },
   "orientation": {
     "lesbian": "Lesbiana",
@@ -159,6 +166,9 @@
     "noMessages": "Aún no hay mensajes. ¡Di hola!",
     "errorFetching": "No se pudieron cargar los mensajes.",
     "errorSending": "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+    "toxicMessage": "Este mensaje contiene contenido inapropiado. Por favor, sé respetuosa.",
+    "filterTitle": "Filtro Serenade activo",
+    "filterMessage": "Un mensaje fue bloqueado por contenido inapropiado. Tu seguridad es lo primero.",
     "typing": "Escribiendo",
     "online": "En línea",
     "lastSeenNow": "Última vez hace un momento",
@@ -340,7 +350,24 @@
     "upsellTitle": "Serenade Premium",
     "upsellDescription": "10 perfiles al día, ve quién te ha dado like, y filtros avanzados",
     "viewPlans": "Ver planes",
-    "comingSoon": "¡Los planes premium estarán disponibles pronto!"
+    "comingSoon": "¡Los planes premium estarán disponibles pronto!",
+    "choosePlan": "Elige tu plan",
+    "monthlyPlan": "Mensual",
+    "3monthPlan": "3 Meses",
+    "yearlyPlan": "Anual",
+    "bestValue": "Mejor precio",
+    "subscribe": "Suscribirse",
+    "restorePurchases": "Restaurar compras",
+    "purchaseSuccess": "¡Bienvenida a Premium!",
+    "purchaseError": "Algo salió mal. Inténtalo de nuevo.",
+    "restoreSuccess": "¡Tus compras han sido restauradas!",
+    "restoreNone": "No se encontraron compras anteriores.",
+    "noPlansAvailable": "Los planes no están disponibles ahora. Inténtalo más tarde.",
+    "redeemTitle": "¿Tienes un código?",
+    "redeemPlaceholder": "Introduce tu código",
+    "redeem": "Canjear",
+    "codeSuccess": "¡Código canjeado! ¡Bienvenida a Premium!",
+    "invalidCode": "Código no válido. Revísalo e inténtalo de nuevo."
   },
   "streak": {
     "title": "Racha diaria",

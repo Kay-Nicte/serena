@@ -7,9 +7,11 @@ import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/authStore';
 import { showToast } from '@/stores/toastStore';
+import { useRouter } from 'expo-router';
 
 export function PremiumExpiryModal() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const session = useAuthStore((s) => s.session);
@@ -30,8 +32,8 @@ export function PremiumExpiryModal() {
   if (!visible) return null;
 
   const handleRenew = () => {
-    showToast(t('premium.renewComingSoon'), 'success');
     setVisible(false);
+    router.push('/premium');
   };
 
   const handleDecline = () => {
