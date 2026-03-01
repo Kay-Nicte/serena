@@ -258,6 +258,45 @@ export default function SettingsScreen() {
                 <Ionicons name="checkmark" size={20} color={Colors.primary} />
               )}
             </TouchableOpacity>
+
+            <View style={styles.separator} />
+
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => handleChangeLanguage('fr')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.rowLabel}>{t('settings.languageFr')}</Text>
+              {selectedLanguage === 'fr' && (
+                <Ionicons name="checkmark" size={20} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.separator} />
+
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => handleChangeLanguage('gl')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.rowLabel}>{t('settings.languageGl')}</Text>
+              {selectedLanguage === 'gl' && (
+                <Ionicons name="checkmark" size={20} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <View style={styles.separator} />
+
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => handleChangeLanguage('it')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.rowLabel}>{t('settings.languageIt')}</Text>
+              {selectedLanguage === 'it' && (
+                <Ionicons name="checkmark" size={20} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
 
