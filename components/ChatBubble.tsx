@@ -5,10 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { ImageViewer } from './ImageViewer';
+import { AudioPlayer } from './AudioPlayer';
 
 interface ChatBubbleProps {
   content: string;
   imageUrl?: string | null;
+  audioUrl?: string | null;
   isMine: boolean;
   timestamp: string;
   readAt?: string | null;
@@ -20,13 +22,15 @@ function formatTime(isoDate: string): string {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export function ChatBubble({ content, imageUrl, isMine, timestamp, readAt, showReadReceipt = false }: ChatBubbleProps) {
+export function ChatBubble({ content, imageUrl, audioUrl, isMine, timestamp, readAt, showReadReceipt = false }: ChatBubbleProps) {
   const [viewerVisible, setViewerVisible] = useState(false);
 
   return (
     <View style={[styles.container, isMine ? styles.mine : styles.theirs]}>
       <View style={[styles.bubble, isMine ? styles.bubbleMine : styles.bubbleTheirs, imageUrl ? styles.bubbleImage : undefined]}>
-        {imageUrl ? (
+        {audioUrl ? (
+          <AudioPlayer uri={audioUrl} isMine={isMine} />
+        ) : imageUrl ? (
           <>
             <TouchableOpacity onPress={() => setViewerVisible(true)} activeOpacity={0.9}>
               <Image

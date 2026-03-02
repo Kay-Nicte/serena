@@ -77,6 +77,46 @@ export async function uploadVerificationSelfie(
   return path;
 }
 
+export async function uploadChatAudio(
+  matchId: string,
+  uri: string
+): Promise<string> {
+  const timestamp = Date.now();
+  const path = `${matchId}/${timestamp}.m4a`;
+
+  const base64 = await readAsStringAsync(uri, {
+    encoding: EncodingType.Base64,
+  });
+
+  const { error } = await supabase.storage
+    .from('chat-audio')
+    .upload(path, decode(base64), {
+      contentType: 'audio/mp4',
+    });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage
+    .from('chat-audio')
+    .getPublicUrl(path);
+
+  return data.publicUrl;
+}
+
+export async function takePhoto(): Promise<string | null> {
+  const { status } = await ImagePicker.requestCameraPermissionsAsync();
+  if (status !== 'granted') return null;
+
+  const result = await ImagePicker.launchCameraAsync({
+    allowsEditing: true,
+    aspect: [3, 4],
+    quality: 0.8,
+  });
+
+  if (result.canceled) return null;
+  return result.assets[0].uri;
+}
+
 export async function uploadChatImage(
   matchId: string,
   uri: string

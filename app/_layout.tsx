@@ -120,8 +120,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 function GlobalToast() {
-  const { visible, message, variant, duration, dismiss } = useToastStore();
-  return <Toast visible={visible} message={message} variant={variant} duration={duration} onDismiss={dismiss} />;
+  const { visible, message, variant, duration, onPress, dismiss } = useToastStore();
+  return <Toast visible={visible} message={message} variant={variant} duration={duration} onDismiss={dismiss} onPress={onPress} />;
 }
 
 function GlobalConfirmDialog() {

@@ -184,7 +184,7 @@ export default function ChatScreen() {
     return () => sub.remove();
   }, []);
 
-  const handleSend = useCallback(async (content: string, imageUrl?: string) => {
+  const handleSend = useCallback(async (content: string, imageUrl?: string, audioUrl?: string) => {
     if (content && checkToxicity(content).toxic) {
       setFilterNotices((prev) => [...prev, `filter-${Date.now()}`]);
       setTimeout(() => {
@@ -192,7 +192,7 @@ export default function ChatScreen() {
       }, 100);
       return;
     }
-    await sendMessage(content, imageUrl);
+    await sendMessage(content, imageUrl, audioUrl);
   }, [sendMessage]);
 
   const handleHeaderPress = () => {
@@ -476,6 +476,7 @@ export default function ChatScreen() {
                 <ChatBubble
                   content={item.data.content}
                   imageUrl={item.data.image_url}
+                  audioUrl={item.data.audio_url}
                   isMine={item.data.sender_id === userId}
                   timestamp={item.data.created_at}
                   readAt={item.data.read_at}
@@ -518,7 +519,7 @@ export default function ChatScreen() {
 
         {isTyping && <TypingIndicator />}
 
-        <ChatInput onSend={handleSend} matchId={matchId!} disabled={isBlocked || isBlockedByOther} disabledMessage={isBlocked ? t('chat.blocked') : t('chat.unavailable')} />
+        <ChatInput onSend={handleSend} matchId={matchId!} disabled={isBlocked || isBlockedByOther} disabledMessage={isBlocked ? t('chat.blocked') : t('chat.unavailable')} isPremium={isPremium} />
       </KeyboardAvoidingView>
 
       <Toast visible={toast.visible} message={toast.message} variant={toast.variant} onDismiss={toast.dismiss} />

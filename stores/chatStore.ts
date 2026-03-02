@@ -11,6 +11,7 @@ export interface Message {
   sender_id: string;
   content: string;
   image_url: string | null;
+  audio_url: string | null;
   read_at: string | null;
   created_at: string;
 }
@@ -26,7 +27,7 @@ interface ChatStoreState {
 
   fetchMessages: (matchId: string) => Promise<void>;
   fetchOlderMessages: (matchId: string) => Promise<void>;
-  sendMessage: (matchId: string, content: string, imageUrl?: string) => Promise<void>;
+  sendMessage: (matchId: string, content: string, imageUrl?: string, audioUrl?: string) => Promise<void>;
   markAsRead: (matchId: string) => Promise<void>;
   subscribe: (matchId: string) => void;
   unsubscribe: () => void;
@@ -93,7 +94,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     }
   },
 
-  sendMessage: async (matchId: string, content: string, imageUrl?: string) => {
+  sendMessage: async (matchId: string, content: string, imageUrl?: string, audioUrl?: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -103,6 +104,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
         sender_id: user.id,
         content: content || '',
         image_url: imageUrl ?? null,
+        audio_url: audioUrl ?? null,
       });
 
       if (error) throw error;

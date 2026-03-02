@@ -23,6 +23,7 @@ interface ToastProps {
   variant?: ToastVariant;
   duration?: number;
   onDismiss: () => void;
+  onPress?: (() => void) | null;
 }
 
 // Hook for easy toast usage
@@ -50,6 +51,7 @@ export function Toast({
   variant = 'success',
   duration = 3000,
   onDismiss,
+  onPress,
 }: ToastProps) {
   const insets = useSafeAreaInsets();
   const translateY = useRef(new Animated.Value(-100)).current;
@@ -109,7 +111,10 @@ export function Toast({
     >
       <TouchableOpacity
         style={[styles.toast, { borderLeftColor: COLOR_MAP[variant] }]}
-        onPress={dismiss}
+        onPress={() => {
+          if (onPress) onPress();
+          dismiss();
+        }}
         activeOpacity={0.9}
       >
         <Ionicons name={ICON_MAP[variant]} size={22} color={COLOR_MAP[variant]} />

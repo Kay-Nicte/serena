@@ -17,6 +17,7 @@ export interface Match {
   otherUser: MatchUser;
   lastMessage: string | null;
   lastMessageImageUrl: string | null;
+  lastMessageAudioUrl: string | null;
   lastMessageAt: string | null;
   unreadCount: number;
   created_at: string;
@@ -55,6 +56,7 @@ export const useMatchStore = create<MatchStoreState>((set, get) => ({
           lastMessage: string | null;
           lastMessageAt: string | null;
           lastMessageImageUrl: string | null;
+          lastMessageAudioUrl: string | null;
           unreadCount: number;
           isFavorite: boolean;
         }) => ({
@@ -62,6 +64,7 @@ export const useMatchStore = create<MatchStoreState>((set, get) => ({
           otherUser: row.otherUser,
           lastMessage: row.lastMessage,
           lastMessageImageUrl: row.lastMessageImageUrl ?? null,
+          lastMessageAudioUrl: row.lastMessageAudioUrl ?? null,
           lastMessageAt: row.lastMessageAt,
           unreadCount: row.unreadCount,
           created_at: row.created_at,

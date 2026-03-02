@@ -44,9 +44,11 @@ function ConversationItem({ match, onPress, onToggleFavorite, isOnline }: { matc
 
   const previewText = match.lastMessage
     ? match.lastMessage
-    : match.lastMessageImageUrl
-      ? t('chat.photoMessage')
-      : '';
+    : match.lastMessageAudioUrl
+      ? t('chat.audioMessage')
+      : match.lastMessageImageUrl
+        ? t('chat.photoMessage')
+        : '';
 
   return (
     <TouchableOpacity

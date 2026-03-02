@@ -20,6 +20,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         'Serenade necesita acceso a tu galería para seleccionar fotos de perfil.',
       NSLocationWhenInUseUsageDescription:
         'Serenade necesita tu ubicación para compartirla en citas seguras y mostrar perfiles cercanos.',
+      NSMicrophoneUsageDescription:
+        'Serenade necesita acceso a tu micrófono para enviar mensajes de audio.',
     },
   },
   android: {
@@ -36,6 +38,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'CAMERA',
       'READ_EXTERNAL_STORAGE',
       'WRITE_EXTERNAL_STORAGE',
+      'RECORD_AUDIO',
     ],
   },
   web: {
@@ -79,6 +82,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-notifications',
       {
         color: '#E6A8B4',
+      },
+    ],
+    [
+      'expo-av',
+      {
+        microphonePermission:
+          'Serenade necesita acceso a tu micrófono para enviar mensajes de audio.',
       },
     ],
   ],

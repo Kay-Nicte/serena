@@ -9,25 +9,47 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { updatePresence } from '@/lib/presence';
-import { pickImage, uploadChatImage } from '@/lib/storage';
+import { pickImage, takePhoto, uploadChatImage, uploadChatAudio } from '@/lib/storage';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { ActionSheet, type ActionSheetOption } from '@/components/ActionSheet';
+import { showToast } from '@/stores/toastStore';
 
 interface ChatInputProps {
-  onSend: (content: string, imageUrl?: string) => void;
+  onSend: (content: string, imageUrl?: string, audioUrl?: string) => void;
   matchId: string;
   disabled?: boolean;
   disabledMessage?: string;
+  isPremium?: boolean;
 }
 
-export function ChatInput({ onSend, matchId, disabled, disabledMessage }: ChatInputProps) {
+function formatRecordingTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+export function ChatInput({ onSend, matchId, disabled, disabledMessage, isPremium }: ChatInputProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const [text, setText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [imagePickerVisible, setImagePickerVisible] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
+
+  const {
+    state: recorderState,
+    setState: setRecorderState,
+    duration: recordingDuration,
+    startRecording,
+    stopRecording,
+    cancelRecording,
+  } = useAudioRecorder();
 
   const stopTyping = useCallback(() => {
     if (isTypingRef.current) {
@@ -72,19 +94,76 @@ export function ChatInput({ onSend, matchId, disabled, disabledMessage }: ChatIn
     setText('');
   };
 
-  const handleImagePick = async () => {
+  const handleImageFromGallery = async () => {
     try {
       const uri = await pickImage();
       if (!uri) return;
-
       setIsUploading(true);
       const imageUrl = await uploadChatImage(matchId, uri);
       onSend('', imageUrl);
-    } catch (error) {
-      // Image send failed — error is shown via chat error state
+    } catch {
+      // error shown via chat error state
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleImageFromCamera = async () => {
+    try {
+      const uri = await takePhoto();
+      if (!uri) return;
+      setIsUploading(true);
+      const imageUrl = await uploadChatImage(matchId, uri);
+      onSend('', imageUrl);
+    } catch {
+      // error shown via chat error state
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const imagePickerOptions: ActionSheetOption[] = [
+    {
+      label: t('chat.fromGallery'),
+      icon: 'image-outline',
+      onPress: handleImageFromGallery,
+    },
+    {
+      label: t('chat.fromCamera'),
+      icon: 'camera-outline',
+      onPress: handleImageFromCamera,
+    },
+  ];
+
+  const handleMicPress = async () => {
+    if (!isPremium) {
+      showToast(t('chat.audioPremium'), 'success', 4000, () => router.push('/premium'));
+      return;
+    }
+    const started = await startRecording();
+    if (!started) {
+      // Permission denied
+    }
+  };
+
+  const handleSendAudio = async () => {
+    setRecorderState('uploading');
+    const uri = await stopRecording();
+    if (!uri) return;
+
+    try {
+      setIsUploading(true);
+      const audioUrl = await uploadChatAudio(matchId, uri);
+      onSend('', undefined, audioUrl);
+    } catch {
+      // error shown via chat error state
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleCancelAudio = async () => {
+    await cancelRecording();
   };
 
   if (disabled) {
@@ -96,11 +175,47 @@ export function ChatInput({ onSend, matchId, disabled, disabledMessage }: ChatIn
     );
   }
 
+  // Recording UI
+  if (recorderState === 'recording' || recorderState === 'uploading') {
+    return (
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={handleCancelAudio}
+          disabled={recorderState === 'uploading'}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="close" size={22} color={Colors.error} />
+        </TouchableOpacity>
+
+        <View style={styles.recordingInfo}>
+          <View style={styles.recordingDot} />
+          <Text style={styles.recordingTime}>
+            {formatRecordingTime(recordingDuration)}
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={handleSendAudio}
+          disabled={recorderState === 'uploading'}
+          activeOpacity={0.7}
+        >
+          {recorderState === 'uploading' ? (
+            <ActivityIndicator size="small" color={Colors.textOnPrimary} />
+          ) : (
+            <Ionicons name="send" size={20} color={Colors.textOnPrimary} />
+          )}
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.imageButton}
-        onPress={handleImagePick}
+        onPress={() => setImagePickerVisible(true)}
         disabled={isUploading}
         activeOpacity={0.7}
       >
@@ -122,18 +237,35 @@ export function ChatInput({ onSend, matchId, disabled, disabledMessage }: ChatIn
         onSubmitEditing={handleSend}
         blurOnSubmit={false}
       />
-      <TouchableOpacity
-        style={[styles.sendButton, !text.trim() && styles.sendButtonDisabled]}
-        onPress={handleSend}
-        disabled={!text.trim()}
-        activeOpacity={0.7}
-      >
-        <Ionicons
-          name="send"
-          size={20}
-          color={text.trim() ? Colors.textOnPrimary : Colors.textTertiary}
-        />
-      </TouchableOpacity>
+
+      {text.trim() ? (
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={handleSend}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="send" size={20} color={Colors.textOnPrimary} />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={[styles.micButton, !isPremium && styles.micButtonFree]}
+          onPress={handleMicPress}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="mic"
+            size={22}
+            color={isPremium ? Colors.primary : Colors.textTertiary}
+          />
+        </TouchableOpacity>
+      )}
+
+      <ActionSheet
+        visible={imagePickerVisible}
+        title={t('chat.sendPhoto')}
+        options={imagePickerOptions}
+        onClose={() => setImagePickerVisible(false)}
+      />
     </View>
   );
 }
@@ -176,8 +308,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  sendButtonDisabled: {
-    backgroundColor: Colors.borderLight,
+  micButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  micButtonFree: {
+    opacity: 0.6,
   },
   containerDisabled: {
     justifyContent: 'center',
@@ -187,5 +325,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: Fonts.body,
     color: Colors.textTertiary,
+  },
+  // Recording UI
+  cancelButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  recordingInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+  },
+  recordingDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.error,
+  },
+  recordingTime: {
+    fontSize: 16,
+    fontFamily: Fonts.bodyMedium,
+    color: Colors.text,
   },
 });
