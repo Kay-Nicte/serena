@@ -54,7 +54,8 @@
     "verifyEmailResent": "Correo reenviado",
     "verifyEmailResentMessage": "Enviámosche unha nova ligazón de verificación ao teu correo.",
     "or": "ou",
-    "continueWithGoogle": "Continuar con Google"
+    "continueWithGoogle": "Continuar con Google",
+    "emailVerified": "Email verificado!"
   },
   "profile": {
     "completeTitle": "Completa o teu perfil",

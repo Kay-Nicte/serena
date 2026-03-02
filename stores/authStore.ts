@@ -12,6 +12,8 @@ import { useBlockStore } from './blockStore';
 import { useDailyStatsStore } from './dailyStatsStore';
 import { useVerificationStore } from './verificationStore';
 import { usePromptStore } from './promptStore';
+import { showToast } from './toastStore';
+import i18n from '@/i18n';
 import type { Orientation, LookingFor } from '@/constants/config';
 
 export interface Profile {
@@ -109,10 +111,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
 
     // Listen for auth changes
-    supabase.auth.onAuthStateChange(async (_event, session) => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
       set({ session, user: session?.user ?? null });
       if (session?.user) {
         await get().fetchProfile();
+        if (event === 'USER_UPDATED' && session.user.email_confirmed_at) {
+          showToast(i18n.t('auth.emailVerified'), 'success');
+        }
       } else {
         set({ profile: null, isProfileComplete: false });
       }

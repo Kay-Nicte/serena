@@ -54,7 +54,8 @@
     "verifyEmailResent": "Email resent",
     "verifyEmailResentMessage": "We've sent a new verification link to your email.",
     "or": "or",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
+    "emailVerified": "Email verified!"
   },
   "profile": {
     "completeTitle": "Complete your profile",

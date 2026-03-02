@@ -54,7 +54,8 @@
     "verifyEmailResent": "Posta birbidalia",
     "verifyEmailResentMessage": "Egiaztapen esteka berri bat bidali dugu zure postara.",
     "or": "edo",
-    "continueWithGoogle": "Google-rekin jarraitu"
+    "continueWithGoogle": "Google-rekin jarraitu",
+    "emailVerified": "Emaila egiaztatuta!"
   },
   "profile": {
     "completeTitle": "Osatu zure profila",

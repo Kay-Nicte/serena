@@ -54,7 +54,8 @@
     "verifyEmailResent": "Correu reenviat",
     "verifyEmailResentMessage": "Hem enviat un nou enllaç de verificació al teu correu.",
     "or": "o",
-    "continueWithGoogle": "Continuar amb Google"
+    "continueWithGoogle": "Continuar amb Google",
+    "emailVerified": "Email verificat!"
   },
   "profile": {
     "completeTitle": "Completa el teu perfil",
