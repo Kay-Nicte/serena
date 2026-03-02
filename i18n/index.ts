@@ -22,8 +22,8 @@ i18n.use(initReactI18next).init({
     it: { translation: it },
     gl: { translation: gl },
   },
-  lng: SUPPORTED_LANGUAGES.includes(deviceLanguage) ? deviceLanguage : 'es',
-  fallbackLng: 'es',
+  lng: SUPPORTED_LANGUAGES.includes(deviceLanguage) ? deviceLanguage : 'en',
+  fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
   },

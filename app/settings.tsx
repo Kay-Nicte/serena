@@ -42,6 +42,7 @@ export default function SettingsScreen() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>(
     profile?.language_preference ?? i18n.language
   );
+  const [languageExpanded, setLanguageExpanded] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -211,92 +212,47 @@ export default function SettingsScreen() {
           <View style={styles.card}>
             <TouchableOpacity
               style={styles.row}
-              onPress={() => handleChangeLanguage('en')}
+              onPress={() => setLanguageExpanded(!languageExpanded)}
               activeOpacity={0.7}
             >
-              <Text style={styles.rowLabel}>{t('settings.languageEn')}</Text>
-              {selectedLanguage === 'en' && (
-                <Ionicons name="checkmark" size={20} color={Colors.primary} />
-              )}
+              <Ionicons name="language-outline" size={20} color={Colors.text} />
+              <Text style={styles.rowLabel}>
+                {t(`settings.language${selectedLanguage.charAt(0).toUpperCase()}${selectedLanguage.slice(1)}`)}
+              </Text>
+              <Ionicons
+                name={languageExpanded ? 'chevron-up' : 'chevron-down'}
+                size={18}
+                color={Colors.textTertiary}
+              />
             </TouchableOpacity>
 
-            <View style={styles.separator} />
-
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => handleChangeLanguage('es')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.rowLabel}>{t('settings.languageEs')}</Text>
-              {selectedLanguage === 'es' && (
-                <Ionicons name="checkmark" size={20} color={Colors.primary} />
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.separator} />
-
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => handleChangeLanguage('eu')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.rowLabel}>{t('settings.languageEu')}</Text>
-              {selectedLanguage === 'eu' && (
-                <Ionicons name="checkmark" size={20} color={Colors.primary} />
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.separator} />
-
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => handleChangeLanguage('ca')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.rowLabel}>{t('settings.languageCa')}</Text>
-              {selectedLanguage === 'ca' && (
-                <Ionicons name="checkmark" size={20} color={Colors.primary} />
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.separator} />
-
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => handleChangeLanguage('fr')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.rowLabel}>{t('settings.languageFr')}</Text>
-              {selectedLanguage === 'fr' && (
-                <Ionicons name="checkmark" size={20} color={Colors.primary} />
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.separator} />
-
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => handleChangeLanguage('gl')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.rowLabel}>{t('settings.languageGl')}</Text>
-              {selectedLanguage === 'gl' && (
-                <Ionicons name="checkmark" size={20} color={Colors.primary} />
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.separator} />
-
-            <TouchableOpacity
-              style={styles.row}
-              onPress={() => handleChangeLanguage('it')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.rowLabel}>{t('settings.languageIt')}</Text>
-              {selectedLanguage === 'it' && (
-                <Ionicons name="checkmark" size={20} color={Colors.primary} />
-              )}
-            </TouchableOpacity>
+            {languageExpanded && (
+              <>
+                {(['en', 'es', 'eu', 'ca', 'fr', 'gl', 'it'] as const).map((lang) => (
+                  <View key={lang}>
+                    <View style={styles.separator} />
+                    <TouchableOpacity
+                      style={styles.row}
+                      onPress={() => {
+                        handleChangeLanguage(lang);
+                        setLanguageExpanded(false);
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[
+                        styles.rowLabel,
+                        selectedLanguage === lang && { color: Colors.primary, fontFamily: Fonts.bodySemiBold },
+                      ]}>
+                        {t(`settings.language${lang.charAt(0).toUpperCase()}${lang.slice(1)}`)}
+                      </Text>
+                      {selectedLanguage === lang && (
+                        <Ionicons name="checkmark" size={20} color={Colors.primary} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </>
+            )}
           </View>
         </View>
 

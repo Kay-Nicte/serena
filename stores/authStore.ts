@@ -202,6 +202,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     useDailyStatsStore.getState().reset();
     useVerificationStore.getState().reset();
     usePromptStore.getState().reset();
+    // Reset language to device default
+    const { getLocales } = require('expo-localization');
+    const deviceLang = getLocales()[0]?.languageCode ?? 'en';
+    const supported = ['es', 'en', 'eu', 'ca', 'fr', 'it', 'gl'];
+    i18n.changeLanguage(supported.includes(deviceLang) ? deviceLang : 'en');
     set({
       session: null,
       user: null,
