@@ -13,7 +13,7 @@
   },
   "welcome": {
     "title": "Serenade",
-    "subtitle": "Echte Verbindungen für queere Frauen",
+    "subtitle": "Echte Verbindung von Frau zu Frau",
     "login": "Anmelden",
     "register": "Konto erstellen"
   },
@@ -151,7 +151,8 @@
     "errorUnmatching": "Match konnte nicht aufgelöst werden. Bitte versuche es erneut.",
     "deletedUser": "Gelöschte Nutzerin",
     "viewProfile": "Profil ansehen",
-    "chat": "Chat"
+    "chat": "Chat",
+    "favoriteInfoToast": "Deine Favoriten erscheinen immer ganz oben"
   },
   "match": {
     "title": "Es ist ein Match!",

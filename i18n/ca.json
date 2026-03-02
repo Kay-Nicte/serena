@@ -13,7 +13,7 @@
   },
   "welcome": {
     "title": "Serenade",
-    "subtitle": "Connexions reals per a dones queer",
+    "subtitle": "Connexió real de dona a dona",
     "login": "Iniciar sessió",
     "register": "Crear compte"
   },
@@ -151,7 +151,8 @@
     "errorUnmatching": "No s'ha pogut desfer el match. Torna-ho a provar.",
     "deletedUser": "Usuària eliminada",
     "viewProfile": "Veure perfil",
-    "chat": "Xat"
+    "chat": "Xat",
+    "favoriteInfoToast": "Les teves favorites apareixeran sempre a dalt"
   },
   "match": {
     "title": "És un match!",

@@ -13,7 +13,7 @@
   },
   "welcome": {
     "title": "Serenade",
-    "subtitle": "Real connections for queer women",
+    "subtitle": "Real connection from woman to woman",
     "login": "Sign in",
     "register": "Create account"
   },
@@ -151,7 +151,8 @@
     "errorUnmatching": "Could not unmatch. Please try again.",
     "deletedUser": "Deleted user",
     "viewProfile": "View Profile",
-    "chat": "Chat"
+    "chat": "Chat",
+    "favoriteInfoToast": "Your favorites will always appear at the top"
   },
   "match": {
     "title": "It's a match!",

@@ -22,7 +22,8 @@ export async function uploadPhoto(
   position: number
 ): Promise<string> {
   const timestamp = Date.now();
-  const extension = uri.split('.').pop() ?? 'jpg';
+  const filename = uri.split('/').pop() ?? '';
+  const extension = (filename.includes('.') ? filename.split('.').pop() : 'jpg') ?? 'jpg';
   const path = `${userId}/${position}-${timestamp}.${extension}`;
 
   const base64 = await readAsStringAsync(uri, {
@@ -81,7 +82,8 @@ export async function uploadChatImage(
   uri: string
 ): Promise<string> {
   const timestamp = Date.now();
-  const extension = uri.split('.').pop() ?? 'jpg';
+  const filename = uri.split('/').pop() ?? '';
+  const extension = (filename.includes('.') ? filename.split('.').pop() : 'jpg') ?? 'jpg';
   const path = `${matchId}/${timestamp}.${extension}`;
 
   const base64 = await readAsStringAsync(uri, {

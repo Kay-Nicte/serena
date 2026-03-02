@@ -13,7 +13,7 @@
   },
   "welcome": {
     "title": "Serenade",
-    "subtitle": "Des connexions authentiques pour les femmes queer",
+    "subtitle": "Connexion réelle de femme à femme",
     "login": "Se connecter",
     "register": "Créer un compte"
   },
@@ -151,7 +151,8 @@
     "errorUnmatching": "Impossible d'annuler le match. Réessaie.",
     "deletedUser": "Utilisatrice supprimée",
     "viewProfile": "Voir le profil",
-    "chat": "Chat"
+    "chat": "Chat",
+    "favoriteInfoToast": "Tes favorites apparaîtront toujours en haut"
   },
   "match": {
     "title": "C'est un match !",

@@ -13,7 +13,7 @@
   },
   "welcome": {
     "title": "Serenade",
-    "subtitle": "Ligações reais para mulheres queer",
+    "subtitle": "Conexão real de mulher para mulher",
     "login": "Iniciar sessão",
     "register": "Criar conta"
   },
@@ -151,7 +151,8 @@
     "errorUnmatching": "Não foi possível desfazer o match. Tenta novamente.",
     "deletedUser": "Utilizadora eliminada",
     "viewProfile": "Ver perfil",
-    "chat": "Chat"
+    "chat": "Chat",
+    "favoriteInfoToast": "As tuas favoritas aparecerão sempre no topo"
   },
   "match": {
     "title": "É um match!",

@@ -34,7 +34,7 @@ function formatMatchDate(isoDate: string): string {
   return date.toLocaleDateString([], { day: 'numeric', month: 'long' });
 }
 
-function MatchCard({ match, onPress, onLongPress, deletedLabel }: { match: Match; onPress: () => void; onLongPress: () => void; deletedLabel: string }) {
+function MatchCard({ match, onPress, onLongPress, onToggleFavorite, deletedLabel }: { match: Match; onPress: () => void; onLongPress: () => void; onToggleFavorite: () => void; deletedLabel: string }) {
   return (
     <TouchableOpacity
       style={styles.matchCard}
@@ -68,6 +68,17 @@ function MatchCard({ match, onPress, onLongPress, deletedLabel }: { match: Match
           {formatMatchDate(match.created_at)}
         </Text>
       </View>
+      <TouchableOpacity
+        style={styles.favoriteButton}
+        onPress={onToggleFavorite}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <Ionicons
+          name={match.isFavorite ? 'heart' : 'heart-outline'}
+          size={20}
+          color={match.isFavorite ? Colors.primary : Colors.textTertiary}
+        />
+      </TouchableOpacity>
       {match.unreadCount > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>{match.unreadCount}</Text>
@@ -251,7 +262,7 @@ export default function MatchesScreen() {
           contentContainerStyle={styles.grid}
           ListHeaderComponent={renderIceBreakersHeader}
           renderItem={({ item }) => (
-            <MatchCard match={item} onPress={() => handleMatchPress(item)} onLongPress={() => handleLongPress(item)} deletedLabel={t('matches.deletedUser')} />
+            <MatchCard match={item} onPress={() => handleMatchPress(item)} onLongPress={() => handleLongPress(item)} onToggleFavorite={() => useMatchStore.getState().toggleFavorite(item.id)} deletedLabel={t('matches.deletedUser')} />
           )}
           onRefresh={handleRefresh}
           refreshing={isLoading}
@@ -347,6 +358,17 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
     marginTop: 2,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    borderRadius: 14,
+    width: 28,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   badge: {
     position: 'absolute',

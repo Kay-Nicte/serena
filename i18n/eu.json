@@ -13,7 +13,7 @@
   },
   "welcome": {
     "title": "Serenade",
-    "subtitle": "Benetako konexioak emakume queerrentzat",
+    "subtitle": "Emakumezkoen arteko benetako konexioa",
     "login": "Saioa hasi",
     "register": "Kontua sortu"
   },
@@ -151,7 +151,8 @@
     "errorUnmatching": "Ezin izan da match-a desegin. Saiatu berriro.",
     "deletedUser": "Erabiltzaile ezabatua",
     "viewProfile": "Profila ikusi",
-    "chat": "Txat"
+    "chat": "Txat",
+    "favoriteInfoToast": "Zure gogokoak beti agertuko dira goian"
   },
   "match": {
     "title": "Match bat da!",

@@ -18,7 +18,7 @@ import { useMatches } from '@/hooks/useMatches';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useBlockStore } from '@/stores/blockStore';
 import { supabase } from '@/lib/supabase';
-import type { Match } from '@/stores/matchStore';
+import { useMatchStore, type Match } from '@/stores/matchStore';
 import type { UserPresence } from '@/lib/presence';
 
 function formatRelativeTime(isoDate: string): string {
@@ -36,7 +36,7 @@ function formatRelativeTime(isoDate: string): string {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-function ConversationItem({ match, onPress, isOnline }: { match: Match; onPress: () => void; isOnline: boolean }) {
+function ConversationItem({ match, onPress, onToggleFavorite, isOnline }: { match: Match; onPress: () => void; onToggleFavorite: () => void; isOnline: boolean }) {
   const { t } = useTranslation();
   const timeStr = match.lastMessageAt
     ? formatRelativeTime(match.lastMessageAt)
@@ -81,6 +81,17 @@ function ConversationItem({ match, onPress, isOnline }: { match: Match; onPress:
           >
             {match.otherUser.name ?? ''}
           </Text>
+          <TouchableOpacity
+            onPress={onToggleFavorite}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={styles.favoriteButton}
+          >
+            <Ionicons
+              name={match.isFavorite ? 'heart' : 'heart-outline'}
+              size={16}
+              color={match.isFavorite ? Colors.primary : Colors.textTertiary}
+            />
+          </TouchableOpacity>
           <Text style={styles.conversationTime}>{timeStr}</Text>
         </View>
         <View style={styles.conversationFooter}>
@@ -198,6 +209,7 @@ export default function ChatListScreen() {
             <ConversationItem
               match={item}
               onPress={() => handleConversationPress(item)}
+              onToggleFavorite={() => useMatchStore.getState().toggleFavorite(item.id)}
               isOnline={
                 onlineUserIds.has(item.otherUser.id) &&
                 !blockedIds.has(item.otherUser.id) &&
@@ -294,11 +306,14 @@ const styles = StyleSheet.create({
   conversationNameUnread: {
     fontFamily: Fonts.bodyBold,
   },
+  favoriteButton: {
+    marginLeft: 6,
+  },
   conversationTime: {
     fontSize: 12,
     fontFamily: Fonts.body,
     color: Colors.textTertiary,
-    marginLeft: 8,
+    marginLeft: 6,
   },
   conversationFooter: {
     flexDirection: 'row',
