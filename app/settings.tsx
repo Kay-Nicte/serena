@@ -228,7 +228,7 @@ export default function SettingsScreen() {
 
             {languageExpanded && (
               <>
-                {(['en', 'es', 'eu', 'ca', 'fr', 'gl', 'it'] as const).map((lang) => (
+                {(['en', 'es', 'eu', 'ca', 'fr', 'gl', 'it', 'de', 'pt'] as const).map((lang) => (
                   <View key={lang}>
                     <View style={styles.separator} />
                     <TouchableOpacity
