@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,11 +11,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { type PurchasesPackage } from 'react-native-purchases';
 import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
+import { getBoostOffering, purchaseBoostPackage } from '@/lib/purchases';
 import { useBoostStore } from '@/stores/boostStore';
-import { supabase } from '@/lib/supabase';
 import { showToast } from '@/stores/toastStore';
+
+// Map package identifier → boost count granted
+const BOOST_COUNTS: Record<string, number> = {
+  boost_x1: 1,
+  boost_x3: 3,
+};
 
 export default function BuyBoostScreen() {
   const { t } = useTranslation();
@@ -23,19 +30,45 @@ export default function BuyBoostScreen() {
   const Colors = useColors();
   const styles = makeStyles(Colors);
   const { fetch: fetchBoosts } = useBoostStore();
+  const [packages, setPackages] = useState<PurchasesPackage[]>([]);
+  const [loadingOffering, setLoadingOffering] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
 
-  const handleBuy = async (count: number) => {
+  useEffect(() => {
+    (async () => {
+      try {
+        const offering = await getBoostOffering();
+        if (offering) {
+          // Sort: x1 first, x3 second
+          const sorted = [...offering.availablePackages].sort((a, b) => {
+            const order = ['boost_x1', 'boost_x3'];
+            return order.indexOf(a.identifier) - order.indexOf(b.identifier);
+          });
+          setPackages(sorted);
+        }
+      } catch {
+        // Offerings may fail in sandbox
+      } finally {
+        setLoadingOffering(false);
+      }
+    })();
+  }, []);
+
+  const handleBuy = async (pkg: PurchasesPackage) => {
+    const count = BOOST_COUNTS[pkg.identifier] ?? 1;
     setPurchasing(true);
     try {
-      // TODO: integrate RevenueCat consumable product for boosts
-      // For now, grant directly (dev/testing path)
-      await supabase.rpc('add_boosts', { count });
+      await purchaseBoostPackage(pkg, count);
       await fetchBoosts();
       showToast(t('boost.activateSuccess'), 'success');
       router.back();
-    } catch {
-      showToast(t('common.error'), 'error');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : '';
+      if (msg.includes('PURCHASE_CANCELLED') || msg.includes('userCancelled')) {
+        // User cancelled — do nothing
+      } else {
+        showToast(t('common.error'), 'error');
+      }
     } finally {
       setPurchasing(false);
     }
@@ -54,34 +87,47 @@ export default function BuyBoostScreen() {
         <Text style={styles.title}>{t('boost.title')}</Text>
         <Text style={styles.subtitle}>{t('boost.subtitle')}</Text>
 
-        <View style={styles.options}>
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={() => handleBuy(1)}
-            disabled={purchasing}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.optionTitle}>{t('boost.x1')}</Text>
-            <Ionicons name="flash" size={28} color="#E0A800" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.optionCard, styles.optionCardBest]}
-            onPress={() => handleBuy(3)}
-            disabled={purchasing}
-            activeOpacity={0.7}
-          >
-            <View style={styles.bestBadge}>
-              <Text style={styles.bestBadgeText}>{t('premium.bestValue')}</Text>
-            </View>
-            <Text style={[styles.optionTitle, { color: '#E0A800' }]}>{t('boost.x3')}</Text>
-            <View style={styles.flashRow}>
-              {[0, 1, 2].map((i) => (
-                <Ionicons key={i} name="flash" size={24} color="#E0A800" />
-              ))}
-            </View>
-          </TouchableOpacity>
-        </View>
+        {loadingOffering ? (
+          <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 24 }} />
+        ) : packages.length === 0 ? (
+          <Text style={styles.noPlans}>{t('premium.noPlansAvailable')}</Text>
+        ) : (
+          <View style={styles.options}>
+            {packages.map((pkg) => {
+              const isBest = pkg.identifier === 'boost_x3';
+              return (
+                <TouchableOpacity
+                  key={pkg.identifier}
+                  style={[styles.optionCard, isBest && styles.optionCardBest]}
+                  onPress={() => handleBuy(pkg)}
+                  disabled={purchasing}
+                  activeOpacity={0.7}
+                >
+                  {isBest && (
+                    <View style={styles.bestBadge}>
+                      <Text style={styles.bestBadgeText}>{t('premium.bestValue')}</Text>
+                    </View>
+                  )}
+                  <Text style={[styles.optionTitle, isBest && { color: '#E0A800' }]}>
+                    {t(pkg.identifier === 'boost_x1' ? 'boost.x1' : 'boost.x3')}
+                  </Text>
+                  <View style={styles.optionRight}>
+                    <Text style={styles.optionPrice}>{pkg.product.priceString}</Text>
+                    {isBest ? (
+                      <View style={styles.flashRow}>
+                        {[0, 1, 2].map((i) => (
+                          <Ionicons key={i} name="flash" size={20} color="#E0A800" />
+                        ))}
+                      </View>
+                    ) : (
+                      <Ionicons name="flash" size={24} color="#E0A800" />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
 
         {purchasing && (
           <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 24 }} />
@@ -127,6 +173,13 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       color: c.textSecondary,
       textAlign: 'center',
     },
+    noPlans: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      paddingVertical: 20,
+    },
     options: {
       width: '100%',
       gap: 16,
@@ -152,6 +205,15 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       fontSize: 18,
       fontFamily: Fonts.bodySemiBold,
       color: c.text,
+    },
+    optionRight: {
+      alignItems: 'flex-end',
+      gap: 4,
+    },
+    optionPrice: {
+      fontSize: 15,
+      fontFamily: Fonts.bodyBold,
+      color: c.textSecondary,
     },
     flashRow: {
       flexDirection: 'row',

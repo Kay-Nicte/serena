@@ -36,6 +36,21 @@ export async function getOfferings(): Promise<PurchasesOffering | null> {
   }
 }
 
+export async function getBoostOffering(): Promise<PurchasesOffering | null> {
+  if (!initialized) return null;
+  try {
+    const offerings = await Purchases.getOfferings();
+    return offerings.all['boosts'] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function purchaseBoostPackage(pkg: PurchasesPackage, count: number): Promise<void> {
+  await Purchases.purchasePackage(pkg);
+  await supabase.rpc('add_boosts', { count });
+}
+
 export async function purchasePackage(pkg: PurchasesPackage) {
   const { customerInfo } = await Purchases.purchasePackage(pkg);
 
