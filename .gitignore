@@ -43,8 +43,7 @@ app-example
 /ios
 /android
 
-# Firebase
-google-services.json
+# Firebase (GoogleService-Info.plist is iOS-only and excluded; google-services.json is safe to commit)
 GoogleService-Info.plist
 
 # Claude Code

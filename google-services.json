@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "101839612601",
+    "project_id": "serenade-adf7c",
+    "storage_bucket": "serenade-adf7c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101839612601:android:636c9d7a188330ac118968",
+        "android_client_info": {
+          "package_name": "com.ixabel.serenade"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3gYPEpJk3G8Ce_Sqriwq6T-Fdois5pwM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
