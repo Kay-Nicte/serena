@@ -38,8 +38,15 @@ async function extractSessionFromUrl(url: string) {
 
   const access_token = params.get('access_token');
   const refresh_token = params.get('refresh_token');
+  const type = params.get('type');
 
   if (access_token && refresh_token) {
+    // Set recovery flag BEFORE setSession so AuthGuard routes correctly.
+    // supabase.auth.setSession fires SIGNED_IN (not PASSWORD_RECOVERY),
+    // so we derive the flag from the URL type ourselves.
+    if (type === 'recovery') {
+      useAuthStore.getState().setPasswordRecovery();
+    }
     await supabase.auth.setSession({ access_token, refresh_token });
   }
 }

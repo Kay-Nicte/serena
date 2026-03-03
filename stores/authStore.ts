@@ -61,6 +61,7 @@ interface AuthState {
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   signOut: () => Promise<void>;
   forceReset: () => void;
+  setPasswordRecovery: () => void;
   clearPasswordRecovery: () => void;
 }
 
@@ -200,6 +201,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     get().forceReset();
   },
 
+  setPasswordRecovery: () => set({ isPasswordRecovery: true }),
   clearPasswordRecovery: () => set({ isPasswordRecovery: false }),
 
   forceReset: () => {
