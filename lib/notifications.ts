@@ -54,8 +54,8 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
     }
 
     if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
+      await Notifications.setNotificationChannelAsync('serenade', {
+        name: 'Serenade',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#E6A8B4',
