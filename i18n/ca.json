@@ -55,7 +55,8 @@
     "verifyEmailResentMessage": "Hem enviat un nou enllaç de verificació al teu correu.",
     "or": "o",
     "continueWithGoogle": "Continuar amb Google",
-    "emailVerified": "Email verificat!"
+    "emailVerified": "Email verificat!",
+    "errorEmailAlreadyExists": "Ja existeix un compte amb aquest correu electrònic"
   },
   "profile": {
     "completeTitle": "Completa el teu perfil",
@@ -127,6 +128,7 @@
     "loading": "Cercant perfils...",
     "errorFetching": "No s'han pogut carregar els perfils. Torna-ho a provar.",
     "dailyLimitReached": "Has assolit el límit diari de likes. Torna demà!",
+    "likesExhaustedPremium": "Sense likes. Aconsegueix Premium per likes il·limitats!",
     "refresh": "Actualitzar",
     "secondChance": "Donar una altra oportunitat",
     "activityToday": "Activa avui",
@@ -138,7 +140,9 @@
     "inactiveYear": "Fa més d'1 any",
     "inactiveYears": "Fa més de {{count}} anys",
     "inactiveWeek": "Fa 1 setmana",
-    "inactiveWeeks": "Fa {{count}} setmanes"
+    "inactiveWeeks": "Fa {{count}} setmanes",
+    "distanceKm": "A {{km}} km",
+    "distanceLessThan1": "A menys d'1 km"
   },
   "matches": {
     "title": "Matches",
@@ -190,7 +194,10 @@
     "yesterday": "Ahir",
     "matchedOn": "Match el {{date}}",
     "shareDateLocation": "Compartir ubicació",
-    "shareDateMessage": "Estic en una cita a través de Serenade. La meva ubicació actual: {{link}}"
+    "shareDateMessage": "Estic en una cita a través de Serenade. La meva ubicació actual: {{link}}",
+    "searchGifs": "Cercar GIFs...",
+    "poweredByGiphy": "Powered by GIPHY",
+    "gifMessage": "🎬 GIF"
   },
   "notifications": {
     "permissionTitle": "Activar notificacions",
@@ -335,6 +342,10 @@
     "languageGl": "Galego",
     "languageDe": "Deutsch",
     "languagePt": "Português",
+    "appearance": "Aparença",
+    "light": "Clar",
+    "dark": "Fosc",
+    "system": "Sistema",
     "legal": "Legal",
     "termsOfService": "Termes de Servei",
     "privacyPolicy": "Política de Privacitat",

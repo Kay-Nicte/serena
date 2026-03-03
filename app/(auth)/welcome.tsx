@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { signInWithGoogle } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -16,6 +16,8 @@ export default function WelcomeScreen() {
   const { t } = useTranslation();
   const fetchProfile = useAuthStore((s) => s.fetchProfile);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
@@ -78,70 +80,72 @@ export default function WelcomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.primaryPastel,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 32,
-    justifyContent: 'space-between',
-    paddingBottom: 40,
-  },
-  hero: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 12,
-  },
-  title: {
-    fontSize: 48,
-    fontFamily: Fonts.heading,
-    color: Colors.primaryDark,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 18,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 26,
-  },
-  buttons: {
-    gap: 12,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginVertical: 4,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.border,
-  },
-  dividerText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textTertiary,
-    textTransform: 'lowercase',
-  },
-  googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 12,
-    paddingVertical: 14,
-  },
-  googleButtonText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primaryDark,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.primaryPastel,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 32,
+      justifyContent: 'space-between',
+      paddingBottom: 40,
+    },
+    hero: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 12,
+    },
+    title: {
+      fontSize: 48,
+      fontFamily: Fonts.heading,
+      color: c.primaryDark,
+      textAlign: 'center',
+    },
+    subtitle: {
+      fontSize: 18,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 26,
+    },
+    buttons: {
+      gap: 12,
+    },
+    divider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      marginVertical: 4,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: c.border,
+    },
+    dividerText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textTertiary,
+      textTransform: 'lowercase',
+    },
+    googleButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 10,
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 12,
+      paddingVertical: 14,
+    },
+    googleButtonText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primaryDark,
+    },
+  });
+}

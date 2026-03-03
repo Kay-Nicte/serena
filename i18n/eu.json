@@ -55,7 +55,8 @@
     "verifyEmailResentMessage": "Egiaztapen esteka berri bat bidali dugu zure postara.",
     "or": "edo",
     "continueWithGoogle": "Google-rekin jarraitu",
-    "emailVerified": "Emaila egiaztatuta!"
+    "emailVerified": "Emaila egiaztatuta!",
+    "errorEmailAlreadyExists": "Email honekin kontu bat dagoeneko existitzen da"
   },
   "profile": {
     "completeTitle": "Osatu zure profila",
@@ -127,6 +128,7 @@
     "loading": "Profilak bilatzen...",
     "errorFetching": "Ezin izan dira profilak kargatu. Saiatu berriro.",
     "dailyLimitReached": "Eguneko like muga lortu duzu. Bihar itzuli!",
+    "likesExhaustedPremium": "Ez dago likerik. Lortu Premium mugagabeko likeentzat!",
     "refresh": "Eguneratu",
     "secondChance": "Beste aukera bat eman",
     "activityToday": "Gaur aktiboa",
@@ -138,7 +140,9 @@
     "inactiveYear": "Duela urte 1 baino gehiago",
     "inactiveYears": "Duela {{count}} urte baino gehiago",
     "inactiveWeek": "Duela aste 1",
-    "inactiveWeeks": "Duela {{count}} aste"
+    "inactiveWeeks": "Duela {{count}} aste",
+    "distanceKm": "{{km}} km-ra",
+    "distanceLessThan1": "Km 1 baino gutxiagora"
   },
   "matches": {
     "title": "Match-ak",
@@ -190,7 +194,10 @@
     "yesterday": "Atzo",
     "matchedOn": "Match-a {{date}}-(e)an",
     "shareDateLocation": "Kokapena partekatu",
-    "shareDateMessage": "Serenade bidez zita batean nago. Nire uneko kokapena: {{link}}"
+    "shareDateMessage": "Serenade bidez zita batean nago. Nire uneko kokapena: {{link}}",
+    "searchGifs": "Bilatu GIFak...",
+    "poweredByGiphy": "GIPHY-ren bidez",
+    "gifMessage": "🎬 GIF"
   },
   "notifications": {
     "permissionTitle": "Jakinarazpenak aktibatu",
@@ -335,6 +342,10 @@
     "languageGl": "Galego",
     "languageDe": "Deutsch",
     "languagePt": "Português",
+    "appearance": "Itxura",
+    "light": "Argia",
+    "dark": "Iluna",
+    "system": "Sistema",
     "legal": "Legala",
     "termsOfService": "Zerbitzu Baldintzak",
     "privacyPolicy": "Pribatutasun Politika",

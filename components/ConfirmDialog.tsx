@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { create } from 'zustand';
 
@@ -61,6 +61,8 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({ defaultConfirmLabel, defaultCancelLabel }: ConfirmDialogProps) {
   const { visible, title, message, confirmLabel, cancelLabel, destructive, onConfirm, dismiss } =
     useConfirmStore();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const handleConfirm = async () => {
     dismiss();
@@ -113,71 +115,73 @@ export function ConfirmDialog({ defaultConfirmLabel, defaultCancelLabel }: Confi
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: Colors.overlay,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 340,
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  message: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-  },
-  cancelButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  cancelText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textSecondary,
-  },
-  confirmButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: Colors.primary,
-  },
-  confirmDestructive: {
-    backgroundColor: Colors.error,
-  },
-  confirmText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  confirmTextDestructive: {
-    color: Colors.textOnPrimary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 32,
+    },
+    card: {
+      width: '100%',
+      maxWidth: 340,
+      backgroundColor: c.surface,
+      borderRadius: 20,
+      padding: 24,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.15,
+      shadowRadius: 24,
+      elevation: 12,
+    },
+    title: {
+      fontSize: 18,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      marginBottom: 8,
+    },
+    message: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 22,
+      marginBottom: 24,
+    },
+    actions: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      gap: 12,
+    },
+    cancelButton: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    cancelText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textSecondary,
+    },
+    confirmButton: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 12,
+      backgroundColor: c.primary,
+    },
+    confirmDestructive: {
+      backgroundColor: c.error,
+    },
+    confirmText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    confirmTextDestructive: {
+      color: c.textOnPrimary,
+    },
+  });
+}

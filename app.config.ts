@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './assets/images/icon.png',
   scheme: 'serenade',
-  userInterfaceStyle: 'light',
+  userInterfaceStyle: 'automatic',
   newArchEnabled: true,
   ios: {
     bundleIdentifier: 'com.ixabel.serenade',
@@ -101,6 +101,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
     revenueCatAppleKey: process.env.EXPO_PUBLIC_REVENUECAT_APPLE_KEY,
     revenueCatGoogleKey: process.env.EXPO_PUBLIC_REVENUECAT_GOOGLE_KEY,
+    giphyApiKey: process.env.EXPO_PUBLIC_GIPHY_API_KEY,
+    giphyApiKeyIos: process.env.EXPO_PUBLIC_GIPHY_API_KEY_IOS,
     eas: {
       projectId: '98901d6c-f25e-401c-bbc2-bda2120a90a8',
     },

@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { signUp } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -36,6 +36,8 @@ export default function RegisterScreen() {
     confirmPassword?: string;
     age?: string;
   }>({});
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -63,6 +65,9 @@ export default function RegisterScreen() {
       // If session is returned, email confirmation is disabled — proceed normally
       if (data.session) {
         await fetchProfile();
+      } else if ((data.user?.identities?.length ?? 0) === 0) {
+        // Supabase silently "succeeds" for existing emails but returns empty identities
+        showToast(t('auth.errorEmailAlreadyExists'), 'error');
       } else {
         // Email confirmation required — show verification screen
         router.replace({ pathname: '/(auth)/verify-email', params: { email: email.trim() } });
@@ -172,74 +177,76 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  flex: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 32,
-    paddingBottom: 40,
-  },
-  header: {
-    paddingTop: 40,
-    paddingBottom: 32,
-  },
-  title: {
-    fontSize: 32,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  form: {
-    gap: 16,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingVertical: 4,
-  },
-  checkboxLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-    flex: 1,
-  },
-  errorText: {
-    fontSize: 12,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.error,
-    marginLeft: 32,
-    marginTop: -4,
-  },
-  terms: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  termsLink: {
-    color: Colors.primary,
-    fontFamily: Fonts.bodyMedium,
-  },
-  button: {
-    marginTop: 8,
-  },
-  link: {
-    alignItems: 'center',
-    paddingTop: 16,
-  },
-  linkText: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  linkHighlight: {
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    flex: {
+      flex: 1,
+    },
+    content: {
+      paddingHorizontal: 32,
+      paddingBottom: 40,
+    },
+    header: {
+      paddingTop: 40,
+      paddingBottom: 32,
+    },
+    title: {
+      fontSize: 32,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    form: {
+      gap: 16,
+    },
+    checkboxRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 4,
+    },
+    checkboxLabel: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.text,
+      flex: 1,
+    },
+    errorText: {
+      fontSize: 12,
+      fontFamily: Fonts.bodyMedium,
+      color: c.error,
+      marginLeft: 32,
+      marginTop: -4,
+    },
+    terms: {
+      fontSize: 12,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      textAlign: 'center',
+      lineHeight: 18,
+    },
+    termsLink: {
+      color: c.primary,
+      fontFamily: Fonts.bodyMedium,
+    },
+    button: {
+      marginTop: 8,
+    },
+    link: {
+      alignItems: 'center',
+      paddingTop: 16,
+    },
+    linkText: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    linkHighlight: {
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
+    },
+  });
+}

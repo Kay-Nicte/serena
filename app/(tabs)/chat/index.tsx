@@ -11,7 +11,7 @@ import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useMatches } from '@/hooks/useMatches';
@@ -36,7 +36,7 @@ function formatRelativeTime(isoDate: string): string {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
-function ConversationItem({ match, onPress, onToggleFavorite, isOnline }: { match: Match; onPress: () => void; onToggleFavorite: () => void; isOnline: boolean }) {
+function ConversationItem({ match, onPress, onToggleFavorite, isOnline, styles, Colors }: { match: Match; onPress: () => void; onToggleFavorite: () => void; isOnline: boolean; styles: ReturnType<typeof makeStyles>; Colors: ReturnType<typeof useColors> }) {
   const { t } = useTranslation();
   const timeStr = match.lastMessageAt
     ? formatRelativeTime(match.lastMessageAt)
@@ -47,7 +47,9 @@ function ConversationItem({ match, onPress, onToggleFavorite, isOnline }: { matc
     : match.lastMessageAudioUrl
       ? t('chat.audioMessage')
       : match.lastMessageImageUrl
-        ? t('chat.photoMessage')
+        ? match.lastMessageImageUrl.includes('giphy.com')
+          ? t('chat.gifMessage')
+          : t('chat.photoMessage')
         : '';
 
   return (
@@ -119,6 +121,8 @@ function ConversationItem({ match, onPress, onToggleFavorite, isOnline }: { matc
 
 export default function ChatListScreen() {
   const { t } = useTranslation();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   const router = useRouter();
   const { matches, isLoading, refresh } = useMatches();
   const { isTablet, chatMaxWidth } = useResponsive();
@@ -217,6 +221,8 @@ export default function ChatListScreen() {
                 !blockedIds.has(item.otherUser.id) &&
                 !blockedByIds.has(item.otherUser.id)
               }
+              styles={styles}
+              Colors={Colors}
             />
           )}
           onRefresh={refresh}
@@ -229,122 +235,124 @@ export default function ChatListScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    paddingHorizontal: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  list: {
-    paddingBottom: 24,
-  },
-  conversationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    gap: 14,
-  },
-  avatarContainer: {
-    position: 'relative',
-  },
-  avatar: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-  },
-  avatarPlaceholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  onlineDot: {
-    position: 'absolute',
-    bottom: 1,
-    right: 1,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: Colors.success,
-    borderWidth: 2,
-    borderColor: Colors.surface,
-  },
-  conversationContent: {
-    flex: 1,
-    gap: 4,
-  },
-  conversationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  conversationName: {
-    fontSize: 16,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-    flex: 1,
-  },
-  conversationNameUnread: {
-    fontFamily: Fonts.bodyBold,
-  },
-  favoriteButton: {
-    marginLeft: 6,
-  },
-  conversationTime: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    marginLeft: 6,
-  },
-  conversationFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  conversationMessage: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    flex: 1,
-  },
-  conversationMessageUnread: {
-    color: Colors.text,
-    fontFamily: Fonts.bodyMedium,
-  },
-  unreadBadge: {
-    backgroundColor: Colors.primary,
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-    marginLeft: 8,
-  },
-  unreadBadgeText: {
-    fontSize: 11,
-    fontFamily: Fonts.bodyBold,
-    color: Colors.textOnPrimary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    title: {
+      fontSize: 28,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 12,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 16,
+      paddingHorizontal: 40,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 24,
+    },
+    list: {
+      paddingBottom: 24,
+    },
+    conversationItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      gap: 14,
+    },
+    avatarContainer: {
+      position: 'relative',
+    },
+    avatar: {
+      width: 54,
+      height: 54,
+      borderRadius: 27,
+    },
+    avatarPlaceholder: {
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    onlineDot: {
+      position: 'absolute',
+      bottom: 1,
+      right: 1,
+      width: 14,
+      height: 14,
+      borderRadius: 7,
+      backgroundColor: c.success,
+      borderWidth: 2,
+      borderColor: c.surface,
+    },
+    conversationContent: {
+      flex: 1,
+      gap: 4,
+    },
+    conversationHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    conversationName: {
+      fontSize: 16,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+      flex: 1,
+    },
+    conversationNameUnread: {
+      fontFamily: Fonts.bodyBold,
+    },
+    favoriteButton: {
+      marginLeft: 6,
+    },
+    conversationTime: {
+      fontSize: 12,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      marginLeft: 6,
+    },
+    conversationFooter: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    conversationMessage: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      flex: 1,
+    },
+    conversationMessageUnread: {
+      color: c.text,
+      fontFamily: Fonts.bodyMedium,
+    },
+    unreadBadge: {
+      backgroundColor: c.primary,
+      borderRadius: 10,
+      minWidth: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 5,
+      marginLeft: 8,
+    },
+    unreadBadgeText: {
+      fontSize: 11,
+      fontFamily: Fonts.bodyBold,
+      color: c.textOnPrimary,
+    },
+  });
+}

@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { showToast } from '@/stores/toastStore';
@@ -27,6 +27,8 @@ export default function ResetPasswordScreen() {
     password?: string;
     confirmPassword?: string;
   }>({});
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -100,35 +102,37 @@ export default function ResetPasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 32,
-  },
-  header: {
-    paddingTop: 40,
-    paddingBottom: 32,
-    gap: 8,
-  },
-  title: {
-    fontSize: 32,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-  },
-  form: {
-    gap: 16,
-  },
-  button: {
-    marginTop: 8,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 32,
+    },
+    header: {
+      paddingTop: 40,
+      paddingBottom: 32,
+      gap: 8,
+    },
+    title: {
+      fontSize: 32,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    subtitle: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 22,
+    },
+    form: {
+      gap: 16,
+    },
+    button: {
+      marginTop: 8,
+    },
+  });
+}

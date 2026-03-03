@@ -13,7 +13,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { Config } from '@/constants/config';
@@ -49,6 +49,8 @@ export default function AdminProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [photos, setPhotos] = useState<{ uri: string }[]>([]);
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
@@ -441,256 +443,258 @@ export default function AdminProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  bannedBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: Colors.error,
-    paddingVertical: 8,
-  },
-  bannedText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  info: {
-    padding: 24,
-    gap: 12,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 8,
-  },
-  name: {
-    fontSize: 28,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    flexShrink: 1,
-  },
-  age: {
-    fontSize: 24,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  bio: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 24,
-  },
-  noBio: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    fontStyle: 'italic',
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tag: {
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-  },
-  tagText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primaryDark,
-  },
-  detailsSection: {
-    marginTop: 16,
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  detailLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  detailValue: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-    maxWidth: '60%',
-    textAlign: 'right',
-  },
-  reportHistoryHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  reportCountBadge: {
-    backgroundColor: Colors.warning,
-    borderRadius: 12,
-    minWidth: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-  },
-  reportCountBadgeDanger: {
-    backgroundColor: Colors.error,
-  },
-  reportCountText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  reportHistoryItem: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.borderLight,
-    paddingTop: 10,
-    gap: 4,
-  },
-  reportHistoryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  reportHistoryReason: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-  },
-  reportHistoryStatus: {
-    fontSize: 12,
-    fontFamily: Fonts.bodySemiBold,
-  },
-  reportHistoryMeta: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-  },
-  conversationSubtitle: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    marginBottom: 8,
-  },
-  messageBubble: {
-    borderRadius: 12,
-    padding: 10,
-    maxWidth: '85%',
-  },
-  messageBubbleReported: {
-    backgroundColor: '#FDECEA',
-    alignSelf: 'flex-end',
-    borderBottomRightRadius: 4,
-  },
-  messageBubbleReporter: {
-    backgroundColor: Colors.surfaceSecondary,
-    alignSelf: 'flex-start',
-    borderBottomLeftRadius: 4,
-  },
-  messageSender: {
-    fontSize: 11,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textTertiary,
-    marginBottom: 2,
-  },
-  messageContent: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-    lineHeight: 20,
-  },
-  messageImage: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.secondary,
-    marginTop: 2,
-  },
-  messageTime: {
-    fontSize: 10,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    textAlign: 'right',
-    marginTop: 4,
-  },
-  noMessages: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    paddingVertical: 12,
-  },
-  banButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 16,
-    marginTop: 8,
-  },
-  banButtonDanger: {
-    backgroundColor: Colors.error,
-  },
-  unbanButton: {
-    backgroundColor: Colors.success,
-  },
-  banButtonText: {
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    errorText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    scrollContent: {
+      paddingBottom: 40,
+    },
+    bannedBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: c.error,
+      paddingVertical: 8,
+    },
+    bannedText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    info: {
+      padding: 24,
+      gap: 12,
+    },
+    nameRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 8,
+    },
+    name: {
+      fontSize: 28,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      flexShrink: 1,
+    },
+    age: {
+      fontSize: 24,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    bio: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 24,
+    },
+    noBio: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      fontStyle: 'italic',
+    },
+    tags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    tag: {
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 16,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+    },
+    tagText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.primaryDark,
+    },
+    detailsSection: {
+      marginTop: 16,
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      padding: 16,
+      gap: 12,
+      borderWidth: 1,
+      borderColor: c.borderLight,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      marginBottom: 4,
+    },
+    detailRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    detailLabel: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    detailValue: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.text,
+      maxWidth: '60%',
+      textAlign: 'right',
+    },
+    reportHistoryHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    reportCountBadge: {
+      backgroundColor: c.warning,
+      borderRadius: 12,
+      minWidth: 24,
+      height: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+    },
+    reportCountBadgeDanger: {
+      backgroundColor: c.error,
+    },
+    reportCountText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    reportHistoryItem: {
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: c.borderLight,
+      paddingTop: 10,
+      gap: 4,
+    },
+    reportHistoryRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    reportHistoryReason: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+    },
+    reportHistoryStatus: {
+      fontSize: 12,
+      fontFamily: Fonts.bodySemiBold,
+    },
+    reportHistoryMeta: {
+      fontSize: 12,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+    },
+    conversationSubtitle: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      marginBottom: 8,
+    },
+    messageBubble: {
+      borderRadius: 12,
+      padding: 10,
+      maxWidth: '85%',
+    },
+    messageBubbleReported: {
+      backgroundColor: '#FDECEA',
+      alignSelf: 'flex-end',
+      borderBottomRightRadius: 4,
+    },
+    messageBubbleReporter: {
+      backgroundColor: c.surfaceSecondary,
+      alignSelf: 'flex-start',
+      borderBottomLeftRadius: 4,
+    },
+    messageSender: {
+      fontSize: 11,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textTertiary,
+      marginBottom: 2,
+    },
+    messageContent: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.text,
+      lineHeight: 20,
+    },
+    messageImage: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.secondary,
+      marginTop: 2,
+    },
+    messageTime: {
+      fontSize: 10,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      textAlign: 'right',
+      marginTop: 4,
+    },
+    noMessages: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      fontStyle: 'italic',
+      textAlign: 'center',
+      paddingVertical: 12,
+    },
+    banButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      paddingVertical: 14,
+      borderRadius: 16,
+      marginTop: 8,
+    },
+    banButtonDanger: {
+      backgroundColor: c.error,
+    },
+    unbanButton: {
+      backgroundColor: c.success,
+    },
+    banButtonText: {
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+  });
+}

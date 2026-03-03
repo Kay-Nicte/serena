@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { getPhotoUrl } from '@/lib/storage';
@@ -78,6 +78,8 @@ export default function MatchProfileScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
   const router = useRouter();
   const { t } = useTranslation();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [photos, setPhotos] = useState<{ uri: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -292,132 +294,134 @@ export default function MatchProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
-    backgroundColor: Colors.surface,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    textAlign: 'center',
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  scrollContent: {
-    paddingBottom: 40,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyText: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  info: {
-    padding: 24,
-    gap: 16,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 8,
-  },
-  name: {
-    fontSize: 28,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    flexShrink: 1,
-  },
-  age: {
-    fontSize: 24,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  section: {
-    gap: 6,
-  },
-  sectionLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  bio: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-    lineHeight: 24,
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 4,
-  },
-  tag: {
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-  },
-  tagText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primaryDark,
-  },
-  interestTag: {
-    backgroundColor: '#E8F5E9',
-    borderWidth: 1,
-    borderColor: '#A5D6A7',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-  },
-  interestTagText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: '#2E7D32',
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  detailLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  detailValue: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    flexShrink: 1,
-    textAlign: 'right',
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: c.borderLight,
+      backgroundColor: c.surface,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      flex: 1,
+      fontSize: 18,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      textAlign: 'center',
+    },
+    headerSpacer: {
+      width: 40,
+    },
+    scrollContent: {
+      paddingBottom: 40,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 40,
+    },
+    emptyText: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+    },
+    info: {
+      padding: 24,
+      gap: 16,
+    },
+    nameRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 8,
+    },
+    name: {
+      fontSize: 28,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      flexShrink: 1,
+    },
+    age: {
+      fontSize: 24,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    section: {
+      gap: 6,
+    },
+    sectionLabel: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    bio: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.text,
+      lineHeight: 24,
+    },
+    tags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 4,
+    },
+    tag: {
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 16,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+    },
+    tagText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.primaryDark,
+    },
+    interestTag: {
+      backgroundColor: '#E8F5E9',
+      borderWidth: 1,
+      borderColor: '#A5D6A7',
+      borderRadius: 16,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+    },
+    interestTagText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: '#2E7D32',
+    },
+    detailRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+    detailLabel: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    detailValue: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      flexShrink: 1,
+      textAlign: 'right',
+    },
+  });
+}

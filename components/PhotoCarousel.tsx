@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { View, StyleSheet, ScrollView, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 
 interface PhotoCarouselProps {
   photos: { uri: string }[];
@@ -22,6 +22,8 @@ export function PhotoCarousel({
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
   const height = heightProp ?? width / aspectRatio;
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const displayPhotos =
     photos.length > 0
@@ -93,30 +95,32 @@ export function PhotoCarousel({
   );
 }
 
-const styles = StyleSheet.create({
-  placeholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dots: {
-    position: 'absolute',
-    bottom: 12,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  dotActive: {
-    backgroundColor: Colors.textOnPrimary,
-  },
-  dotInactive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    placeholder: {
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    dots: {
+      position: 'absolute',
+      bottom: 12,
+      left: 0,
+      right: 0,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 6,
+    },
+    dot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    dotActive: {
+      backgroundColor: c.textOnPrimary,
+    },
+    dotInactive: {
+      backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    },
+  });
+}

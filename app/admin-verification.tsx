@@ -16,7 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { GESTURES } from '@/constants/gestures';
 import { supabase } from '@/lib/supabase';
@@ -44,6 +44,8 @@ interface VerificationRequest {
 export default function AdminVerificationScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   const [requests, setRequests] = useState<VerificationRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
@@ -324,229 +326,231 @@ export default function AdminVerificationScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    paddingHorizontal: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  list: {
-    padding: 16,
-    gap: 16,
-  },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  userRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  miniAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-  },
-  miniAvatarPlaceholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  userName: {
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    flex: 1,
-  },
-  dateText: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-  },
-  gestureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: Colors.primaryPastel,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  gestureLabel: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  gestureText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primaryDark,
-    flex: 1,
-  },
-  sectionLabel: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-    marginTop: 4,
-  },
-  selfieImage: {
-    width: '100%',
-    aspectRatio: 3 / 4,
-    borderRadius: 12,
-  },
-  noImage: {
-    width: '100%',
-    aspectRatio: 3 / 4,
-    borderRadius: 12,
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  photosRow: {
-    gap: 8,
-  },
-  profilePhoto: {
-    width: 80,
-    height: 100,
-    borderRadius: 8,
-  },
-  rejectSection: {
-    gap: 8,
-  },
-  rejectInput: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-    minHeight: 60,
-    textAlignVertical: 'top',
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 4,
-  },
-  approveButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: Colors.success,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  approveButtonText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  rejectOutlineButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: Colors.surfaceSecondary,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  rejectOutlineButtonText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.error,
-  },
-  rejectButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: Colors.error,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  rejectButtonText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  cancelButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.surfaceSecondary,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  cancelButtonText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textSecondary,
-  },
-  viewerOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.92)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewerClose: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    zIndex: 10,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewerImage: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height * 0.8,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 18,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 16,
+      paddingHorizontal: 40,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+    },
+    list: {
+      padding: 16,
+      gap: 16,
+    },
+    card: {
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      padding: 16,
+      gap: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    userRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    miniAvatar: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+    },
+    miniAvatarPlaceholder: {
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    userName: {
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      flex: 1,
+    },
+    dateText: {
+      fontSize: 12,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+    },
+    gestureRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: c.primaryPastel,
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+    },
+    gestureLabel: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    gestureText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primaryDark,
+      flex: 1,
+    },
+    sectionLabel: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+      marginTop: 4,
+    },
+    selfieImage: {
+      width: '100%',
+      aspectRatio: 3 / 4,
+      borderRadius: 12,
+    },
+    noImage: {
+      width: '100%',
+      aspectRatio: 3 / 4,
+      borderRadius: 12,
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    photosRow: {
+      gap: 8,
+    },
+    profilePhoto: {
+      width: 80,
+      height: 100,
+      borderRadius: 8,
+    },
+    rejectSection: {
+      gap: 8,
+    },
+    rejectInput: {
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: 12,
+      padding: 12,
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.text,
+      minHeight: 60,
+      textAlignVertical: 'top',
+    },
+    actions: {
+      flexDirection: 'row',
+      gap: 10,
+      marginTop: 4,
+    },
+    approveButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      backgroundColor: c.success,
+      paddingVertical: 12,
+      borderRadius: 12,
+    },
+    approveButtonText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    rejectOutlineButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      backgroundColor: c.surfaceSecondary,
+      paddingVertical: 12,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    rejectOutlineButtonText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.error,
+    },
+    rejectButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      backgroundColor: c.error,
+      paddingVertical: 12,
+      borderRadius: 12,
+    },
+    rejectButtonText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    cancelButton: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: c.surfaceSecondary,
+      paddingVertical: 12,
+      borderRadius: 12,
+    },
+    cancelButtonText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textSecondary,
+    },
+    viewerOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.92)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    viewerClose: {
+      position: 'absolute',
+      top: 50,
+      right: 20,
+      zIndex: 10,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: 'rgba(255,255,255,0.15)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    viewerImage: {
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height * 0.8,
+    },
+  });
+}

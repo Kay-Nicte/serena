@@ -15,11 +15,13 @@ export function useDailyProfiles() {
     isLoading,
     error,
     matchResult,
+    lastSwipe,
     fetchCandidates,
     resetPasses,
     likeProfile,
     superlikeProfile,
     passProfile,
+    undoLastSwipe,
     clearMatchResult,
   } = useProfileStore();
 
@@ -78,6 +80,8 @@ export function useDailyProfiles() {
         await passProfile(currentProfile.id);
       }
     },
+    lastSwipe,
+    undoLastSwipe,
     clearMatchResult,
     refresh: fetchCandidates,
     resetPasses,

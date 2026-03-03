@@ -34,6 +34,7 @@
     "errorAgeConfirm": "You must be at least 18 to use Serenade",
     "errorInvalidEmail": "Invalid email address",
     "errorPasswordShort": "Password must be at least 6 characters",
+    "errorEmailAlreadyExists": "An account with this email already exists",
     "errorPasswordMismatch": "Passwords don't match",
     "errorGeneric": "Authentication error. Please try again.",
     "forgotPasswordTitle": "Reset password",
@@ -127,6 +128,7 @@
     "loading": "Finding profiles...",
     "errorFetching": "Could not load profiles. Try again.",
     "dailyLimitReached": "You've reached the daily like limit. Come back tomorrow.",
+    "likesExhaustedPremium": "No likes left. Get Premium for unlimited likes!",
     "refresh": "Refresh",
     "secondChance": "Give them another chance",
     "activityToday": "Active today",
@@ -138,7 +140,9 @@
     "inactiveYear": "More than 1 year ago",
     "inactiveYears": "More than {{count}} years ago",
     "inactiveWeek": "1 week ago",
-    "inactiveWeeks": "{{count}} weeks ago"
+    "inactiveWeeks": "{{count}} weeks ago",
+    "distanceKm": "{{km}} km away",
+    "distanceLessThan1": "Less than 1 km away"
   },
   "matches": {
     "title": "Matches",
@@ -190,7 +194,10 @@
     "yesterday": "Yesterday",
     "matchedOn": "Matched on {{date}}",
     "shareDateLocation": "Share location",
-    "shareDateMessage": "I'm on a date through Serenade. My current location: {{link}}"
+    "shareDateMessage": "I'm on a date through Serenade. My current location: {{link}}",
+    "searchGifs": "Search GIFs...",
+    "poweredByGiphy": "Powered by GIPHY",
+    "gifMessage": "🎬 GIF"
   },
   "notifications": {
     "permissionTitle": "Enable notifications",
@@ -335,6 +342,10 @@
     "languageGl": "Galego",
     "languageDe": "Deutsch",
     "languagePt": "Português",
+    "appearance": "Appearance",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
     "legal": "Legal",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",

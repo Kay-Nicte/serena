@@ -16,6 +16,8 @@ interface DailyStatsState {
   decrementLike: () => void;
   decrementSuperlike: () => void;
   decrementIceBreaker: () => void;
+  incrementLike: () => void;
+  incrementSuperlike: () => void;
   reset: () => void;
 }
 
@@ -71,6 +73,16 @@ export const useDailyStatsStore = create<DailyStatsState>((set) => ({
   decrementIceBreaker: () =>
     set((state) => ({
       availableIceBreakers: Math.max(state.availableIceBreakers - 1, 0),
+    })),
+
+  incrementLike: () =>
+    set((state) => ({
+      remainingLikes: state.remainingLikes + 1,
+    })),
+
+  incrementSuperlike: () =>
+    set((state) => ({
+      availableSuperlikes: state.availableSuperlikes + 1,
     })),
 
   reset: () =>

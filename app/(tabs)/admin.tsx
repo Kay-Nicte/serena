@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { ActionSheet, type ActionSheetOption } from '@/components/ActionSheet';
@@ -35,17 +35,20 @@ interface ReportRow {
   reportCount: number;
 }
 
-const STATUS_COLORS: Record<ReportStatus, string> = {
-  pending: Colors.warning,
-  reviewed: Colors.secondary,
-  resolved: Colors.success,
-  dismissed: Colors.textTertiary,
-};
-
 const FILTER_TABS: ReportStatus[] = ['pending', 'reviewed', 'resolved', 'dismissed'];
 
 export default function AdminScreen() {
   const { t } = useTranslation();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
+
+  const STATUS_COLORS: Record<ReportStatus, string> = {
+    pending: Colors.warning,
+    reviewed: Colors.secondary,
+    resolved: Colors.success,
+    dismissed: Colors.textTertiary,
+  };
+
   const router = useRouter();
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -381,191 +384,193 @@ export default function AdminScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  adminHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  verificationsLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  verificationsLinkText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  verificationsCountBadge: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-    marginLeft: 2,
-  },
-  verificationsCountText: {
-    fontSize: 11,
-    fontFamily: Fonts.bodyBold,
-    color: Colors.primary,
-  },
-  filters: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    paddingBottom: 12,
-    gap: 6,
-    flexWrap: 'wrap',
-  },
-  filterTab: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: Colors.surfaceSecondary,
-  },
-  filterTabActive: {
-    backgroundColor: Colors.primary,
-  },
-  filterText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  filterTextActive: {
-    color: Colors.textOnPrimary,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    paddingHorizontal: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  list: {
-    padding: 16,
-    gap: 12,
-  },
-  reportCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    gap: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  statusBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  statusText: {
-    fontSize: 11,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  userRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  rowLabel: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  miniAvatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-  },
-  miniAvatarPlaceholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  userName: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-  },
-  userNameLink: {
-    color: Colors.secondary,
-    textDecorationLine: 'underline',
-  },
-  repeatBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.warning,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    alignSelf: 'flex-start',
-  },
-  repeatBadgeDanger: {
-    backgroundColor: Colors.error,
-  },
-  repeatText: {
-    fontSize: 12,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  reasonText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.error,
-  },
-  description: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 18,
-    backgroundColor: Colors.surfaceSecondary,
-    borderRadius: 8,
-    padding: 10,
-  },
-  date: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    textAlign: 'right',
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    adminHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 8,
+    },
+    title: {
+      fontSize: 28,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    verificationsLink: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      backgroundColor: c.primary,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 16,
+    },
+    verificationsLinkText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    verificationsCountBadge: {
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      minWidth: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 5,
+      marginLeft: 2,
+    },
+    verificationsCountText: {
+      fontSize: 11,
+      fontFamily: Fonts.bodyBold,
+      color: c.primary,
+    },
+    filters: {
+      flexDirection: 'row',
+      paddingHorizontal: 24,
+      paddingBottom: 12,
+      gap: 6,
+      flexWrap: 'wrap',
+    },
+    filterTab: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 16,
+      backgroundColor: c.surfaceSecondary,
+    },
+    filterTabActive: {
+      backgroundColor: c.primary,
+    },
+    filterText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    filterTextActive: {
+      color: c.textOnPrimary,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 16,
+      paddingHorizontal: 40,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+    },
+    list: {
+      padding: 16,
+      gap: 12,
+    },
+    reportCard: {
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      padding: 16,
+      gap: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    statusBadge: {
+      alignSelf: 'flex-start',
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      borderRadius: 10,
+    },
+    statusText: {
+      fontSize: 11,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    userRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    rowLabel: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    userInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    miniAvatar: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+    },
+    miniAvatarPlaceholder: {
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    userName: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+    },
+    userNameLink: {
+      color: c.secondary,
+      textDecorationLine: 'underline',
+    },
+    repeatBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      backgroundColor: c.warning,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      alignSelf: 'flex-start',
+    },
+    repeatBadgeDanger: {
+      backgroundColor: c.error,
+    },
+    repeatText: {
+      fontSize: 12,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    detailRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    reasonText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.error,
+    },
+    description: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 18,
+      backgroundColor: c.surfaceSecondary,
+      borderRadius: 8,
+      padding: 10,
+    },
+    date: {
+      fontSize: 12,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      textAlign: 'right',
+    },
+  });
+}

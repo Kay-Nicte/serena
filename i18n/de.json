@@ -55,7 +55,8 @@
     "verifyEmailResentMessage": "Wir haben einen neuen Bestätigungslink an deine E-Mail gesendet.",
     "or": "oder",
     "continueWithGoogle": "Weiter mit Google",
-    "emailVerified": "E-Mail bestätigt!"
+    "emailVerified": "E-Mail bestätigt!",
+    "errorEmailAlreadyExists": "Ein Konto mit dieser E-Mail-Adresse existiert bereits"
   },
   "profile": {
     "completeTitle": "Vervollständige dein Profil",
@@ -127,6 +128,7 @@
     "loading": "Profile werden gesucht...",
     "errorFetching": "Profile konnten nicht geladen werden. Bitte versuche es erneut.",
     "dailyLimitReached": "Du hast dein tägliches Like-Limit erreicht. Komm morgen wieder!",
+    "likesExhaustedPremium": "Keine Likes mehr. Hol dir Premium für unbegrenzte Likes!",
     "refresh": "Aktualisieren",
     "secondChance": "Zweite Chance geben",
     "activityToday": "Heute aktiv",
@@ -138,7 +140,9 @@
     "inactiveYear": "Vor über 1 Jahr",
     "inactiveYears": "Vor über {{count}} Jahren",
     "inactiveWeek": "Vor 1 Woche",
-    "inactiveWeeks": "Vor {{count}} Wochen"
+    "inactiveWeeks": "Vor {{count}} Wochen",
+    "distanceKm": "{{km}} km entfernt",
+    "distanceLessThan1": "Weniger als 1 km entfernt"
   },
   "matches": {
     "title": "Matches",
@@ -190,7 +194,10 @@
     "yesterday": "Gestern",
     "matchedOn": "Match am {{date}}",
     "shareDateLocation": "Standort teilen",
-    "shareDateMessage": "Ich bin auf einem Date über Serenade. Mein aktueller Standort: {{link}}"
+    "shareDateMessage": "Ich bin auf einem Date über Serenade. Mein aktueller Standort: {{link}}",
+    "searchGifs": "GIFs suchen...",
+    "poweredByGiphy": "Unterstützt von GIPHY",
+    "gifMessage": "🎬 GIF"
   },
   "notifications": {
     "permissionTitle": "Benachrichtigungen aktivieren",
@@ -335,6 +342,10 @@
     "languageGl": "Galego",
     "languageDe": "Deutsch",
     "languagePt": "Português",
+    "appearance": "Erscheinungsbild",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System",
     "legal": "Rechtliches",
     "termsOfService": "Nutzungsbedingungen",
     "privacyPolicy": "Datenschutzrichtlinie",

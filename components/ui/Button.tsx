@@ -6,7 +6,7 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 
 interface ButtonProps {
@@ -28,6 +28,9 @@ export function Button({
   style,
   textStyle,
 }: ButtonProps) {
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
+
   return (
     <TouchableOpacity
       style={[
@@ -59,45 +62,47 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    height: 52,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  primary: {
-    backgroundColor: Colors.primary,
-  },
-  secondary: {
-    backgroundColor: Colors.surfaceSecondary,
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  text: {
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-  },
-  primaryText: {
-    color: Colors.textOnPrimary,
-  },
-  secondaryText: {
-    color: Colors.primary,
-  },
-  outlineText: {
-    color: Colors.primary,
-  },
-  ghostText: {
-    color: Colors.primary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    base: {
+      height: 52,
+      borderRadius: 26,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 24,
+    },
+    primary: {
+      backgroundColor: c.primary,
+    },
+    secondary: {
+      backgroundColor: c.surfaceSecondary,
+    },
+    outline: {
+      backgroundColor: 'transparent',
+      borderWidth: 1.5,
+      borderColor: c.primary,
+    },
+    ghost: {
+      backgroundColor: 'transparent',
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+    text: {
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+    },
+    primaryText: {
+      color: c.textOnPrimary,
+    },
+    secondaryText: {
+      color: c.primary,
+    },
+    outlineText: {
+      color: c.primary,
+    },
+    ghostText: {
+      color: c.primary,
+    },
+  });
+}

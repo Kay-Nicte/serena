@@ -4,12 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 
 export default function TermsOfServiceScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,40 +33,42 @@ export default function TermsOfServiceScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
-    backgroundColor: Colors.surface,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    marginLeft: 4,
-  },
-  content: {
-    padding: 24,
-    paddingBottom: 40,
-  },
-  body: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: c.borderLight,
+      backgroundColor: c.surface,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 20,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      marginLeft: 4,
+    },
+    content: {
+      padding: 24,
+      paddingBottom: 40,
+    },
+    body: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 22,
+    },
+  });
+}

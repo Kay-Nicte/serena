@@ -1,5 +1,5 @@
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 
 interface TagProps {
@@ -9,6 +9,9 @@ interface TagProps {
 }
 
 export function Tag({ label, selected = false, onPress }: TagProps) {
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
+
   return (
     <TouchableOpacity
       style={[styles.tag, selected && styles.tagSelected]}
@@ -22,25 +25,27 @@ export function Tag({ label, selected = false, onPress }: TagProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  tag: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-  },
-  tagSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primaryPastel,
-  },
-  text: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  textSelected: {
-    color: Colors.primaryDark,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    tag: {
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      borderRadius: 20,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+    },
+    tagSelected: {
+      borderColor: c.primary,
+      backgroundColor: c.primaryPastel,
+    },
+    text: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    textSelected: {
+      color: c.primaryDark,
+    },
+  });
+}

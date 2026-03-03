@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Modal } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
@@ -13,6 +13,8 @@ interface MatchOverlayProps {
 
 export function MatchOverlay({ visible, onChat, onKeepExploring }: MatchOverlayProps) {
   const { t } = useTranslation();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   return (
     <Modal
@@ -49,51 +51,53 @@ export function MatchOverlay({ visible, onChat, onKeepExploring }: MatchOverlayP
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: Colors.overlay,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
-  },
-  content: {
-    backgroundColor: Colors.surface,
-    borderRadius: 28,
-    padding: 32,
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 340,
-  },
-  iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: Colors.primaryPastel,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 28,
-  },
-  buttons: {
-    width: '100%',
-    gap: 12,
-  },
-  chatButton: {
-    width: '100%',
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 32,
+    },
+    content: {
+      backgroundColor: c.surface,
+      borderRadius: 28,
+      padding: 32,
+      alignItems: 'center',
+      width: '100%',
+      maxWidth: 340,
+    },
+    iconContainer: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: c.primaryPastel,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 28,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 24,
+      marginBottom: 28,
+    },
+    buttons: {
+      width: '100%',
+      gap: 12,
+    },
+    chatButton: {
+      width: '100%',
+    },
+  });
+}

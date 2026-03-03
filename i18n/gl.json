@@ -55,7 +55,8 @@
     "verifyEmailResentMessage": "Enviámosche unha nova ligazón de verificación ao teu correo.",
     "or": "ou",
     "continueWithGoogle": "Continuar con Google",
-    "emailVerified": "Email verificado!"
+    "emailVerified": "Email verificado!",
+    "errorEmailAlreadyExists": "Xa existe unha conta con este correo electrónico"
   },
   "profile": {
     "completeTitle": "Completa o teu perfil",
@@ -127,6 +128,7 @@
     "loading": "Buscando perfís...",
     "errorFetching": "Non se puideron cargar os perfís. Téntao de novo.",
     "dailyLimitReached": "Alcanzaches o límite diario de likes. Volve mañá!",
+    "likesExhaustedPremium": "Sen likes. ¡Fáite Premium para likes ilimitados!",
     "refresh": "Actualizar",
     "secondChance": "Dar outra oportunidade",
     "activityToday": "Activa hoxe",
@@ -138,7 +140,9 @@
     "inactiveYear": "Hai máis de 1 ano",
     "inactiveYears": "Hai máis de {{count}} anos",
     "inactiveWeek": "Hai 1 semana",
-    "inactiveWeeks": "Hai {{count}} semanas"
+    "inactiveWeeks": "Hai {{count}} semanas",
+    "distanceKm": "A {{km}} km",
+    "distanceLessThan1": "A menos de 1 km"
   },
   "matches": {
     "title": "Matches",
@@ -190,7 +194,10 @@
     "yesterday": "Onte",
     "matchedOn": "Match o {{date}}",
     "shareDateLocation": "Compartir ubicación",
-    "shareDateMessage": "Estou nunha cita a través de Serenade. A miña ubicación actual: {{link}}"
+    "shareDateMessage": "Estou nunha cita a través de Serenade. A miña ubicación actual: {{link}}",
+    "searchGifs": "Buscar GIFs...",
+    "poweredByGiphy": "Powered by GIPHY",
+    "gifMessage": "🎬 GIF"
   },
   "notifications": {
     "permissionTitle": "Activar notificacións",
@@ -335,6 +342,10 @@
     "languageGl": "Galego",
     "languageDe": "Deutsch",
     "languagePt": "Português",
+    "appearance": "Aparencia",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema",
     "legal": "Legal",
     "termsOfService": "Termos de Servizo",
     "privacyPolicy": "Política de Privacidade",

@@ -55,7 +55,8 @@
     "verifyEmailResentMessage": "Hemos enviado un nuevo enlace de verificación a tu correo.",
     "or": "o",
     "continueWithGoogle": "Continuar con Google",
-    "emailVerified": "¡Email verificado!"
+    "emailVerified": "¡Email verificado!",
+    "errorEmailAlreadyExists": "Ya existe una cuenta con este correo electrónico"
   },
   "profile": {
     "completeTitle": "Completa tu perfil",
@@ -127,6 +128,7 @@
     "loading": "Buscando perfiles...",
     "errorFetching": "No se pudieron cargar los perfiles. Inténtalo de nuevo.",
     "dailyLimitReached": "Has alcanzado el límite diario de likes. ¡Vuelve mañana!",
+    "likesExhaustedPremium": "Sin likes. ¡Hazte Premium y da likes ilimitados!",
     "refresh": "Actualizar",
     "secondChance": "Dar otra oportunidad",
     "activityToday": "Activa hoy",
@@ -138,7 +140,9 @@
     "inactiveYear": "Hace más de 1 año",
     "inactiveYears": "Hace más de {{count}} años",
     "inactiveWeek": "Hace 1 semana",
-    "inactiveWeeks": "Hace {{count}} semanas"
+    "inactiveWeeks": "Hace {{count}} semanas",
+    "distanceKm": "A {{km}} km",
+    "distanceLessThan1": "A menos de 1 km"
   },
   "matches": {
     "title": "Matches",
@@ -190,7 +194,10 @@
     "yesterday": "Ayer",
     "matchedOn": "Match el {{date}}",
     "shareDateLocation": "Compartir ubicación",
-    "shareDateMessage": "Estoy en una cita a través de Serenade. Mi ubicación actual: {{link}}"
+    "shareDateMessage": "Estoy en una cita a través de Serenade. Mi ubicación actual: {{link}}",
+    "searchGifs": "Buscar GIFs...",
+    "poweredByGiphy": "Desarrollado por GIPHY",
+    "gifMessage": "🎬 GIF"
   },
   "notifications": {
     "permissionTitle": "Activar notificaciones",
@@ -335,6 +342,10 @@
     "languageGl": "Galego",
     "languageDe": "Deutsch",
     "languagePt": "Português",
+    "appearance": "Apariencia",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema",
     "legal": "Legal",
     "termsOfService": "Términos de Servicio",
     "privacyPolicy": "Política de Privacidad",

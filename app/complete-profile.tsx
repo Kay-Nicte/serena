@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Tag } from '@/components/ui/Tag';
 import { PhotoGrid } from '@/components/PhotoGrid';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, INTERESTS, CHILDREN_OPTIONS, ZODIAC_SIGNS, PET_OPTIONS, SMOKING_OPTIONS, DRINKING_OPTIONS, HOGWARTS_HOUSES } from '@/constants/config';
 import { useAuthStore } from '@/stores/authStore';
@@ -34,6 +34,8 @@ export default function CompleteProfileScreen() {
   const router = useRouter();
   const { user, updateProfile } = useAuthStore();
   const { photos, addPhoto, removePhoto } = usePhotoStore();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const [name, setName] = useState('');
   const [day, setDay] = useState('');
@@ -500,183 +502,185 @@ export default function CompleteProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  flex: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 32,
-    paddingBottom: 40,
-    gap: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    paddingTop: 24,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-  },
-  dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  dateField: {
-    flex: 1,
-    height: 52,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-    justifyContent: 'center',
-  },
-  dateFieldYear: {
-    flex: 1.5,
-    height: 52,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-    justifyContent: 'center',
-  },
-  dateInput: {
-    textAlign: 'center',
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-  },
-  dateSeparator: {
-    fontSize: 18,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-  },
-  underageError: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.error,
-    marginTop: 4,
-    marginLeft: 4,
-  },
-  section: {
-    gap: 10,
-  },
-  sectionLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-    marginLeft: 4,
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  premiumTeaser: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: '#FFF8E1',
-    borderWidth: 1,
-    borderColor: '#FFE082',
-    borderRadius: 16,
-    padding: 14,
-  },
-  premiumTeaserText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: '#9A7800',
-    flex: 1,
-    lineHeight: 20,
-  },
-  saveButton: {
-    marginTop: 12,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  modalCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 24,
-    padding: 28,
-    alignItems: 'center',
-    gap: 14,
-    width: '100%',
-    maxWidth: 360,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    textAlign: 'center',
-  },
-  modalDescription: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  modalBenefits: {
-    width: '100%',
-    gap: 10,
-    paddingVertical: 4,
-  },
-  modalBenefit: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  modalBenefitText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-    flex: 1,
-  },
-  modalButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 40,
-    paddingVertical: 14,
-    borderRadius: 24,
-    marginTop: 4,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  verifyIconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: Colors.primaryPastel,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  verifyLaterText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textTertiary,
-    marginTop: 4,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    flex: {
+      flex: 1,
+    },
+    content: {
+      paddingHorizontal: 32,
+      paddingBottom: 40,
+      gap: 20,
+    },
+    title: {
+      fontSize: 28,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      paddingTop: 24,
+    },
+    subtitle: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 22,
+    },
+    dateRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    dateField: {
+      flex: 1,
+      height: 52,
+      borderRadius: 16,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+      justifyContent: 'center',
+    },
+    dateFieldYear: {
+      flex: 1.5,
+      height: 52,
+      borderRadius: 16,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+      justifyContent: 'center',
+    },
+    dateInput: {
+      textAlign: 'center',
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.text,
+    },
+    dateSeparator: {
+      fontSize: 18,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+    },
+    underageError: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.error,
+      marginTop: 4,
+      marginLeft: 4,
+    },
+    section: {
+      gap: 10,
+    },
+    sectionLabel: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+      marginLeft: 4,
+    },
+    tags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    premiumTeaser: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      backgroundColor: '#FFF8E1',
+      borderWidth: 1,
+      borderColor: '#FFE082',
+      borderRadius: 16,
+      padding: 14,
+    },
+    premiumTeaserText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: '#9A7800',
+      flex: 1,
+      lineHeight: 20,
+    },
+    saveButton: {
+      marginTop: 12,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 32,
+    },
+    modalCard: {
+      backgroundColor: c.surface,
+      borderRadius: 24,
+      padding: 28,
+      alignItems: 'center',
+      gap: 14,
+      width: '100%',
+      maxWidth: 360,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8,
+    },
+    modalTitle: {
+      fontSize: 22,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      textAlign: 'center',
+    },
+    modalDescription: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    modalBenefits: {
+      width: '100%',
+      gap: 10,
+      paddingVertical: 4,
+    },
+    modalBenefit: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    modalBenefitText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+      flex: 1,
+    },
+    modalButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: c.primary,
+      paddingHorizontal: 40,
+      paddingVertical: 14,
+      borderRadius: 24,
+      marginTop: 4,
+    },
+    modalButtonText: {
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    verifyIconCircle: {
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+      backgroundColor: c.primaryPastel,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    verifyLaterText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textTertiary,
+      marginTop: 4,
+    },
+  });
+}

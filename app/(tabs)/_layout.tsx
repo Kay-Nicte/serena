@@ -3,7 +3,7 @@ import { Tabs, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { useAuthStore } from '@/stores/authStore';
 import { useIceBreakerStore } from '@/stores/iceBreakerStore';
@@ -50,10 +50,12 @@ function useAdminPendingCount(isAdmin: boolean) {
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  const Colors = useColors();
   const profile = useAuthStore((s) => s.profile);
   const isAdmin = profile?.is_admin === true;
   const pendingCount = useIceBreakerStore((s) => s.pendingIceBreakers.length);
   const adminPendingCount = useAdminPendingCount(isAdmin);
+  const tabStyles = makeStyles(Colors);
 
   return (
     <>
@@ -142,22 +144,24 @@ export default function TabLayout() {
   );
 }
 
-const tabStyles = StyleSheet.create({
-  badge: {
-    position: 'absolute',
-    top: -4,
-    right: -10,
-    backgroundColor: Colors.primary,
-    borderRadius: 9,
-    minWidth: 18,
-    height: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontFamily: Fonts.bodyBold,
-    color: Colors.textOnPrimary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    badge: {
+      position: 'absolute',
+      top: -4,
+      right: -10,
+      backgroundColor: c.primary,
+      borderRadius: 9,
+      minWidth: 18,
+      height: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 4,
+    },
+    badgeText: {
+      fontSize: 10,
+      fontFamily: Fonts.bodyBold,
+      color: c.textOnPrimary,
+    },
+  });
+}

@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 
@@ -24,6 +24,8 @@ export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const handleReset = async () => {
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
@@ -110,60 +112,62 @@ export default function ForgotPasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 32,
-  },
-  backButton: {
-    paddingTop: 16,
-    paddingBottom: 8,
-    alignSelf: 'flex-start',
-  },
-  header: {
-    paddingTop: 16,
-    paddingBottom: 32,
-    gap: 8,
-  },
-  title: {
-    fontSize: 32,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-  },
-  form: {
-    gap: 16,
-  },
-  button: {
-    marginTop: 8,
-  },
-  successContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    paddingHorizontal: 16,
-  },
-  successTitle: {
-    fontSize: 24,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    textAlign: 'center',
-  },
-  successMessage: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 32,
+    },
+    backButton: {
+      paddingTop: 16,
+      paddingBottom: 8,
+      alignSelf: 'flex-start',
+    },
+    header: {
+      paddingTop: 16,
+      paddingBottom: 32,
+      gap: 8,
+    },
+    title: {
+      fontSize: 32,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    subtitle: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 22,
+    },
+    form: {
+      gap: 16,
+    },
+    button: {
+      marginTop: 8,
+    },
+    successContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 16,
+      paddingHorizontal: 16,
+    },
+    successTitle: {
+      fontSize: 24,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      textAlign: 'center',
+    },
+    successMessage: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+  });
+}

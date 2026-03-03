@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { useTranslation } from 'react-i18next';
 
@@ -33,6 +33,8 @@ export function ActionSheet({ visible, title, options, onClose }: ActionSheetPro
   const insets = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   useEffect(() => {
     if (visible) {
@@ -169,63 +171,65 @@ export function ActionSheet({ visible, title, options, onClose }: ActionSheetPro
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.overlay,
-  },
-  sheet: {
-    paddingHorizontal: 10,
-    gap: 8,
-  },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  titleContainer: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textSecondary,
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-  },
-  optionBorder: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.borderLight,
-  },
-  optionText: {
-    fontSize: 18,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-  },
-  optionTextDestructive: {
-    color: Colors.error,
-    fontFamily: Fonts.bodySemiBold,
-  },
-  cancelCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontSize: 18,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'flex-end',
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: c.overlay,
+    },
+    sheet: {
+      paddingHorizontal: 10,
+      gap: 8,
+    },
+    card: {
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      overflow: 'hidden',
+    },
+    titleContainer: {
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textSecondary,
+    },
+    option: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 14,
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+    },
+    optionBorder: {
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: c.borderLight,
+    },
+    optionText: {
+      fontSize: 18,
+      fontFamily: Fonts.body,
+      color: c.text,
+    },
+    optionTextDestructive: {
+      color: c.error,
+      fontFamily: Fonts.bodySemiBold,
+    },
+    cancelCard: {
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      paddingVertical: 16,
+      alignItems: 'center',
+    },
+    cancelText: {
+      fontSize: 18,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+    },
+  });
+}

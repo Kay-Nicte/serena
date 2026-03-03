@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 
 // Singleton: only one audio plays at a time
@@ -25,6 +25,8 @@ export function AudioPlayer({ uri, isMine }: AudioPlayerProps) {
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const soundRef = useRef<Audio.Sound | null>(null);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const stopPlayback = useCallback(() => {
     setIsPlaying(false);
@@ -123,35 +125,37 @@ export function AudioPlayer({ uri, isMine }: AudioPlayerProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minWidth: 180,
-    gap: 10,
-  },
-  playButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  waveformContainer: {
-    flex: 1,
-    gap: 4,
-  },
-  progressTrack: {
-    height: 4,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
-  durationText: {
-    fontSize: 11,
-    fontFamily: Fonts.body,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      minWidth: 180,
+      gap: 10,
+    },
+    playButton: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    waveformContainer: {
+      flex: 1,
+      gap: 4,
+    },
+    progressTrack: {
+      height: 4,
+      borderRadius: 2,
+      overflow: 'hidden',
+    },
+    progressFill: {
+      height: '100%',
+      borderRadius: 2,
+    },
+    durationText: {
+      fontSize: 11,
+      fontFamily: Fonts.body,
+    },
+  });
+}

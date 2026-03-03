@@ -11,12 +11,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { updatePresence } from '@/lib/presence';
 import { pickImage, takePhoto, uploadChatImage, uploadChatAudio } from '@/lib/storage';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { ActionSheet, type ActionSheetOption } from '@/components/ActionSheet';
+import { GifPicker } from '@/components/GifPicker';
 import { showToast } from '@/stores/toastStore';
 
 interface ChatInputProps {
@@ -39,8 +40,11 @@ export function ChatInput({ onSend, matchId, disabled, disabledMessage, isPremiu
   const [text, setText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [imagePickerVisible, setImagePickerVisible] = useState(false);
+  const [gifPickerVisible, setGifPickerVisible] = useState(false);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const {
     state: recorderState,
@@ -122,6 +126,11 @@ export function ChatInput({ onSend, matchId, disabled, disabledMessage, isPremiu
     }
   };
 
+  const handleGifSelect = (gifUrl: string) => {
+    setGifPickerVisible(false);
+    onSend('', gifUrl);
+  };
+
   const imagePickerOptions: ActionSheetOption[] = [
     {
       label: t('chat.fromGallery'),
@@ -133,11 +142,16 @@ export function ChatInput({ onSend, matchId, disabled, disabledMessage, isPremiu
       icon: 'camera-outline',
       onPress: handleImageFromCamera,
     },
+    {
+      label: 'GIF',
+      icon: 'film-outline',
+      onPress: () => setGifPickerVisible(true),
+    },
   ];
 
   const handleMicPress = async () => {
     if (!isPremium) {
-      showToast(t('chat.audioPremium'), 'success', 4000, () => router.push('/premium'));
+      showToast(t('chat.audioPremium'), 'success', 2500, () => router.push('/premium'));
       return;
     }
     const started = await startRecording();
@@ -266,89 +280,97 @@ export function ChatInput({ onSend, matchId, disabled, disabledMessage, isPremiu
         options={imagePickerOptions}
         onClose={() => setImagePickerVisible(false)}
       />
+
+      <GifPicker
+        visible={gifPickerVisible}
+        onSelect={handleGifSelect}
+        onClose={() => setGifPickerVisible(false)}
+      />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    paddingBottom: Platform.OS === 'ios' ? 24 : 8,
-    backgroundColor: Colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: Colors.borderLight,
-    gap: 8,
-  },
-  imageButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  input: {
-    flex: 1,
-    minHeight: 40,
-    maxHeight: 100,
-    backgroundColor: Colors.surfaceSecondary,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-  },
-  sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  micButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  micButtonFree: {
-    opacity: 0.6,
-  },
-  containerDisabled: {
-    justifyContent: 'center',
-    gap: 6,
-  },
-  disabledText: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-  },
-  // Recording UI
-  cancelButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  recordingInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-  },
-  recordingDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: Colors.error,
-  },
-  recordingTime: {
-    fontSize: 16,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+      backgroundColor: c.surface,
+      borderTopWidth: 1,
+      borderTopColor: c.borderLight,
+      gap: 8,
+    },
+    imageButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    input: {
+      flex: 1,
+      minHeight: 40,
+      maxHeight: 100,
+      backgroundColor: c.surfaceSecondary,
+      borderRadius: 20,
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.text,
+    },
+    sendButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: c.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    micButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    micButtonFree: {
+      opacity: 0.6,
+    },
+    containerDisabled: {
+      justifyContent: 'center',
+      gap: 6,
+    },
+    disabledText: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+    },
+    // Recording UI
+    cancelButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    recordingInfo: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingHorizontal: 12,
+    },
+    recordingDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: c.error,
+    },
+    recordingTime: {
+      fontSize: 16,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+    },
+  });
+}

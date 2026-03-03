@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import i18n from '@/i18n';
-import { Colors } from '@/constants/colors';
+import { lightColors } from '@/constants/colors';
 import { Fonts } from '@/constants/fonts';
 import { Button } from '@/components/ui/Button';
 
@@ -47,19 +47,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.background,
+    backgroundColor: lightColors.background,
     gap: 16,
     padding: 32,
   },
   title: {
     fontSize: 28,
     fontFamily: Fonts.heading,
-    color: Colors.text,
+    color: lightColors.text,
   },
   message: {
     fontSize: 16,
     fontFamily: Fonts.body,
-    color: Colors.textSecondary,
+    color: lightColors.textSecondary,
     textAlign: 'center',
   },
 });

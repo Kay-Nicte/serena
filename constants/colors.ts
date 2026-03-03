@@ -1,4 +1,4 @@
-export const Colors = {
+export const lightColors = {
   primary: '#E6A8B4',
   primaryDark: '#D4899A',
   primaryLight: '#F2CDD5',
@@ -29,3 +29,40 @@ export const Colors = {
   tabBarActive: '#E6A8B4',
   tabBarInactive: '#9B8A9B',
 } as const;
+
+export const darkColors = {
+  primary: '#E6A8B4',
+  primaryDark: '#D4899A',
+  primaryLight: '#F2CDD5',
+  primaryPastel: '#3D2030',
+
+  secondary: '#8B5E83',
+  secondaryLight: '#B08AAC',
+
+  background: '#1C1218',
+  surface: '#261A22',
+  surfaceSecondary: '#2E2029',
+
+  text: '#F5EFF5',
+  textSecondary: '#C4B0C4',
+  textTertiary: '#8A758A',
+  textOnPrimary: '#FFFFFF',
+
+  border: '#3D2D3A',
+  borderLight: '#2E2030',
+
+  success: '#7BC77B',
+  error: '#E07070',
+  warning: '#E0C070',
+
+  overlay: 'rgba(0,0,0,0.7)',
+
+  tabBar: '#1C1218',
+  tabBarActive: '#E6A8B4',
+  tabBarInactive: '#8A758A',
+} as const;
+
+export type AppColors = typeof lightColors;
+
+// Keep for backwards compatibility in non-component contexts
+export const Colors = lightColors;

@@ -3,7 +3,7 @@ import { showConfirm } from '@/components/ConfirmDialog';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { Config } from '@/constants/config';
 import { getPhotoUrl } from '@/lib/storage';
@@ -27,6 +27,8 @@ export function PhotoGrid({ photos, onAdd, onRemove, editable = true }: PhotoGri
   const containerPadding = 32 * 2;
   const itemWidth = (effectiveWidth - containerPadding - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
   const itemHeight = itemWidth * (4 / 3);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const photoByPosition = new Map(photos.map((p) => [p.position, p]));
 
@@ -92,54 +94,56 @@ export function PhotoGrid({ photos, onAdd, onRemove, editable = true }: PhotoGri
   );
 }
 
-const styles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: GRID_GAP,
-  },
-  slot: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  emptySlot: {
-    backgroundColor: Colors.surfaceSecondary,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 4,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  removeButton: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    backgroundColor: Colors.surface,
-    borderRadius: 11,
-  },
-  primaryBadge: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(230, 168, 180, 0.85)',
-    paddingVertical: 3,
-    alignItems: 'center',
-  },
-  primaryBadgeText: {
-    fontSize: 10,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-  addLabel: {
-    fontSize: 10,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: GRID_GAP,
+    },
+    slot: {
+      borderRadius: 12,
+      overflow: 'hidden',
+      position: 'relative',
+    },
+    emptySlot: {
+      backgroundColor: c.surfaceSecondary,
+      borderWidth: 2,
+      borderColor: c.border,
+      borderStyle: 'dashed',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 4,
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+    },
+    removeButton: {
+      position: 'absolute',
+      top: 4,
+      right: 4,
+      backgroundColor: c.surface,
+      borderRadius: 11,
+    },
+    primaryBadge: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: 'rgba(230, 168, 180, 0.85)',
+      paddingVertical: 3,
+      alignItems: 'center',
+    },
+    primaryBadgeText: {
+      fontSize: 10,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+    addLabel: {
+      fontSize: 10,
+      fontFamily: Fonts.bodyMedium,
+      color: c.primary,
+    },
+  });
+}

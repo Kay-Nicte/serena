@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
@@ -45,6 +45,8 @@ export function ReportModal({
   const [selectedReason, setSelectedReason] = useState<ReportReason | null>(null);
   const [description, setDescription] = useState('');
   const [alsoBlock, setAlsoBlock] = useState(true);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const handleClose = () => {
     setSelectedReason(null);
@@ -175,139 +177,141 @@ export function ReportModal({
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: Colors.overlay,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  content: {
-    backgroundColor: Colors.surface,
-    borderRadius: 28,
-    padding: 24,
-    width: '100%',
-    maxWidth: 400,
-    maxHeight: '85%',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    flex: 1,
-    marginRight: 8,
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  sectionLabel: {
-    fontSize: 15,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-    marginBottom: 12,
-  },
-  reasons: {
-    gap: 4,
-    marginBottom: 16,
-  },
-  reasonRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    gap: 12,
-  },
-  radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioSelected: {
-    borderColor: Colors.primary,
-  },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: Colors.primary,
-  },
-  reasonText: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-  },
-  descriptionInput: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 16,
-    padding: 14,
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-    minHeight: 80,
-    marginBottom: 16,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 20,
-    paddingHorizontal: 4,
-  },
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  checkboxLabel: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-  },
-  privacyNotice: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-    backgroundColor: Colors.surfaceSecondary,
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 16,
-  },
-  privacyText: {
-    flex: 1,
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 18,
-  },
-  buttons: {
-    gap: 8,
-  },
-  blockOnlyText: {
-    color: Colors.error,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 24,
+    },
+    content: {
+      backgroundColor: c.surface,
+      borderRadius: 28,
+      padding: 24,
+      width: '100%',
+      maxWidth: 400,
+      maxHeight: '85%',
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 22,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      flex: 1,
+      marginRight: 8,
+    },
+    closeButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    sectionLabel: {
+      fontSize: 15,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+      marginBottom: 12,
+    },
+    reasons: {
+      gap: 4,
+      marginBottom: 16,
+    },
+    reasonRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 10,
+      paddingHorizontal: 4,
+      gap: 12,
+    },
+    radio: {
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      borderWidth: 2,
+      borderColor: c.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    radioSelected: {
+      borderColor: c.primary,
+    },
+    radioInner: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      backgroundColor: c.primary,
+    },
+    reasonText: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.text,
+    },
+    descriptionInput: {
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: 16,
+      padding: 14,
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.text,
+      minHeight: 80,
+      marginBottom: 16,
+    },
+    checkboxRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      marginBottom: 20,
+      paddingHorizontal: 4,
+    },
+    checkbox: {
+      width: 22,
+      height: 22,
+      borderRadius: 6,
+      borderWidth: 2,
+      borderColor: c.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    checkboxChecked: {
+      backgroundColor: c.primary,
+      borderColor: c.primary,
+    },
+    checkboxLabel: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.text,
+    },
+    privacyNotice: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 8,
+      backgroundColor: c.surfaceSecondary,
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 16,
+    },
+    privacyText: {
+      flex: 1,
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 18,
+    },
+    buttons: {
+      gap: 8,
+    },
+    blockOnlyText: {
+      color: c.error,
+    },
+  });
+}

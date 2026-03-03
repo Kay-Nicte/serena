@@ -39,6 +39,13 @@ interface MatchResult {
   match_id?: string;
 }
 
+export interface LastSwipe {
+  targetId: string;
+  action: 'like' | 'superlike' | 'pass';
+  timestamp: number;
+  matchCreated: boolean;
+}
+
 export function computeActivityLevel(
   lastSeen: string | undefined,
 ): 'today' | 'this_week' | 'this_month' | 'inactive' {
@@ -61,6 +68,7 @@ interface ProfileStoreState {
   error: string | null;
   matchResult: MatchResult | null;
   maxDistanceKm: number;
+  lastSwipe: LastSwipe | null;
 
   fetchCandidates: () => Promise<void>;
   resetPasses: () => Promise<void>;
@@ -68,6 +76,7 @@ interface ProfileStoreState {
   likeProfile: (targetId: string) => Promise<void>;
   superlikeProfile: (targetId: string) => Promise<void>;
   passProfile: (targetId: string) => Promise<void>;
+  undoLastSwipe: () => Promise<void>;
   clearMatchResult: () => void;
   reset: () => void;
 }
@@ -82,6 +91,7 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
   error: null,
   matchResult: null,
   maxDistanceKm: Config.defaultMaxDistanceKm,
+  lastSwipe: null,
 
   setMaxDistance: (km: number) => set({ maxDistanceKm: km }),
 
@@ -187,7 +197,15 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       }
 
       useDailyStatsStore.getState().decrementLike();
-      set((state) => ({ currentIndex: state.currentIndex + 1 }));
+      set((state) => ({
+        currentIndex: state.currentIndex + 1,
+        lastSwipe: {
+          targetId,
+          action: 'like',
+          timestamp: Date.now(),
+          matchCreated: result.matched ?? false,
+        },
+      }));
     } catch (error) {
       reportError(error, { source: 'profileStore.likeProfile' });
       set({ error: 'today.errorFetching' });
@@ -220,7 +238,15 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       }
 
       useDailyStatsStore.getState().decrementSuperlike();
-      set((state) => ({ currentIndex: state.currentIndex + 1 }));
+      set((state) => ({
+        currentIndex: state.currentIndex + 1,
+        lastSwipe: {
+          targetId,
+          action: 'superlike',
+          timestamp: Date.now(),
+          matchCreated: result.matched ?? false,
+        },
+      }));
     } catch (error) {
       reportError(error, { source: 'profileStore.superlikeProfile' });
       set({ error: 'today.errorFetching' });
@@ -235,10 +261,56 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
 
       if (error) throw error;
 
-      set((state) => ({ currentIndex: state.currentIndex + 1 }));
+      set((state) => ({
+        currentIndex: state.currentIndex + 1,
+        lastSwipe: {
+          targetId,
+          action: 'pass',
+          timestamp: Date.now(),
+          matchCreated: false,
+        },
+      }));
     } catch (error) {
       reportError(error, { source: 'profileStore.passProfile' });
       set({ error: 'today.errorFetching' });
+    }
+  },
+
+  undoLastSwipe: async () => {
+    const { lastSwipe } = get();
+    if (!lastSwipe) return;
+
+    try {
+      const { data, error } = await supabase.rpc('undo_last_swipe', {
+        target_user_id: lastSwipe.targetId,
+        swipe_action: lastSwipe.action,
+      });
+
+      if (error) throw error;
+
+      const result = data as { success?: boolean; error?: string; match_removed?: boolean };
+
+      if (result.error) {
+        showToast(i18n.t('common.error'), 'error');
+        return;
+      }
+
+      // Restore counts
+      if (lastSwipe.action === 'like') {
+        useDailyStatsStore.getState().incrementLike();
+      } else if (lastSwipe.action === 'superlike') {
+        useDailyStatsStore.getState().incrementSuperlike();
+      }
+
+      // Go back to previous profile
+      set((state) => ({
+        currentIndex: Math.max(state.currentIndex - 1, 0),
+        lastSwipe: null,
+        matchResult: null,
+      }));
+    } catch (error) {
+      reportError(error, { source: 'profileStore.undoLastSwipe' });
+      showToast(i18n.t('common.error'), 'error');
     }
   },
 
@@ -255,5 +327,6 @@ export const useProfileStore = create<ProfileStoreState>((set, get) => ({
       error: null,
       matchResult: null,
       maxDistanceKm: Config.defaultMaxDistanceKm,
+      lastSwipe: null,
     }),
 }));

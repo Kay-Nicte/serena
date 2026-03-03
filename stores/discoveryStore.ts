@@ -93,15 +93,13 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set, get) => ({
         height_include_unspecified: updates.height_include_unspecified ?? current?.height_include_unspecified ?? true,
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('discovery_preferences')
-        .upsert(payload, { onConflict: 'user_id' })
-        .select()
-        .single();
+        .upsert(payload, { onConflict: 'user_id' });
 
       if (error) throw error;
 
-      set({ preferences: data as DiscoveryPreferences });
+      set({ preferences: payload as DiscoveryPreferences });
     } catch (error) {
       reportError(error, { source: 'discoveryStore.updatePreferences' });
       throw error;

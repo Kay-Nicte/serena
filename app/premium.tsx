@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { type PurchasesPackage } from 'react-native-purchases';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { getOfferings, purchasePackage, restorePurchases } from '@/lib/purchases';
 import { supabase } from '@/lib/supabase';
@@ -48,6 +48,8 @@ export default function PremiumScreen() {
   const [isRestoring, setIsRestoring] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [isRedeeming, setIsRedeeming] = useState(false);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   useEffect(() => {
     (async () => {
@@ -150,11 +152,11 @@ export default function PremiumScreen() {
 
         {/* Benefits */}
         <View style={styles.benefits}>
-          <Benefit icon="heart" color={Colors.primary} text={t('premium.benefit10Likes')} />
-          <Benefit icon="star" color="#E0A800" text={t('premium.benefitSuperlike')} />
-          <Benefit icon="chatbubble" color={Colors.primary} text={t('premium.benefitIceBreaker')} />
-          <Benefit icon="eye" color={Colors.primary} text={t('premium.benefitReadReceipts')} />
-          <Benefit icon="time" color={Colors.primary} text={t('premium.benefitLastSeen')} />
+          <Benefit icon="heart" color={Colors.primary} text={t('premium.benefit10Likes')} styles={styles} />
+          <Benefit icon="star" color="#E0A800" text={t('premium.benefitSuperlike')} styles={styles} />
+          <Benefit icon="chatbubble" color={Colors.primary} text={t('premium.benefitIceBreaker')} styles={styles} />
+          <Benefit icon="eye" color={Colors.primary} text={t('premium.benefitReadReceipts')} styles={styles} />
+          <Benefit icon="time" color={Colors.primary} text={t('premium.benefitLastSeen')} styles={styles} />
         </View>
 
         {/* Plans */}
@@ -255,7 +257,7 @@ export default function PremiumScreen() {
   );
 }
 
-function Benefit({ icon, color, text }: { icon: string; color: string; text: string }) {
+function Benefit({ icon, color, text, styles }: { icon: string; color: string; text: string; styles: ReturnType<typeof makeStyles> }) {
   return (
     <View style={styles.benefit}>
       <Ionicons name={icon as any} size={18} color={color} />
@@ -264,182 +266,184 @@ function Benefit({ icon, color, text }: { icon: string; color: string; text: str
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    alignItems: 'center',
-    paddingHorizontal: 28,
-    paddingBottom: 40,
-    gap: 20,
-  },
-  title: {
-    fontSize: 26,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    textAlign: 'center',
-  },
-  benefits: {
-    width: '100%',
-    gap: 12,
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 20,
-  },
-  benefit: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  benefitText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-    flex: 1,
-  },
-  plans: {
-    width: '100%',
-    gap: 10,
-  },
-  planCard: {
-    borderWidth: 2,
-    borderColor: Colors.border,
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: Colors.surface,
-  },
-  planCardSelected: {
-    borderColor: '#E0A800',
-    backgroundColor: '#FFFBF0',
-  },
-  planCardBest: {
-    overflow: 'visible',
-  },
-  bestBadge: {
-    position: 'absolute',
-    top: -10,
-    right: 16,
-    backgroundColor: '#E0A800',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-  },
-  bestBadgeText: {
-    fontSize: 10,
-    fontFamily: Fonts.bodySemiBold,
-    color: '#fff',
-    textTransform: 'uppercase',
-  },
-  planName: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-  },
-  planNameSelected: {
-    color: '#9A7800',
-  },
-  planPrice: {
-    fontSize: 16,
-    fontFamily: Fonts.bodyBold,
-    color: Colors.text,
-  },
-  planPriceSelected: {
-    color: '#E0A800',
-  },
-  noPlans: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    paddingVertical: 20,
-  },
-  subscribeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#E0A800',
-    paddingVertical: 16,
-    borderRadius: 24,
-    width: '100%',
-    marginTop: 4,
-  },
-  subscribeButtonDisabled: {
-    opacity: 0.7,
-  },
-  subscribeText: {
-    fontSize: 17,
-    fontFamily: Fonts.bodySemiBold,
-    color: '#fff',
-  },
-  restoreLink: {
-    paddingVertical: 8,
-  },
-  restoreText: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    textDecorationLine: 'underline',
-  },
-  redeemSection: {
-    width: '100%',
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    paddingTop: 20,
-    gap: 10,
-  },
-  redeemTitle: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    textAlign: 'center',
-  },
-  redeemRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  redeemInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-    backgroundColor: Colors.surface,
-  },
-  redeemButton: {
-    backgroundColor: '#E0A800',
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  redeemButtonText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: '#fff',
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+    },
+    closeButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    content: {
+      alignItems: 'center',
+      paddingHorizontal: 28,
+      paddingBottom: 40,
+      gap: 20,
+    },
+    title: {
+      fontSize: 26,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      textAlign: 'center',
+    },
+    benefits: {
+      width: '100%',
+      gap: 12,
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      padding: 20,
+    },
+    benefit: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    benefitText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+      flex: 1,
+    },
+    plans: {
+      width: '100%',
+      gap: 10,
+    },
+    planCard: {
+      borderWidth: 2,
+      borderColor: c.border,
+      borderRadius: 16,
+      paddingVertical: 16,
+      paddingHorizontal: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: c.surface,
+    },
+    planCardSelected: {
+      borderColor: '#E0A800',
+      backgroundColor: '#FFFBF0',
+    },
+    planCardBest: {
+      overflow: 'visible',
+    },
+    bestBadge: {
+      position: 'absolute',
+      top: -10,
+      right: 16,
+      backgroundColor: '#E0A800',
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+    },
+    bestBadgeText: {
+      fontSize: 10,
+      fontFamily: Fonts.bodySemiBold,
+      color: '#fff',
+      textTransform: 'uppercase',
+    },
+    planName: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+    },
+    planNameSelected: {
+      color: '#9A7800',
+    },
+    planPrice: {
+      fontSize: 16,
+      fontFamily: Fonts.bodyBold,
+      color: c.text,
+    },
+    planPriceSelected: {
+      color: '#E0A800',
+    },
+    noPlans: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      paddingVertical: 20,
+    },
+    subscribeButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: '#E0A800',
+      paddingVertical: 16,
+      borderRadius: 24,
+      width: '100%',
+      marginTop: 4,
+    },
+    subscribeButtonDisabled: {
+      opacity: 0.7,
+    },
+    subscribeText: {
+      fontSize: 17,
+      fontFamily: Fonts.bodySemiBold,
+      color: '#fff',
+    },
+    restoreLink: {
+      paddingVertical: 8,
+    },
+    restoreText: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      textDecorationLine: 'underline',
+    },
+    redeemSection: {
+      width: '100%',
+      borderTopWidth: 1,
+      borderTopColor: c.border,
+      paddingTop: 20,
+      gap: 10,
+    },
+    redeemTitle: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      textAlign: 'center',
+    },
+    redeemRow: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    redeemInput: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      fontSize: 15,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+      backgroundColor: c.surface,
+    },
+    redeemButton: {
+      backgroundColor: '#E0A800',
+      borderRadius: 12,
+      paddingHorizontal: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    redeemButtonText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: '#fff',
+    },
+  });
+}

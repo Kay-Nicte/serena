@@ -18,7 +18,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
+import { useThemeStore, type ThemePreference } from '@/stores/themeStore';
 import { Fonts } from '@/constants/fonts';
 import { useAuthStore } from '@/stores/authStore';
 import { deleteAccount } from '@/lib/auth';
@@ -36,6 +37,8 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { user, profile, updateProfile, signOut } = useAuthStore();
   const { blockedUsers } = useBlock();
+  const Colors = useColors();
+  const { theme, setTheme } = useThemeStore();
 
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
@@ -46,6 +49,8 @@ export default function SettingsScreen() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const styles = makeStyles(Colors);
 
   useEffect(() => {
     checkPushTokenExists();
@@ -129,6 +134,12 @@ export default function SettingsScreen() {
   };
 
   const appVersion = Constants.expoConfig?.version ?? '1.0.0';
+
+  const themeOptions: { value: ThemePreference; label: string; icon: string }[] = [
+    { value: 'light', label: t('settings.light'), icon: '☀️' },
+    { value: 'dark', label: t('settings.dark'), icon: '🌙' },
+    { value: 'system', label: t('settings.system'), icon: '📱' },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -256,6 +267,34 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* Appearance Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('settings.appearance')}</Text>
+          <View style={styles.card}>
+            <View style={styles.themeRow}>
+              {themeOptions.map((opt) => (
+                <TouchableOpacity
+                  key={opt.value}
+                  style={[
+                    styles.themeButton,
+                    theme === opt.value && styles.themeButtonActive,
+                  ]}
+                  onPress={() => setTheme(opt.value)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.themeIcon}>{opt.icon}</Text>
+                  <Text style={[
+                    styles.themeLabel,
+                    theme === opt.value && { color: Colors.primary, fontFamily: Fonts.bodySemiBold },
+                  ]}>
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+
         {/* Legal Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('settings.legal')}</Text>
@@ -373,170 +412,198 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
-    backgroundColor: Colors.surface,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    marginLeft: 4,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 40,
-    gap: 8,
-  },
-  section: {
-    gap: 8,
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textTertiary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginLeft: 4,
-    marginTop: 8,
-  },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: Colors.text,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    gap: 12,
-  },
-  rowLabel: {
-    flex: 1,
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-  },
-  rowValue: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: Colors.borderLight,
-    marginLeft: 48,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: Colors.overlay,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  modalCard: {
-    width: '100%',
-    maxWidth: 340,
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    padding: 24,
-    alignItems: 'center',
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    textAlign: 'center',
-  },
-  modalMessage: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  modalInputLabel: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-    alignSelf: 'stretch',
-    marginTop: 4,
-  },
-  modalInput: {
-    width: '100%',
-    height: 48,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    backgroundColor: Colors.background,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    textAlign: 'center',
-    letterSpacing: 2,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-    width: '100%',
-    marginTop: 8,
-  },
-  modalCancelButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  modalCancelText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textSecondary,
-  },
-  modalDeleteButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: Colors.error,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  modalDeleteButtonDisabled: {
-    opacity: 0.4,
-  },
-  modalDeleteText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: c.borderLight,
+      backgroundColor: c.surface,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 20,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      marginLeft: 4,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 40,
+      gap: 8,
+    },
+    section: {
+      gap: 8,
+    },
+    sectionTitle: {
+      fontSize: 13,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textTertiary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginLeft: 4,
+      marginTop: 8,
+    },
+    card: {
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      overflow: 'hidden',
+      shadowColor: c.text,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      gap: 12,
+    },
+    rowLabel: {
+      flex: 1,
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.text,
+    },
+    rowValue: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    separator: {
+      height: 1,
+      backgroundColor: c.borderLight,
+      marginLeft: 48,
+    },
+    themeRow: {
+      flexDirection: 'row',
+      padding: 8,
+      gap: 8,
+    },
+    themeButton: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 12,
+      borderRadius: 12,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      gap: 4,
+    },
+    themeButtonActive: {
+      borderColor: c.primary,
+      backgroundColor: c.primaryPastel,
+    },
+    themeIcon: {
+      fontSize: 20,
+    },
+    themeLabel: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 32,
+    },
+    modalCard: {
+      width: '100%',
+      maxWidth: 340,
+      backgroundColor: c.surface,
+      borderRadius: 20,
+      padding: 24,
+      alignItems: 'center',
+      gap: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.15,
+      shadowRadius: 24,
+      elevation: 12,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      textAlign: 'center',
+    },
+    modalMessage: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    modalInputLabel: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+      alignSelf: 'stretch',
+      marginTop: 4,
+    },
+    modalInput: {
+      width: '100%',
+      height: 48,
+      borderRadius: 12,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      backgroundColor: c.background,
+      paddingHorizontal: 16,
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      textAlign: 'center',
+      letterSpacing: 2,
+    },
+    modalActions: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      gap: 12,
+      width: '100%',
+      marginTop: 8,
+    },
+    modalCancelButton: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    modalCancelText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textSecondary,
+    },
+    modalDeleteButton: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 12,
+      backgroundColor: c.error,
+      minWidth: 80,
+      alignItems: 'center',
+    },
+    modalDeleteButtonDisabled: {
+      opacity: 0.4,
+    },
+    modalDeleteText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+  });
+}

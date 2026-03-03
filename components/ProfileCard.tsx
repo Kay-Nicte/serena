@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { useAuthStore, type Profile } from '@/stores/authStore';
@@ -74,13 +74,6 @@ function calculateAge(birthDate: string | null): number | null {
   return age;
 }
 
-const ACTIVITY_CONFIG: Record<ActivityLevel, { color: string; i18nKey: string }> = {
-  today: { color: Colors.success, i18nKey: 'today.activityToday' },
-  this_week: { color: Colors.warning, i18nKey: 'today.activityThisWeek' },
-  this_month: { color: '#E0A050', i18nKey: 'today.activityThisMonth' },
-  inactive: { color: Colors.textTertiary, i18nKey: 'today.activityInactive' },
-};
-
 function formatInactiveTime(lastSeen: string | undefined, t: (key: string, opts?: any) => string): string {
   if (!lastSeen) return t('today.activityInactive');
   const diff = Date.now() - new Date(lastSeen).getTime();
@@ -104,6 +97,15 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
   const myProfile = useAuthStore((s) => s.profile);
   const compatibility = showCompatibility ? computeCompatibility(myProfile, profile) : null;
   const [prompts, setPrompts] = useState<ProfilePrompt[]>([]);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
+
+  const ACTIVITY_CONFIG: Record<ActivityLevel, { color: string; i18nKey: string }> = {
+    today: { color: Colors.success, i18nKey: 'today.activityToday' },
+    this_week: { color: Colors.warning, i18nKey: 'today.activityThisWeek' },
+    this_month: { color: '#E0A050', i18nKey: 'today.activityThisMonth' },
+    inactive: { color: Colors.textTertiary, i18nKey: 'today.activityInactive' },
+  };
 
   useEffect(() => {
     if (profile.id && profile.id !== myProfile?.id) {
@@ -162,10 +164,20 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
           </View>
         )}
 
-        {profile.hometown ? (
+        {(profile.hometown || profile.distance_km != null) ? (
           <View style={styles.hometownRow}>
             <Ionicons name="location-outline" size={14} color={Colors.textSecondary} />
-            <Text style={styles.hometownText}>{profile.hometown}</Text>
+            {profile.hometown && profile.distance_km != null ? (
+              <Text style={styles.hometownText}>
+                {profile.hometown} · {profile.distance_km < 1 ? t('today.distanceLessThan1') : t('today.distanceKm', { km: Math.round(profile.distance_km) })}
+              </Text>
+            ) : profile.hometown ? (
+              <Text style={styles.hometownText}>{profile.hometown}</Text>
+            ) : (
+              <Text style={styles.hometownText}>
+                {profile.distance_km! < 1 ? t('today.distanceLessThan1') : t('today.distanceKm', { km: Math.round(profile.distance_km!) })}
+              </Text>
+            )}
           </View>
         ) : null}
 
@@ -235,174 +247,176 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    width: CARD_WIDTH,
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-  },
-  photo: {
-    width: '100%',
-    aspectRatio: 3 / 4,
-  },
-  photoPlaceholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  info: {
-    padding: 20,
-    gap: 10,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 8,
-  },
-  name: {
-    fontSize: 26,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    flexShrink: 1,
-  },
-  age: {
-    fontSize: 22,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  activityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  activityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  activityText: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  hometownRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  hometownText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  bio: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 4,
-  },
-  tag: {
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-  },
-  tagText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primaryDark,
-  },
-  interestTag: {
-    backgroundColor: '#E8F5E9',
-    borderWidth: 1,
-    borderColor: '#A5D6A7',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-  },
-  interestTagText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: '#2E7D32',
-  },
-  detailRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  detailText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-  },
-  compatBadge: {
-    position: 'absolute',
-    bottom: 12,
-    right: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  compatText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primary,
-  },
-  promptsSection: {
-    gap: 10,
-  },
-  promptItem: {
-    backgroundColor: Colors.surfaceSecondary,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  promptQuestion: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textTertiary,
-    marginBottom: 4,
-  },
-  promptAnswer: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-    lineHeight: 22,
-  },
-  superlikeBanner: {
-    backgroundColor: '#FFF8E1',
-    borderBottomWidth: 1,
-    borderBottomColor: '#FFE082',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-  },
-  superlikeBannerText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: '#E0A800',
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    card: {
+      width: CARD_WIDTH,
+      backgroundColor: c.surface,
+      borderRadius: 20,
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 12,
+      elevation: 5,
+    },
+    photo: {
+      width: '100%',
+      aspectRatio: 3 / 4,
+    },
+    photoPlaceholder: {
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    info: {
+      padding: 20,
+      gap: 10,
+    },
+    nameRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 8,
+    },
+    name: {
+      fontSize: 26,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      flexShrink: 1,
+    },
+    age: {
+      fontSize: 22,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    activityRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    activityDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    activityText: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    hometownRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    hometownText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    bio: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 22,
+    },
+    tags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginTop: 4,
+    },
+    tag: {
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 16,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+    },
+    tagText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.primaryDark,
+    },
+    interestTag: {
+      backgroundColor: '#E8F5E9',
+      borderWidth: 1,
+      borderColor: '#A5D6A7',
+      borderRadius: 16,
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+    },
+    interestTagText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: '#2E7D32',
+    },
+    detailRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12,
+    },
+    detailItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    detailText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+    },
+    compatBadge: {
+      position: 'absolute',
+      bottom: 12,
+      right: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: 'rgba(255,255,255,0.92)',
+      borderRadius: 12,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+    },
+    compatText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
+    },
+    promptsSection: {
+      gap: 10,
+    },
+    promptItem: {
+      backgroundColor: c.surfaceSecondary,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    promptQuestion: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textTertiary,
+      marginBottom: 4,
+    },
+    promptAnswer: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.text,
+      lineHeight: 22,
+    },
+    superlikeBanner: {
+      backgroundColor: '#FFF8E1',
+      borderBottomWidth: 1,
+      borderBottomColor: '#FFE082',
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      alignItems: 'center',
+    },
+    superlikeBannerText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: '#E0A800',
+    },
+  });
+}

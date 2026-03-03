@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 
 export function TypingIndicator() {
@@ -9,6 +9,8 @@ export function TypingIndicator() {
   const dot1 = useRef(new Animated.Value(0)).current;
   const dot2 = useRef(new Animated.Value(0)).current;
   const dot3 = useRef(new Animated.Value(0)).current;
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   useEffect(() => {
     const animate = (dot: Animated.Value, delay: number) =>
@@ -62,26 +64,28 @@ export function TypingIndicator() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-  },
-  text: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontStyle: 'italic',
-  },
-  dots: {
-    flexDirection: 'row',
-    marginLeft: 1,
-  },
-  dot: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 4,
+    },
+    text: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      fontStyle: 'italic',
+    },
+    dots: {
+      flexDirection: 'row',
+      marginLeft: 1,
+    },
+    dot: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+  });
+}

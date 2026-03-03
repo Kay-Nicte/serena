@@ -42,3 +42,13 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+
+# Claude Code
+.claude/
+
+# Supabase temp
+supabase/.temp/

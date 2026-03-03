@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/authStore';
@@ -15,6 +15,8 @@ export function PremiumExpiryModal() {
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const session = useAuthStore((s) => s.session);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   // Check premium expiry directly — this is the ONLY place that calls
   // get_premium_status(), so it always receives the one-time expired signal.
@@ -85,6 +87,8 @@ export function PremiumExpiryModal() {
 }
 
 function Benefit({ icon, color, text }: { icon: string; color: string; text: string }) {
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   return (
     <View style={styles.benefit}>
       <Ionicons name={icon as any} size={18} color={color} />
@@ -93,94 +97,96 @@ function Benefit({ icon, color, text }: { icon: string; color: string; text: str
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 24,
-    padding: 28,
-    alignItems: 'center',
-    gap: 14,
-    width: '100%',
-    maxWidth: 360,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  title: {
-    fontSize: 22,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  benefits: {
-    width: '100%',
-    gap: 10,
-    paddingVertical: 4,
-  },
-  benefit: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  benefitText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-    flex: 1,
-  },
-  renewButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#E0A800',
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 24,
-    marginTop: 4,
-  },
-  renewButtonText: {
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-    color: '#FFFFFF',
-  },
-  noThanks: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    paddingVertical: 4,
-  },
-  keepGoingMessage: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  understoodButton: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 40,
-    paddingVertical: 14,
-    borderRadius: 24,
-    marginTop: 4,
-  },
-  understoodButtonText: {
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.textOnPrimary,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 32,
+    },
+    card: {
+      backgroundColor: c.surface,
+      borderRadius: 24,
+      padding: 28,
+      alignItems: 'center',
+      gap: 14,
+      width: '100%',
+      maxWidth: 360,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8,
+    },
+    title: {
+      fontSize: 22,
+      fontFamily: Fonts.heading,
+      color: c.text,
+      textAlign: 'center',
+    },
+    description: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+    },
+    benefits: {
+      width: '100%',
+      gap: 10,
+      paddingVertical: 4,
+    },
+    benefit: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    benefitText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+      flex: 1,
+    },
+    renewButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: '#E0A800',
+      paddingHorizontal: 32,
+      paddingVertical: 14,
+      borderRadius: 24,
+      marginTop: 4,
+    },
+    renewButtonText: {
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+      color: '#FFFFFF',
+    },
+    noThanks: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      paddingVertical: 4,
+    },
+    keepGoingMessage: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    understoodButton: {
+      backgroundColor: c.primary,
+      paddingHorizontal: 40,
+      paddingVertical: 14,
+      borderRadius: 24,
+      marginTop: 4,
+    },
+    understoodButtonText: {
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.textOnPrimary,
+    },
+  });
+}

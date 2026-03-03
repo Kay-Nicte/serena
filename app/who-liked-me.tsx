@@ -13,7 +13,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/lib/supabase';
@@ -37,6 +37,8 @@ export default function WhoLikedMeScreen() {
   const isPremium = useAuthStore((s) => s.profile?.is_premium ?? false);
   const [likes, setLikes] = useState<PendingLike[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   useEffect(() => {
     const fetchLikes = async () => {
@@ -145,114 +147,116 @@ export default function WhoLikedMeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 8,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    paddingHorizontal: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  premiumCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginHorizontal: GRID_PADDING,
-    marginTop: 16,
-    marginBottom: 8,
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  premiumCtaText: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-  },
-  grid: {
-    paddingHorizontal: GRID_PADDING,
-    paddingVertical: 16,
-  },
-  row: {
-    gap: GRID_GAP,
-    marginBottom: GRID_GAP,
-  },
-  likeCard: {
-    width: ITEM_SIZE,
-    alignItems: 'center',
-  },
-  avatar: {
-    width: ITEM_SIZE,
-    height: ITEM_SIZE,
-    borderRadius: 16,
-  },
-  avatarPlaceholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  superlikeBadge: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    backgroundColor: '#FFF8E1',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  verifiedBadge: {
-    position: 'absolute',
-    top: 6,
-    left: 6,
-    backgroundColor: Colors.primary,
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  likeName: {
-    fontSize: 12,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-    marginTop: 4,
-    textAlign: 'center',
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 8,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: c.borderLight,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 20,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 16,
+      paddingHorizontal: 40,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+      lineHeight: 24,
+    },
+    premiumCta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginHorizontal: GRID_PADDING,
+      marginTop: 16,
+      marginBottom: 8,
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+    premiumCtaText: {
+      flex: 1,
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+    },
+    grid: {
+      paddingHorizontal: GRID_PADDING,
+      paddingVertical: 16,
+    },
+    row: {
+      gap: GRID_GAP,
+      marginBottom: GRID_GAP,
+    },
+    likeCard: {
+      width: ITEM_SIZE,
+      alignItems: 'center',
+    },
+    avatar: {
+      width: ITEM_SIZE,
+      height: ITEM_SIZE,
+      borderRadius: 16,
+    },
+    avatarPlaceholder: {
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    superlikeBadge: {
+      position: 'absolute',
+      top: 6,
+      right: 6,
+      backgroundColor: '#FFF8E1',
+      borderRadius: 10,
+      width: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    verifiedBadge: {
+      position: 'absolute',
+      top: 6,
+      left: 6,
+      backgroundColor: c.primary,
+      borderRadius: 10,
+      width: 20,
+      height: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    likeName: {
+      fontSize: 12,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+      marginTop: 4,
+      textAlign: 'center',
+    },
+  });
+}

@@ -55,7 +55,8 @@
     "verifyEmailResentMessage": "Nous avons envoyé un nouveau lien de vérification à ton adresse e-mail.",
     "or": "ou",
     "continueWithGoogle": "Continuer avec Google",
-    "emailVerified": "Email vérifié !"
+    "emailVerified": "Email vérifié !",
+    "errorEmailAlreadyExists": "Un compte avec cet e-mail existe déjà"
   },
   "profile": {
     "completeTitle": "Complète ton profil",
@@ -127,6 +128,7 @@
     "loading": "Recherche de profils...",
     "errorFetching": "Impossible de charger les profils. Réessaie.",
     "dailyLimitReached": "Tu as atteint la limite quotidienne de likes. Reviens demain !",
+    "likesExhaustedPremium": "Plus de likes. Passe Premium pour des likes illimités !",
     "refresh": "Actualiser",
     "secondChance": "Donner une seconde chance",
     "activityToday": "Active aujourd'hui",
@@ -138,7 +140,9 @@
     "inactiveYear": "Il y a plus d'1 an",
     "inactiveYears": "Il y a plus de {{count}} ans",
     "inactiveWeek": "Il y a 1 semaine",
-    "inactiveWeeks": "Il y a {{count}} semaines"
+    "inactiveWeeks": "Il y a {{count}} semaines",
+    "distanceKm": "À {{km}} km",
+    "distanceLessThan1": "À moins d'1 km"
   },
   "matches": {
     "title": "Matches",
@@ -190,7 +194,10 @@
     "yesterday": "Hier",
     "matchedOn": "Match le {{date}}",
     "shareDateLocation": "Partager ma position",
-    "shareDateMessage": "Je suis à un rendez-vous via Serenade. Ma position actuelle : {{link}}"
+    "shareDateMessage": "Je suis à un rendez-vous via Serenade. Ma position actuelle : {{link}}",
+    "searchGifs": "Rechercher des GIFs...",
+    "poweredByGiphy": "Propulsé par GIPHY",
+    "gifMessage": "🎬 GIF"
   },
   "notifications": {
     "permissionTitle": "Activer les notifications",
@@ -335,6 +342,10 @@
     "languageGl": "Galego",
     "languageDe": "Deutsch",
     "languagePt": "Português",
+    "appearance": "Apparence",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
     "legal": "Mentions légales",
     "termsOfService": "Conditions Générales d'Utilisation",
     "privacyPolicy": "Politique de Confidentialité",

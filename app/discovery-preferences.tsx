@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import {
   Config,
@@ -36,6 +36,8 @@ import { showToast } from '@/stores/toastStore';
 export default function DiscoveryPreferencesScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   const { preferences, isLoading, updatePreferences } = useDiscoveryPreferences();
   const { fetchCandidates } = useProfileStore();
 
@@ -161,7 +163,8 @@ export default function DiscoveryPreferencesScreen() {
       });
       await fetchCandidates();
       router.back();
-    } catch {
+    } catch (err: any) {
+      console.error('Discovery save error:', err?.message ?? err);
       showToast(t('common.error'), 'error');
     } finally {
       setSaving(false);
@@ -454,114 +457,116 @@ export default function DiscoveryPreferencesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  flex: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-    gap: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  subtitle: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  section: {
-    gap: 10,
-  },
-  sectionLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textSecondary,
-    marginLeft: 4,
-  },
-  rangeRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 12,
-  },
-  rangeField: {
-    flex: 1,
-    gap: 4,
-  },
-  rangeLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textTertiary,
-    marginLeft: 4,
-  },
-  rangeInputWrap: {
-    height: 52,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-    justifyContent: 'center',
-  },
-  rangeInput: {
-    textAlign: 'center',
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-  },
-  rangeSeparator: {
-    fontSize: 18,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    marginBottom: 14,
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  hint: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    marginLeft: 4,
-  },
-  hintLink: {
-    fontSize: 12,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primaryDark,
-    marginLeft: 4,
-  },
-  inputDisabled: {
-    opacity: 0.4,
-  },
-  includeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-    paddingHorizontal: 4,
-  },
-  includeLabel: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    flex: 1,
-    marginRight: 12,
-  },
-  saveButton: {
-    marginTop: 4,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    flex: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingHorizontal: 24,
+      paddingBottom: 40,
+      gap: 20,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingTop: 16,
+    },
+    title: {
+      fontSize: 28,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    subtitle: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    section: {
+      gap: 10,
+    },
+    sectionLabel: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+      marginLeft: 4,
+    },
+    rangeRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      gap: 12,
+    },
+    rangeField: {
+      flex: 1,
+      gap: 4,
+    },
+    rangeLabel: {
+      fontSize: 12,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textTertiary,
+      marginLeft: 4,
+    },
+    rangeInputWrap: {
+      height: 52,
+      borderRadius: 16,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      backgroundColor: c.surface,
+      justifyContent: 'center',
+    },
+    rangeInput: {
+      textAlign: 'center',
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.text,
+    },
+    rangeSeparator: {
+      fontSize: 18,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      marginBottom: 14,
+    },
+    tags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    hint: {
+      fontSize: 12,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      marginLeft: 4,
+    },
+    hintLink: {
+      fontSize: 12,
+      fontFamily: Fonts.bodyMedium,
+      color: c.primaryDark,
+      marginLeft: 4,
+    },
+    inputDisabled: {
+      opacity: 0.4,
+    },
+    includeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 4,
+      paddingHorizontal: 4,
+    },
+    includeLabel: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      flex: 1,
+      marginRight: 12,
+    },
+    saveButton: {
+      marginTop: 4,
+    },
+  });
+}

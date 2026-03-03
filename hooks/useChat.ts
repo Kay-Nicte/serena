@@ -12,6 +12,7 @@ export function useChat(matchId: string) {
     fetchOlderMessages,
     sendMessage,
     markAsRead,
+    toggleReaction,
     subscribe,
     unsubscribe,
   } = useChatStore();
@@ -33,9 +34,10 @@ export function useChat(matchId: string) {
     isLoading,
     isLoadingOlder,
     hasOlderMessages,
-    sendMessage: async (content: string, imageUrl?: string) => {
-      await sendMessage(matchId, content, imageUrl);
+    sendMessage: async (content: string, imageUrl?: string, audioUrl?: string) => {
+      await sendMessage(matchId, content, imageUrl, audioUrl);
     },
+    toggleReaction,
     fetchOlderMessages: () => fetchOlderMessages(matchId),
     markAsRead: () => markAsRead(matchId),
   };

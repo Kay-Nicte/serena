@@ -6,7 +6,8 @@ import { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold
 import * as SplashScreen from 'expo-splash-screen';
 import * as Linking from 'expo-linking';
 import { StatusBar } from 'expo-status-bar';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
+import { useThemeStore } from '@/stores/themeStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -108,9 +109,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, isAuthenticated, isProfileComplete, isPasswordRecovery, segments, isReady, router]);
 
+  const Colors = useColors();
+
   if (isLoading) {
     return (
-      <View style={styles.loading}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
         <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
@@ -146,14 +149,18 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   const { isConnected } = useNetworkStatus();
+  const theme = useThemeStore((s) => s.theme);
+  const Colors = useColors();
 
   if (!fontsLoaded) return null;
+
+  const statusBarStyle = theme === 'dark' ? 'light' : theme === 'light' ? 'dark' : 'auto';
 
   return (
     <ErrorBoundary>
       {!isConnected && <OfflineBanner />}
       <AuthGuard>
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.background } }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="complete-profile" />
           <Stack.Screen name="(tabs)" />
@@ -170,19 +177,10 @@ export default function RootLayout() {
           <Stack.Screen name="admin-verification" />
           <Stack.Screen name="premium" options={{ presentation: 'modal' }} />
         </Stack>
-        <StatusBar style="dark" />
+        <StatusBar style={statusBarStyle} />
       </AuthGuard>
       <GlobalToast />
       <GlobalConfirmDialog />
     </ErrorBoundary>
   );
 }
-
-const styles = StyleSheet.create({
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-  },
-});

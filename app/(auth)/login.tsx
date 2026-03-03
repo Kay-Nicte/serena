@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { signIn, signInWithGoogle } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -30,6 +30,8 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -151,83 +153,85 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 32,
-  },
-  header: {
-    paddingTop: 40,
-    paddingBottom: 32,
-  },
-  title: {
-    fontSize: 32,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  form: {
-    gap: 16,
-  },
-  button: {
-    marginTop: 8,
-  },
-  link: {
-    alignItems: 'center',
-    paddingTop: 16,
-  },
-  linkText: {
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  linkHighlight: {
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primary,
-  },
-  forgotLink: {
-    alignItems: 'center',
-    paddingTop: 4,
-  },
-  forgotLinkText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primary,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginVertical: 4,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.border,
-  },
-  dividerText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textTertiary,
-    textTransform: 'lowercase',
-  },
-  googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 12,
-    paddingVertical: 14,
-  },
-  googleButtonText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primaryDark,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 32,
+    },
+    header: {
+      paddingTop: 40,
+      paddingBottom: 32,
+    },
+    title: {
+      fontSize: 32,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    form: {
+      gap: 16,
+    },
+    button: {
+      marginTop: 8,
+    },
+    link: {
+      alignItems: 'center',
+      paddingTop: 16,
+    },
+    linkText: {
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    linkHighlight: {
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
+    },
+    forgotLink: {
+      alignItems: 'center',
+      paddingTop: 4,
+    },
+    forgotLinkText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodyMedium,
+      color: c.primary,
+    },
+    divider: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      marginVertical: 4,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: c.border,
+    },
+    dividerText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textTertiary,
+      textTransform: 'lowercase',
+    },
+    googleButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 10,
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 12,
+      paddingVertical: 14,
+    },
+    googleButtonText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primaryDark,
+    },
+  });
+}

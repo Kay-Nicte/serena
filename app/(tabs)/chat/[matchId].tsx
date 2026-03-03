@@ -15,7 +15,7 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { useChat } from '@/hooks/useChat';
 import { ChatBubble } from '@/components/ChatBubble';
@@ -35,6 +35,7 @@ import type { Message } from '@/stores/chatStore';
 import { checkToxicity } from '@/lib/moderation';
 import { getStarters } from '@/lib/conversationStarters';
 import { getCurrentLocation, requestLocationPermission } from '@/lib/location';
+import { ReactionPicker } from '@/components/ReactionPicker';
 
 type ChatItem =
   | { type: 'match-separator'; id: string; label: string }
@@ -75,9 +76,11 @@ export default function ChatScreen() {
   const { matchId } = useLocalSearchParams<{ matchId: string }>();
   const router = useRouter();
   const { t } = useTranslation();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   const isPremium = useAuthStore((s) => s.profile?.is_premium ?? false);
   const myProfile = useAuthStore((s) => s.profile);
-  const { messages, isLoading, sendMessage, markAsRead } = useChat(matchId!);
+  const { messages, isLoading, sendMessage, markAsRead, toggleReaction } = useChat(matchId!);
   const { isTablet, chatMaxWidth } = useResponsive();
   const flatListRef = useRef<FlatList>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -89,11 +92,20 @@ export default function ChatScreen() {
   const [matchCreatedAt, setMatchCreatedAt] = useState<string | null>(null);
   const [otherPresence, setOtherPresence] = useState<UserPresence | null>(null);
   const [isBlockedByOther, setIsBlockedByOther] = useState(false);
-  const [filterNotices, setFilterNotices] = useState<string[]>([]);
+  const [filterNotices, setFilterNotices] = useState<{ id: string; timestamp: number }[]>([]);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const toast = useToast();
+  const [reactionMessageId, setReactionMessageId] = useState<string | null>(null);
+  const [reactionAnchor, setReactionAnchor] = useState<{ y: number; x: number }>({ y: 0, x: 0 });
+
+  const handleReactionSelect = useCallback((reaction: string) => {
+    if (reactionMessageId) {
+      toggleReaction(reactionMessageId, reaction);
+    }
+    setReactionMessageId(null);
+  }, [reactionMessageId, toggleReaction]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -186,7 +198,8 @@ export default function ChatScreen() {
 
   const handleSend = useCallback(async (content: string, imageUrl?: string, audioUrl?: string) => {
     if (content && checkToxicity(content).toxic) {
-      setFilterNotices((prev) => [...prev, `filter-${Date.now()}`]);
+      const ts = Date.now();
+      setFilterNotices((prev) => [...prev, { id: `filter-${ts}`, timestamp: ts }]);
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
@@ -323,7 +336,7 @@ export default function ChatScreen() {
     ? t('chat.matchedOn').replace('{{date}}', formatMatchDate(matchCreatedAt))
     : '';
 
-  // Build chat items with date separators
+  // Build chat items with date separators, interleaving filter notices by timestamp
   const chatItems: ChatItem[] = useMemo(() => {
     const items: ChatItem[] = [];
 
@@ -336,23 +349,42 @@ export default function ChatScreen() {
       });
     }
 
+    // Combine messages and filter notices sorted by timestamp
+    type Event =
+      | { time: number; kind: 'message'; data: Message }
+      | { time: number; kind: 'filter-notice'; id: string };
+
+    const events: Event[] = [
+      ...messages.map((msg) => ({
+        time: new Date(msg.created_at).getTime(),
+        kind: 'message' as const,
+        data: msg,
+      })),
+      ...filterNotices.map((n) => ({
+        time: n.timestamp,
+        kind: 'filter-notice' as const,
+        id: n.id,
+      })),
+    ];
+
+    events.sort((a, b) => a.time - b.time);
+
     let lastDateStr = '';
-    for (const msg of messages) {
-      const msgDateStr = new Date(msg.created_at).toDateString();
-      if (msgDateStr !== lastDateStr) {
+    for (const event of events) {
+      const dateStr = new Date(event.time).toDateString();
+      if (dateStr !== lastDateStr) {
         items.push({
           type: 'date-separator',
-          id: `date-${msgDateStr}`,
-          label: formatDateSeparator(msg.created_at, t),
+          id: `date-${dateStr}`,
+          label: formatDateSeparator(new Date(event.time).toISOString(), t),
         });
-        lastDateStr = msgDateStr;
+        lastDateStr = dateStr;
       }
-      items.push({ type: 'message', id: msg.id, data: msg });
-    }
-
-    // Append filter notices at the end
-    for (const noticeId of filterNotices) {
-      items.push({ type: 'filter-notice', id: noticeId });
+      if (event.kind === 'message') {
+        items.push({ type: 'message', id: event.data.id, data: event.data });
+      } else {
+        items.push({ type: 'filter-notice', id: event.id });
+      }
     }
 
     return items;
@@ -481,6 +513,12 @@ export default function ChatScreen() {
                   timestamp={item.data.created_at}
                   readAt={item.data.read_at}
                   showReadReceipt={isPremium}
+                  reactions={item.data.reactions}
+                  userId={userId}
+                  onLongPress={(y, x) => {
+                    setReactionMessageId(item.data.id);
+                    setReactionAnchor({ y, x });
+                  }}
                 />
               );
             }}
@@ -524,6 +562,19 @@ export default function ChatScreen() {
 
       <Toast visible={toast.visible} message={toast.message} variant={toast.variant} onDismiss={toast.dismiss} />
 
+      <ReactionPicker
+        visible={reactionMessageId !== null}
+        currentReaction={
+          reactionMessageId && userId
+            ? messages.find((m) => m.id === reactionMessageId)?.reactions.find((r) => r.userId === userId)?.reaction ?? null
+            : null
+        }
+        onSelect={handleReactionSelect}
+        onClose={() => setReactionMessageId(null)}
+        anchorY={reactionAnchor.y}
+        anchorX={reactionAnchor.x}
+      />
+
       <ActionSheet
         visible={menuVisible}
         title={otherUserName}
@@ -559,190 +610,192 @@ export default function ChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
-    backgroundColor: Colors.surface,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-  },
-  headerAvatarPlaceholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerCenter: {
-    flex: 1,
-    marginLeft: 10,
-  },
-  menuButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 1,
-  },
-  onlineDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: Colors.success,
-  },
-  statusText: {
-    fontSize: 12,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  matchDateHeader: {
-    fontSize: 11,
-    fontFamily: Fonts.body,
-    color: Colors.textTertiary,
-    marginTop: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyText: {
-    fontSize: 15,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  emptyFooter: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 24,
-  },
-  startersContainer: {
-    marginTop: 16,
-    gap: 8,
-    width: '100%',
-  },
-  starterCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  starterText: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: Fonts.body,
-    color: Colors.text,
-  },
-  messagesListEmpty: {
-    flexGrow: 1,
-  },
-  messagesList: {
-    paddingVertical: 12,
-  },
-  matchSeparator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-  },
-  matchSeparatorText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.primary,
-  },
-  dateSeparator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    gap: 12,
-  },
-  dateSeparatorLine: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.borderLight,
-  },
-  dateSeparatorText: {
-    fontSize: 12,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.textTertiary,
-  },
-  filterNoticeContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    marginVertical: 8,
-  },
-  filterNoticeBubble: {
-    backgroundColor: Colors.primaryPastel,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    maxWidth: '85%',
-  },
-  filterNoticeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
-  },
-  filterNoticeTitle: {
-    fontSize: 13,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primary,
-  },
-  filterNoticeText: {
-    fontSize: 13,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    lineHeight: 18,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: c.borderLight,
+      backgroundColor: c.surface,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerContent: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    headerAvatar: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+    },
+    headerAvatarPlaceholder: {
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerCenter: {
+      flex: 1,
+      marginLeft: 10,
+    },
+    menuButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerTitleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 17,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+    },
+    statusRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      marginTop: 1,
+    },
+    onlineDot: {
+      width: 7,
+      height: 7,
+      borderRadius: 3.5,
+      backgroundColor: c.success,
+    },
+    statusText: {
+      fontSize: 12,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    matchDateHeader: {
+      fontSize: 11,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      marginTop: 1,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 40,
+    },
+    emptyText: {
+      fontSize: 15,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+    },
+    emptyFooter: {
+      alignItems: 'center',
+      paddingVertical: 24,
+      paddingHorizontal: 24,
+    },
+    startersContainer: {
+      marginTop: 16,
+      gap: 8,
+      width: '100%',
+    },
+    starterCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 16,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    starterText: {
+      flex: 1,
+      fontSize: 14,
+      fontFamily: Fonts.body,
+      color: c.text,
+    },
+    messagesListEmpty: {
+      flexGrow: 1,
+    },
+    messagesList: {
+      paddingVertical: 12,
+    },
+    matchSeparator: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      paddingVertical: 16,
+      paddingHorizontal: 24,
+    },
+    matchSeparatorText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.primary,
+    },
+    dateSeparator: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      gap: 12,
+    },
+    dateSeparatorLine: {
+      flex: 1,
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: c.borderLight,
+    },
+    dateSeparatorText: {
+      fontSize: 12,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textTertiary,
+    },
+    filterNoticeContainer: {
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      marginVertical: 8,
+    },
+    filterNoticeBubble: {
+      backgroundColor: c.primaryPastel,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      maxWidth: '85%',
+    },
+    filterNoticeHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 4,
+    },
+    filterNoticeTitle: {
+      fontSize: 13,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
+    },
+    filterNoticeText: {
+      fontSize: 13,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      lineHeight: 18,
+    },
+  });
+}

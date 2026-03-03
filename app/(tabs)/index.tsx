@@ -1,7 +1,8 @@
 import { IceBreakerModal } from "@/components/IceBreakerModal";
 import { MatchOverlay } from "@/components/MatchOverlay";
 import { ProfileCard } from "@/components/ProfileCard";
-import { Colors } from "@/constants/colors";
+import { UndoButton } from "@/components/UndoButton";
+import { useColors } from "@/hooks/useColors";
 import { Fonts } from "@/constants/fonts";
 import { useDailyProfiles } from "@/hooks/useDailyProfiles";
 import { useStreak } from "@/hooks/useStreak";
@@ -29,6 +30,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TodayScreen() {
   const { t } = useTranslation();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   const router = useRouter();
   const {
     currentProfile,
@@ -40,6 +43,8 @@ export default function TodayScreen() {
     like,
     superlike,
     pass,
+    lastSwipe,
+    undoLastSwipe,
     clearMatchResult,
     refresh,
     resetPasses,
@@ -266,7 +271,13 @@ export default function TodayScreen() {
 
             <TouchableOpacity
               style={[styles.actionButton, styles.likeButton]}
-              onPress={like}
+              onPress={() => {
+                if (!isPremium && remainingLikes === 0) {
+                  showToast(t('today.likesExhaustedPremium'), 'success', 2500, () => router.push('/premium'));
+                  return;
+                }
+                like();
+              }}
               activeOpacity={0.7}
             >
               <View>
@@ -315,223 +326,225 @@ export default function TodayScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 4,
-    zIndex: 1,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: Fonts.heading,
-    color: Colors.text,
-  },
-  whoLikedButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  whoLikedText: {
-    fontSize: 13,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primary,
-  },
-  refreshButton: {
-    padding: 8,
-  },
-  verificationBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginHorizontal: 24,
-    marginBottom: 4,
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  verificationBannerPending: {
-    backgroundColor: "#FFF8E1",
-    borderColor: "#FFE082",
-  },
-  verificationBannerText: {
-    flex: 1,
-    fontSize: 13,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.text,
-  },
-  cardWrapper: {
-    flex: 1,
-  },
-  scrollContent: {
-    alignItems: "center",
-    paddingVertical: 8,
-    paddingBottom: 80,
-  },
-  centeredFull: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-    paddingHorizontal: 40,
-  },
-  loadingText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-  },
-  errorText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: "center",
-    lineHeight: 24,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: "center",
-    lineHeight: 24,
-  },
-  secondChanceButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: Colors.primaryPastel,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-    marginTop: 8,
-  },
-  secondChanceText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.primary,
-  },
-  retryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 24,
-    marginTop: 8,
-  },
-  retryText: {
-    fontSize: 15,
-    fontFamily: Fonts.bodyMedium,
-    color: Colors.surface,
-  },
-  actions: {
-    position: "absolute",
-    bottom: 10,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 24,
-  },
-  actionButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  passButton: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  likeButton: {
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-  },
-  iceBreakerButton: {
-    backgroundColor: Colors.primaryPastel,
-    borderWidth: 1,
-    borderColor: Colors.primaryLight,
-  },
-  iceBreakerBadge: {
-    position: "absolute",
-    top: -4,
-    right: -8,
-    backgroundColor: Colors.primary,
-    borderRadius: 8,
-    minWidth: 16,
-    height: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 4,
-  },
-  iceBreakerBadgeText: {
-    fontSize: 9,
-    fontFamily: Fonts.bodySemiBold,
-    color: "#FFFFFF",
-  },
-  superlikeButton: {
-    backgroundColor: "#FFF8E1",
-    borderWidth: 1,
-    borderColor: "#FFE082",
-  },
-  superlikeBadge: {
-    position: "absolute",
-    top: -4,
-    right: -8,
-    backgroundColor: "#E0A800",
-    borderRadius: 8,
-    minWidth: 16,
-    height: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 4,
-  },
-  likeBadge: {
-    position: "absolute",
-    top: -4,
-    right: -8,
-    backgroundColor: Colors.primary,
-    borderRadius: 8,
-    minWidth: 16,
-    height: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 4,
-  },
-  likeBadgeText: {
-    fontSize: 9,
-    fontFamily: Fonts.bodySemiBold,
-    color: "#FFFFFF",
-  },
-  superlikeBadgeText: {
-    fontSize: 9,
-    fontFamily: Fonts.bodySemiBold,
-    color: "#FFFFFF",
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 4,
+      zIndex: 1,
+    },
+    title: {
+      fontSize: 28,
+      fontFamily: Fonts.heading,
+      color: c.text,
+    },
+    whoLikedButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 20,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
+    whoLikedText: {
+      fontSize: 13,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
+    },
+    refreshButton: {
+      padding: 8,
+    },
+    verificationBanner: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginHorizontal: 24,
+      marginBottom: 4,
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    verificationBannerPending: {
+      backgroundColor: "#FFF8E1",
+      borderColor: "#FFE082",
+    },
+    verificationBannerText: {
+      flex: 1,
+      fontSize: 13,
+      fontFamily: Fonts.bodyMedium,
+      color: c.text,
+    },
+    cardWrapper: {
+      flex: 1,
+    },
+    scrollContent: {
+      alignItems: "center",
+      paddingVertical: 8,
+      paddingBottom: 80,
+    },
+    centeredFull: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 16,
+      paddingHorizontal: 40,
+    },
+    loadingText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+    },
+    errorText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: "center",
+      lineHeight: 24,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: "center",
+      lineHeight: 24,
+    },
+    secondChanceButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      backgroundColor: c.primaryPastel,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+      marginTop: 8,
+    },
+    secondChanceText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
+    },
+    retryButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      backgroundColor: c.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderRadius: 24,
+      marginTop: 8,
+    },
+    retryText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodyMedium,
+      color: c.surface,
+    },
+    actions: {
+      position: "absolute",
+      bottom: 10,
+      left: 0,
+      right: 0,
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: 24,
+    },
+    actionButton: {
+      alignItems: "center",
+      justifyContent: "center",
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 6,
+      elevation: 3,
+    },
+    passButton: {
+      backgroundColor: c.surface,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    likeButton: {
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+    },
+    iceBreakerButton: {
+      backgroundColor: c.primaryPastel,
+      borderWidth: 1,
+      borderColor: c.primaryLight,
+    },
+    iceBreakerBadge: {
+      position: "absolute",
+      top: -4,
+      right: -8,
+      backgroundColor: c.primary,
+      borderRadius: 8,
+      minWidth: 16,
+      height: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 4,
+    },
+    iceBreakerBadgeText: {
+      fontSize: 9,
+      fontFamily: Fonts.bodySemiBold,
+      color: "#FFFFFF",
+    },
+    superlikeButton: {
+      backgroundColor: "#FFF8E1",
+      borderWidth: 1,
+      borderColor: "#FFE082",
+    },
+    superlikeBadge: {
+      position: "absolute",
+      top: -4,
+      right: -8,
+      backgroundColor: "#E0A800",
+      borderRadius: 8,
+      minWidth: 16,
+      height: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 4,
+    },
+    likeBadge: {
+      position: "absolute",
+      top: -4,
+      right: -8,
+      backgroundColor: c.primary,
+      borderRadius: 8,
+      minWidth: 16,
+      height: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 4,
+    },
+    likeBadgeText: {
+      fontSize: 9,
+      fontFamily: Fonts.bodySemiBold,
+      color: "#FFFFFF",
+    },
+    superlikeBadgeText: {
+      fontSize: 9,
+      fontFamily: Fonts.bodySemiBold,
+      color: "#FFFFFF",
+    },
+  });
+}

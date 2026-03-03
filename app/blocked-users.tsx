@@ -11,7 +11,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/colors';
+import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { useBlock } from '@/hooks/useBlock';
 import { useMatchStore } from '@/stores/matchStore';
@@ -22,6 +22,8 @@ import { showConfirm } from '@/components/ConfirmDialog';
 export default function BlockedUsersScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const Colors = useColors();
+  const styles = makeStyles(Colors);
   const { blockedUsers, isLoading, unblockUser } = useBlock();
 
   const handleUnblock = (user: BlockedUser) => {
@@ -102,88 +104,90 @@ export default function BlockedUsersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderLight,
-    backgroundColor: Colors.surface,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    marginLeft: 4,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    paddingHorizontal: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  list: {
-    padding: 16,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 12,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-  },
-  avatarPlaceholder: {
-    backgroundColor: Colors.surfaceSecondary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  name: {
-    flex: 1,
-    fontSize: 16,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.text,
-    marginLeft: 12,
-  },
-  unblockButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: Colors.error,
-  },
-  unblockText: {
-    fontSize: 14,
-    fontFamily: Fonts.bodySemiBold,
-    color: Colors.error,
-  },
-});
+function makeStyles(c: ReturnType<typeof useColors>) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 8,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: c.borderLight,
+      backgroundColor: c.surface,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 20,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      marginLeft: 4,
+    },
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 16,
+      paddingHorizontal: 40,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontFamily: Fonts.body,
+      color: c.textSecondary,
+      textAlign: 'center',
+    },
+    list: {
+      padding: 16,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      padding: 12,
+      marginBottom: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 4,
+      elevation: 1,
+    },
+    avatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+    },
+    avatarPlaceholder: {
+      backgroundColor: c.surfaceSecondary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    name: {
+      flex: 1,
+      fontSize: 16,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+      marginLeft: 12,
+    },
+    unblockButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: c.error,
+    },
+    unblockText: {
+      fontSize: 14,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.error,
+    },
+  });
+}
