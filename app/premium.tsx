@@ -125,14 +125,16 @@ export default function PremiumScreen() {
     try {
       const premiumUntil = new Date();
       premiumUntil.setDate(premiumUntil.getDate() + days);
-      await supabase.rpc('activate_premium_purchase', {
+      const { error } = await supabase.rpc('activate_premium_purchase', {
         premium_until_ts: premiumUntil.toISOString(),
       });
-      await fetchProfile();
+      if (error) throw new Error(error.message);
+      fetchProfile(); // fire-and-forget, don't block navigation
       showToast(t('premium.codeSuccess'), 'success');
       router.back();
-    } catch {
-      showToast(t('premium.purchaseError'), 'error');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : t('premium.purchaseError');
+      showToast(msg, 'error');
     } finally {
       setIsRedeeming(false);
     }
