@@ -427,7 +427,7 @@
   },
   "boost": {
     "title": "Boost de perfil",
-    "subtitle": "Apareix primer al descobriment durant 30 minuts",
+    "subtitle": "Apareix primera al descobriment durant 30 minuts",
     "x1": "1 Boost",
     "x3": "3 Boosts",
     "activated": "El teu perfil està boosted!",
@@ -444,6 +444,7 @@
     "remainingLikes": "{{remaining}}/{{total}} likes restants",
     "availableSuperlikes": "{{count}} superlikes",
     "availableIceBreakers": "{{count}} trencaglaços",
+    "availableBoosts": "{{count}} boosts",
     "info": "Obre l'app cada dia per construir la teva ratxa!\n\nDia 2–14: +1 like extra per dia\nDia 10: guanyes un superlike\nDia 15: guanyes un trencaglaç (la ratxa es reinicia)",
     "noStreak": "Obre l'app cada dia per construir la teva ratxa!"
   },

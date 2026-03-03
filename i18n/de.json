@@ -444,6 +444,7 @@
     "remainingLikes": "{{remaining}}/{{total}} Likes übrig",
     "availableSuperlikes": "{{count}} Superlikes",
     "availableIceBreakers": "{{count}} Eisbrecher",
+    "availableBoosts": "{{count}} Boosts",
     "info": "Öffne die App jeden Tag, um deine Serie aufzubauen!\n\nTag 2–14: +1 Extra-Like pro Tag\nTag 10: Du gewinnst einen Superlike\nTag 15: Du gewinnst einen Eisbrecher (die Serie startet neu)",
     "noStreak": "Öffne die App jeden Tag, um deine Serie aufzubauen!"
   },

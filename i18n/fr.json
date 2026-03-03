@@ -444,6 +444,7 @@
     "remainingLikes": "{{remaining}}/{{total}} likes restants",
     "availableSuperlikes": "{{count}} superlikes",
     "availableIceBreakers": "{{count}} brise-glaces",
+    "availableBoosts": "{{count}} boosts",
     "info": "Ouvre l'appli chaque jour pour construire ta série !\n\nJour 2–14 : +1 like bonus par jour\nJour 10 : tu gagnes un superlike\nJour 15 : tu gagnes un brise-glace (la série recommence)",
     "noStreak": "Ouvre l'appli chaque jour pour construire ta série !"
   },

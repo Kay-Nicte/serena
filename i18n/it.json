@@ -444,6 +444,7 @@
     "remainingLikes": "{{remaining}}/{{total}} like rimasti",
     "availableSuperlikes": "{{count}} superlike",
     "availableIceBreakers": "{{count}} rompighiaccio",
+    "availableBoosts": "{{count}} boost",
     "info": "Apri l'app ogni giorno per costruire la tua serie!\n\nGiorno 2–14: +1 like extra al giorno\nGiorno 10: guadagni un superlike\nGiorno 15: guadagni un rompighiaccio (la serie si azzera)",
     "noStreak": "Apri l'app ogni giorno per costruire la tua serie!"
   },

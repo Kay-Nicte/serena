@@ -18,6 +18,8 @@ import { Fonts } from '@/constants/fonts';
 import { getOfferings, purchasePackage, restorePurchases } from '@/lib/purchases';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/authStore';
+import { useDailyStatsStore } from '@/stores/dailyStatsStore';
+import { useBoostStore } from '@/stores/boostStore';
 import { showToast } from '@/stores/toastStore';
 
 const PROMO_CODES: Record<string, number> = {
@@ -81,6 +83,8 @@ export default function PremiumScreen() {
     try {
       await purchasePackage(selectedPkg);
       await fetchProfile();
+      useDailyStatsStore.getState().fetch();
+      useBoostStore.getState().grantWeeklyIfNeeded();
       showToast(t('premium.purchaseSuccess'), 'success');
       router.back();
     } catch (e: unknown) {
@@ -102,6 +106,8 @@ export default function PremiumScreen() {
       const hasActive = !!info.entitlements.active['Serenade Pro'];
       if (hasActive) {
         await fetchProfile();
+        useDailyStatsStore.getState().fetch();
+        useBoostStore.getState().grantWeeklyIfNeeded();
         showToast(t('premium.restoreSuccess'), 'success');
         router.back();
       } else {
@@ -131,6 +137,8 @@ export default function PremiumScreen() {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
       fetchProfile(); // fire-and-forget, don't block navigation
+      useDailyStatsStore.getState().fetch();
+      useBoostStore.getState().grantWeeklyIfNeeded();
       showToast(t('premium.codeSuccess'), 'success');
       router.back();
     } catch (e: unknown) {

@@ -444,6 +444,7 @@
     "remainingLikes": "{{remaining}}/{{total}} likes restantes",
     "availableSuperlikes": "{{count}} superlikes",
     "availableIceBreakers": "{{count}} rompehielos",
+    "availableBoosts": "{{count}} boosts",
     "info": "¡Abre la app cada día para construir tu racha!\n\nDía 2–14: +1 like extra por día\nDía 10: ganas un superlike\nDía 15: ganas un rompehielos (la racha se reinicia)",
     "noStreak": "¡Abre la app cada día para construir tu racha!"
   },

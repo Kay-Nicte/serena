@@ -444,6 +444,7 @@
     "remainingLikes": "{{remaining}}/{{total}} like geratzen dira",
     "availableSuperlikes": "{{count}} superlike",
     "availableIceBreakers": "{{count}} izotz-hausle",
+    "availableBoosts": "{{count}} boost",
     "info": "Ireki aplikazioa egunero zure raxa eraikitzeko!\n\n2-14. egunean: +1 like extra eguneko\n10. egunean: superlike bat irabazten duzu\n15. egunean: izotz-hausle bat irabazten duzu (raxa berrabiatzen da)",
     "noStreak": "Ireki aplikazioa egunero zure raxa eraikitzeko!"
   },

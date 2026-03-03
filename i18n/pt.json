@@ -444,6 +444,7 @@
     "remainingLikes": "{{remaining}}/{{total}} likes restantes",
     "availableSuperlikes": "{{count}} superlikes",
     "availableIceBreakers": "{{count}} quebra-gelos",
+    "availableBoosts": "{{count}} boosts",
     "info": "Abre a app todos os dias para construir a tua sequência!\n\nDia 2–14: +1 like extra por dia\nDia 10: ganhas um superlike\nDia 15: ganhas um quebra-gelo (a sequência reinicia)",
     "noStreak": "Abre a app todos os dias para construir a tua sequência!"
   },

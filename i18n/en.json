@@ -444,6 +444,7 @@
     "remainingLikes": "{{remaining}}/{{total}} likes remaining",
     "availableSuperlikes": "{{count}} superlikes",
     "availableIceBreakers": "{{count}} ice breakers",
+    "availableBoosts": "{{count}} boosts",
     "info": "Open the app every day to build your streak!\n\nDay 2–14: +1 bonus like per day\nDay 10: earn a superlike\nDay 15: earn an ice breaker (streak resets)",
     "noStreak": "Open the app daily to build your streak!"
   },

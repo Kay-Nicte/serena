@@ -679,6 +679,12 @@ export default function ProfileScreen() {
                   {t('streak.availableIceBreakers', { count: availableIceBreakers })}
                 </Text>
               </View>
+              <View style={styles.streakItem}>
+                <Ionicons name="flash" size={16} color={Colors.warning} />
+                <Text style={styles.streakItemText}>
+                  {t('streak.availableBoosts', { count: availableBoosts })}
+                </Text>
+              </View>
             </View>
           </View>
 
