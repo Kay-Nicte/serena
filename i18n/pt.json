@@ -393,7 +393,7 @@
     "benefitIceBreaker": "1 quebra-gelo por dia",
     "benefitReadReceipts": "Confirmações de leitura nos chats",
     "benefitLastSeen": "Ver a última ligação das outras",
-    "benefitBoost": "1 boost semanal — aparece primeiro durante 30 min",
+    "benefitBoost": "1 boost semanal — aparece primeira durante 30 min",
     "expiredTitle": "O teu premium expirou",
     "expiredMessage": "Já não tens acesso às funcionalidades premium:",
     "renew": "Renovar Premium",
@@ -427,7 +427,7 @@
   },
   "boost": {
     "title": "Boost de perfil",
-    "subtitle": "Aparece primeiro na descoberta durante 30 minutos",
+    "subtitle": "Aparece primeira na descoberta durante 30 minutos",
     "x1": "1 Boost",
     "x3": "3 Boosts",
     "activated": "O teu perfil está boosted!",
