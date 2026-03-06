@@ -1,5 +1,5 @@
 export const ORIENTATIONS = ['lesbian', 'bisexual', 'pansexual', 'queer', 'other'] as const;
-export const LOOKING_FOR_OPTIONS = ['friendship', 'dating', 'relationship', 'explore'] as const;
+export const LOOKING_FOR_OPTIONS = ['friendship', 'dating', 'relationship', 'explore', 'travel_buddy'] as const;
 
 export type Orientation = (typeof ORIENTATIONS)[number];
 export type LookingFor = (typeof LOOKING_FOR_OPTIONS)[number];
