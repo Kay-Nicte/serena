@@ -9,7 +9,8 @@
     "back": "Atzera",
     "done": "Egina",
     "or": "edo",
-    "offline": "Internet konexiorik gabe"
+    "offline": "Internet konexiorik gabe",
+    "photoPermissionDenied": "Baimendu zure galeriara sarbidea gailuaren ezarpenetan argazkiak gehitzeko."
   },
   "welcome": {
     "title": "Serenade",
@@ -563,7 +564,8 @@
     "notVerified": "Lehenik zure identitatea egiaztatu behar duzu",
     "promptTitle": "Urrats bat gehiago!",
     "promptMessage": "Egiaztatu zure identitatea besteek zure profila ikusi eta zurekin match egin ahal izateko.",
-    "verified": "Egiaztatua"
+    "verified": "Egiaztatua",
+    "manualReviewNotice": "🛡️ Emakumeentzako espazio seguru bat eskaintzeko, egiaztapenak eskuz egiten dira, baina 12 orduko epean erantzuna ematea konprometitzen gara (normalean askoz gutxiago izaten da). Eskerrik asko pazientziagatik! 🥰✨"
   },
   "starters": {
     "travel": "Zein da bidaiatu duzun azken tokia?",

@@ -9,7 +9,8 @@
     "back": "Voltar",
     "done": "Concluído",
     "or": "ou",
-    "offline": "Sem ligação à internet"
+    "offline": "Sem ligação à internet",
+    "photoPermissionDenied": "Permite o acesso à tua galeria nas definições do dispositivo para adicionar fotos."
   },
   "welcome": {
     "title": "Serenade",
@@ -563,7 +564,8 @@
     "notVerified": "Precisas de verificar a tua identidade primeiro",
     "promptTitle": "Mais um passo!",
     "promptMessage": "Verifica a tua identidade para que as outras possam ver o teu perfil e fazer match contigo.",
-    "verified": "Verificada"
+    "verified": "Verificada",
+    "manualReviewNotice": "🛡️ Para te oferecer um espaço seguro só para mulheres, as verificações são feitas manualmente, mas comprometemo-nos a dar-te uma resposta em no máximo 12 horas (embora costume ser muito menos). Muito obrigada pela paciência! 🥰✨"
   },
   "starters": {
     "travel": "Qual foi o último sítio para onde viajaste?",

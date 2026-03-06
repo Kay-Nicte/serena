@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useFonts, PlayfairDisplay_700Bold, PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
 import { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import * as SplashScreen from 'expo-splash-screen';
+import ExpoFullscreenSplash, { type SplashScreenRef } from 'expo-fullscreen-splash';
 import * as Linking from 'expo-linking';
+import { SplashContent } from '@/components/FullscreenSplash';
 import { StatusBar } from 'expo-status-bar';
 import { useColors } from '@/hooks/useColors';
 import { useThemeStore } from '@/stores/themeStore';
@@ -120,7 +122,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     } else if (isAuthenticated && !isProfileComplete && !inCompleteProfile && !inResetPassword) {
       router.replace('/complete-profile');
     } else if (isAuthenticated && isProfileComplete && (inAuthGroup || inCompleteProfile)) {
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/index');
     }
   }, [isLoading, isAuthenticated, isProfileComplete, isPasswordRecovery, segments, isReady, router]);
 
@@ -148,6 +150,8 @@ function GlobalConfirmDialog() {
 }
 
 export default function RootLayout() {
+  const splashRef = useRef<SplashScreenRef>(null);
+
   const [fontsLoaded] = useFonts({
     PlayfairDisplay_700Bold,
     PlayfairDisplay_700Bold_Italic,
@@ -159,7 +163,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded) {
+      // Hide the native splash first, then let fullscreen splash take over
       SplashScreen.hideAsync();
+      // Auto-hide the fullscreen splash after a brief moment
+      const timer = setTimeout(() => {
+        splashRef.current?.hide();
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, [fontsLoaded]);
 
@@ -172,31 +182,39 @@ export default function RootLayout() {
   const statusBarStyle = theme === 'dark' ? 'light' : theme === 'light' ? 'dark' : 'auto';
 
   return (
-    <ErrorBoundary>
-      {!isConnected && <OfflineBanner />}
-      <AuthGuard>
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.background } }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="complete-profile" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="reset-password" />
-          <Stack.Screen name="discovery-preferences" />
-          <Stack.Screen name="blocked-users" />
-          <Stack.Screen name="admin-profile" />
-          <Stack.Screen name="settings" />
-          <Stack.Screen name="change-password" />
-          <Stack.Screen name="terms-of-service" />
-          <Stack.Screen name="privacy-policy" />
-          <Stack.Screen name="match-profile" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="verify-identity" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="admin-verification" />
-          <Stack.Screen name="premium" options={{ presentation: 'modal' }} />
-          <Stack.Screen name="buy-boost" options={{ presentation: 'modal' }} />
-        </Stack>
-        <StatusBar style={statusBarStyle} />
-      </AuthGuard>
-      <GlobalToast />
-      <GlobalConfirmDialog />
-    </ErrorBoundary>
+    <ExpoFullscreenSplash
+      ref={splashRef}
+      SplashComponent={<SplashContent />}
+      backgroundColor="#FFF0F3"
+      animationType="fade"
+      autoHide={false}
+    >
+      <ErrorBoundary>
+        {!isConnected && <OfflineBanner />}
+        <AuthGuard>
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.background } }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="complete-profile" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="reset-password" />
+            <Stack.Screen name="discovery-preferences" />
+            <Stack.Screen name="blocked-users" />
+            <Stack.Screen name="admin-profile" />
+            <Stack.Screen name="settings" />
+            <Stack.Screen name="change-password" />
+            <Stack.Screen name="terms-of-service" />
+            <Stack.Screen name="privacy-policy" />
+            <Stack.Screen name="match-profile" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="verify-identity" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="admin-verification" />
+            <Stack.Screen name="premium" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="buy-boost" options={{ presentation: 'modal' }} />
+          </Stack>
+          <StatusBar style={statusBarStyle} />
+        </AuthGuard>
+        <GlobalToast />
+        <GlobalConfirmDialog />
+      </ErrorBoundary>
+    </ExpoFullscreenSplash>
   );
 }

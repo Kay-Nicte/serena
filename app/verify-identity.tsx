@@ -68,7 +68,7 @@ export default function VerifyIdentityScreen() {
       const result = await submitRequest(storagePath, currentGesture);
       if (result.success) {
         await fetchProfile();
-        showToast(t('verification.pendingTitle'), 'success');
+        showToast(t('verification.manualReviewNotice'), 'success', 8000);
         router.back();
       } else if (result.error === 'already_pending') {
         showToast(t('verification.pendingMessage'), 'info');

@@ -13,6 +13,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     bundleIdentifier: 'com.ixabel.serenade',
     supportsTablet: true,
+    googleServicesFile: './GoogleService-Info.plist',
     infoPlist: {
       NSCameraUsageDescription:
         'Serenade necesita acceso a tu cámara para tomar fotos de perfil.',
@@ -28,9 +29,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.ixabel.serenade',
     googleServicesFile: './google-services.json',
     adaptiveIcon: {
-      backgroundColor: '#E6A8B4',
+      backgroundColor: '#FFFFFF',
       foregroundImage: './assets/images/android-icon-foreground.png',
-      backgroundImage: './assets/images/android-icon-background.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',
     },
     edgeToEdgeEnabled: true,
@@ -52,7 +52,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-splash-screen',
       {
         image: './assets/images/splash-icon.png',
-        imageWidth: 200,
+        imageWidth: 320,
         resizeMode: 'contain',
         backgroundColor: '#FFF0F3',
       },
@@ -81,6 +81,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-notifications',
       {
+        icon: './assets/images/notification-icon.png',
         color: '#E6A8B4',
       },
     ],

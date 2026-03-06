@@ -88,7 +88,9 @@ export async function deleteAccount() {
 }
 
 export async function signInWithGoogle() {
-  const redirectTo = makeRedirectUri();
+  const redirectTo = makeRedirectUri({ scheme: 'serenade', path: 'google-auth' });
+
+  console.log('[GoogleAuth] redirectTo:', redirectTo);
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -101,7 +103,11 @@ export async function signInWithGoogle() {
   if (error) throw error;
   if (!data.url) throw new Error('No OAuth URL returned');
 
+  console.log('[GoogleAuth] Opening browser with URL:', data.url);
+
   const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+
+  console.log('[GoogleAuth] Browser result:', result.type);
 
   if (result.type !== 'success' || !result.url) {
     throw new Error('Google sign-in was cancelled');

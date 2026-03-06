@@ -98,16 +98,19 @@ export default function CompleteProfileScreen() {
   const [photoLoading, setPhotoLoading] = useState(false);
 
   const handleAddPhoto = async (position: number) => {
-    const uri = await pickImage();
-    if (uri && user) {
+    try {
+      const uri = await pickImage();
+      if (!uri || !user) return;
       setPhotoLoading(true);
-      try {
-        await addPhoto(user.id, uri, position);
-      } catch (error: any) {
+      await addPhoto(user.id, uri, position);
+    } catch (error: any) {
+      if (error?.message === 'PERMISSION_DENIED') {
+        showToast(t('common.photoPermissionDenied'), 'error');
+      } else {
         showToast(error?.message ?? t('common.error'), 'error');
-      } finally {
-        setPhotoLoading(false);
       }
+    } finally {
+      setPhotoLoading(false);
     }
   };
 

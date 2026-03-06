@@ -185,12 +185,15 @@ export default function ProfileScreen() {
   }, [profile, editing]);
 
   const handleAddPhoto = async (position: number) => {
-    const uri = await pickImage();
-    if (uri && user) {
-      try {
-        await addPhoto(user.id, uri, position);
-        await fetchProfile();
-      } catch (error: any) {
+    try {
+      const uri = await pickImage();
+      if (!uri || !user) return;
+      await addPhoto(user.id, uri, position);
+      await fetchProfile();
+    } catch (error: any) {
+      if (error?.message === 'PERMISSION_DENIED') {
+        showToast(t('common.photoPermissionDenied'), 'error');
+      } else {
         showToast(error?.message ?? t('common.error'), 'error');
       }
     }

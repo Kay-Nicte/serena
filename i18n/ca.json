@@ -9,7 +9,8 @@
     "back": "Tornar",
     "done": "Fet",
     "or": "o",
-    "offline": "Sense connexió a internet"
+    "offline": "Sense connexió a internet",
+    "photoPermissionDenied": "Permet l'accés a la teva galeria als ajustos del dispositiu per poder afegir fotos."
   },
   "welcome": {
     "title": "Serenade",
@@ -563,7 +564,8 @@
     "notVerified": "Necessites verificar la teva identitat primer",
     "promptTitle": "Un pas més!",
     "promptMessage": "Verifica la teva identitat perquè les altres puguin veure el teu perfil i fer match amb tu.",
-    "verified": "Verificada"
+    "verified": "Verificada",
+    "manualReviewNotice": "🛡️ Per oferir-te un espai segur només per a dones, les verificacions es fan de manera manual, però ens comprometem a donar-te una resposta en un màxim de 12 hores (tot i que sol ser molt menys). T'agraïm moltíssim la paciència! 🥰✨"
   },
   "starters": {
     "travel": "Quin és l'últim lloc on has viatjat?",

@@ -5,6 +5,11 @@ import { Config } from '@/constants/config';
 import { decode } from 'base64-arraybuffer';
 
 export async function pickImage(): Promise<string | null> {
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== 'granted') {
+    throw new Error('PERMISSION_DENIED');
+  }
+
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ['images'],
     allowsEditing: true,

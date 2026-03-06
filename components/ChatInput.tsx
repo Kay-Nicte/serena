@@ -252,8 +252,10 @@ export function ChatInput({ onSend, matchId, disabled, disabledMessage, isPremiu
         placeholderTextColor={Colors.textTertiary}
         multiline
         maxLength={1000}
-        onSubmitEditing={handleSend}
         blurOnSubmit={false}
+        autoComplete="off"
+        textContentType="none"
+        importantForAutofill="no"
       />
 
       {text.trim() ? (
