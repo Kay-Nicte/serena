@@ -322,7 +322,6 @@ export default function AdminScreen() {
       {/* Section navigation */}
       <View style={styles.sectionNav}>
         <View style={[styles.sectionNavTab, styles.sectionNavTabActive]}>
-          <Ionicons name="flag-outline" size={16} color={Colors.textOnPrimary} />
           <Text style={[styles.sectionNavText, styles.sectionNavTextActive]}>{t('admin.reports')}</Text>
         </View>
         <TouchableOpacity
@@ -330,7 +329,6 @@ export default function AdminScreen() {
           onPress={() => router.push('/admin-verification')}
           activeOpacity={0.7}
         >
-          <Ionicons name="shield-checkmark-outline" size={16} color={Colors.text} />
           <Text style={styles.sectionNavText}>{t('admin.verifications')}</Text>
           {pendingVerifications > 0 && (
             <View style={styles.sectionNavBadge}>
@@ -344,7 +342,6 @@ export default function AdminScreen() {
             onPress={() => router.push('/manage-moderators')}
             activeOpacity={0.7}
           >
-            <Ionicons name="people-outline" size={16} color={Colors.text} />
             <Text style={styles.sectionNavText}>{t('admin.moderators')}</Text>
           </TouchableOpacity>
         )}
@@ -422,17 +419,17 @@ function makeStyles(c: ReturnType<typeof useColors>) {
     },
     sectionNav: {
       flexDirection: 'row',
-      paddingHorizontal: 24,
+      paddingHorizontal: 16,
       paddingVertical: 10,
-      gap: 8,
+      gap: 6,
     },
     sectionNavTab: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-      borderRadius: 12,
+      gap: 4,
+      paddingHorizontal: 10,
+      paddingVertical: 7,
+      borderRadius: 10,
       backgroundColor: c.surfaceSecondary,
     },
     sectionNavTabActive: {
