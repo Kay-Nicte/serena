@@ -25,6 +25,20 @@ export interface DiscoveryPreferences {
   zodiac_include_unspecified: boolean;
   hogwarts_include_unspecified: boolean;
   height_include_unspecified: boolean;
+  relationship_type: string[] | null;
+  gender_identity: string[] | null;
+  languages: string[] | null;
+  exercise: string[] | null;
+  education: string[] | null;
+  religion: string[] | null;
+  music_genres: string[] | null;
+  relationship_type_include_unspecified: boolean;
+  gender_identity_include_unspecified: boolean;
+  languages_include_unspecified: boolean;
+  exercise_include_unspecified: boolean;
+  education_include_unspecified: boolean;
+  religion_include_unspecified: boolean;
+  music_genres_include_unspecified: boolean;
 }
 
 interface DiscoveryStoreState {
@@ -91,6 +105,20 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set, get) => ({
         zodiac_include_unspecified: updates.zodiac_include_unspecified ?? current?.zodiac_include_unspecified ?? true,
         hogwarts_include_unspecified: updates.hogwarts_include_unspecified ?? current?.hogwarts_include_unspecified ?? true,
         height_include_unspecified: updates.height_include_unspecified ?? current?.height_include_unspecified ?? true,
+        relationship_type: updates.relationship_type !== undefined ? updates.relationship_type : (current?.relationship_type ?? null),
+        gender_identity: updates.gender_identity !== undefined ? updates.gender_identity : (current?.gender_identity ?? null),
+        languages: updates.languages !== undefined ? updates.languages : (current?.languages ?? null),
+        exercise: updates.exercise !== undefined ? updates.exercise : (current?.exercise ?? null),
+        education: updates.education !== undefined ? updates.education : (current?.education ?? null),
+        religion: updates.religion !== undefined ? updates.religion : (current?.religion ?? null),
+        music_genres: updates.music_genres !== undefined ? updates.music_genres : (current?.music_genres ?? null),
+        relationship_type_include_unspecified: updates.relationship_type_include_unspecified ?? current?.relationship_type_include_unspecified ?? true,
+        gender_identity_include_unspecified: updates.gender_identity_include_unspecified ?? current?.gender_identity_include_unspecified ?? true,
+        languages_include_unspecified: updates.languages_include_unspecified ?? current?.languages_include_unspecified ?? true,
+        exercise_include_unspecified: updates.exercise_include_unspecified ?? current?.exercise_include_unspecified ?? true,
+        education_include_unspecified: updates.education_include_unspecified ?? current?.education_include_unspecified ?? true,
+        religion_include_unspecified: updates.religion_include_unspecified ?? current?.religion_include_unspecified ?? true,
+        music_genres_include_unspecified: updates.music_genres_include_unspecified ?? current?.music_genres_include_unspecified ?? true,
       };
 
       const { error } = await supabase

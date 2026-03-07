@@ -11,6 +11,8 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS music_genres TEXT[] DEFAULT NULL;
 
 -- New discovery filter columns
 ALTER TABLE discovery_preferences
+  ADD COLUMN IF NOT EXISTS gender_identity TEXT[] DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS gender_identity_include_unspecified BOOLEAN DEFAULT TRUE,
   ADD COLUMN IF NOT EXISTS languages TEXT[] DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS pronouns TEXT[] DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS relationship_type TEXT[] DEFAULT NULL,

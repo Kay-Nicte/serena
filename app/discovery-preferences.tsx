@@ -24,6 +24,13 @@ import {
   PET_OPTIONS,
   ZODIAC_SIGNS,
   HOGWARTS_HOUSES,
+  RELATIONSHIP_TYPE,
+  GENDER_IDENTITY,
+  LANGUAGES,
+  EXERCISE_OPTIONS,
+  EDUCATION_OPTIONS,
+  RELIGION_OPTIONS,
+  MUSIC_GENRES,
 } from '@/constants/config';
 import { Button } from '@/components/ui/Button';
 import { Tag } from '@/components/ui/Tag';
@@ -58,6 +65,13 @@ export default function DiscoveryPreferencesScreen() {
   const [hogwarts, setHogwarts] = useState<string[]>([]);
   const [minHeight, setMinHeight] = useState('');
   const [maxHeight, setMaxHeight] = useState('');
+  const [relationshipType, setRelationshipType] = useState<string[]>([]);
+  const [genderIdentity, setGenderIdentity] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [exercise, setExercise] = useState<string[]>([]);
+  const [education, setEducation] = useState<string[]>([]);
+  const [religion, setReligion] = useState<string[]>([]);
+  const [musicGenres, setMusicGenres] = useState<string[]>([]);
 
   // Include unspecified switches
   const [smokingInclude, setSmokingInclude] = useState(true);
@@ -67,6 +81,13 @@ export default function DiscoveryPreferencesScreen() {
   const [zodiacInclude, setZodiacInclude] = useState(true);
   const [hogwartsInclude, setHogwartsInclude] = useState(true);
   const [heightInclude, setHeightInclude] = useState(true);
+  const [relationshipTypeInclude, setRelationshipTypeInclude] = useState(true);
+  const [genderIdentityInclude, setGenderIdentityInclude] = useState(true);
+  const [languagesInclude, setLanguagesInclude] = useState(true);
+  const [exerciseInclude, setExerciseInclude] = useState(true);
+  const [educationInclude, setEducationInclude] = useState(true);
+  const [religionInclude, setReligionInclude] = useState(true);
+  const [musicGenresInclude, setMusicGenresInclude] = useState(true);
 
   useEffect(() => {
     if (preferences) {
@@ -96,6 +117,20 @@ export default function DiscoveryPreferencesScreen() {
       setZodiacInclude(preferences.zodiac_include_unspecified ?? true);
       setHogwartsInclude(preferences.hogwarts_include_unspecified ?? true);
       setHeightInclude(preferences.height_include_unspecified ?? true);
+      setRelationshipType(preferences.relationship_type ?? []);
+      setGenderIdentity(preferences.gender_identity ?? []);
+      setLanguages(preferences.languages ?? []);
+      setExercise(preferences.exercise ?? []);
+      setEducation(preferences.education ?? []);
+      setReligion(preferences.religion ?? []);
+      setMusicGenres(preferences.music_genres ?? []);
+      setRelationshipTypeInclude(preferences.relationship_type_include_unspecified ?? true);
+      setGenderIdentityInclude(preferences.gender_identity_include_unspecified ?? true);
+      setLanguagesInclude(preferences.languages_include_unspecified ?? true);
+      setExerciseInclude(preferences.exercise_include_unspecified ?? true);
+      setEducationInclude(preferences.education_include_unspecified ?? true);
+      setReligionInclude(preferences.religion_include_unspecified ?? true);
+      setMusicGenresInclude(preferences.music_genres_include_unspecified ?? true);
     }
   }, [preferences]);
 
@@ -160,6 +195,20 @@ export default function DiscoveryPreferencesScreen() {
         zodiac_include_unspecified: zodiacInclude,
         hogwarts_include_unspecified: hogwartsInclude,
         height_include_unspecified: heightInclude,
+        relationship_type: relationshipType.length > 0 ? relationshipType : null,
+        gender_identity: genderIdentity.length > 0 ? genderIdentity : null,
+        languages: languages.length > 0 ? languages : null,
+        exercise: exercise.length > 0 ? exercise : null,
+        education: education.length > 0 ? education : null,
+        religion: religion.length > 0 ? religion : null,
+        music_genres: musicGenres.length > 0 ? musicGenres : null,
+        relationship_type_include_unspecified: relationshipTypeInclude,
+        gender_identity_include_unspecified: genderIdentityInclude,
+        languages_include_unspecified: languagesInclude,
+        exercise_include_unspecified: exerciseInclude,
+        education_include_unspecified: educationInclude,
+        religion_include_unspecified: religionInclude,
+        music_genres_include_unspecified: musicGenresInclude,
       });
       router.back();
       fetchCandidates(); // non-blocking refresh
@@ -331,6 +380,83 @@ export default function DiscoveryPreferencesScreen() {
               <Text style={styles.hint}>{t('discovery.lookingForAll')}</Text>
             )}
           </View>
+
+          {/* Gender Identity */}
+          {renderFilterSection(
+            t('profile.genderIdentity.title'),
+            GENDER_IDENTITY,
+            genderIdentity,
+            'profile.genderIdentity',
+            (v) => toggleArray(setGenderIdentity, v),
+            genderIdentityInclude,
+            setGenderIdentityInclude
+          )}
+
+          {/* Relationship Type */}
+          {renderFilterSection(
+            t('profile.relationshipType.title'),
+            RELATIONSHIP_TYPE,
+            relationshipType,
+            'profile.relationshipType',
+            (v) => toggleArray(setRelationshipType, v),
+            relationshipTypeInclude,
+            setRelationshipTypeInclude
+          )}
+
+          {/* Languages */}
+          {renderFilterSection(
+            t('profile.languages.title'),
+            LANGUAGES,
+            languages,
+            'profile.languages',
+            (v) => toggleArray(setLanguages, v),
+            languagesInclude,
+            setLanguagesInclude
+          )}
+
+          {/* Education */}
+          {renderFilterSection(
+            t('profile.education.title'),
+            EDUCATION_OPTIONS,
+            education,
+            'profile.education',
+            (v) => toggleArray(setEducation, v),
+            educationInclude,
+            setEducationInclude
+          )}
+
+          {/* Exercise */}
+          {renderFilterSection(
+            t('profile.exercise.title'),
+            EXERCISE_OPTIONS,
+            exercise,
+            'profile.exercise',
+            (v) => toggleArray(setExercise, v),
+            exerciseInclude,
+            setExerciseInclude
+          )}
+
+          {/* Music Genres */}
+          {renderFilterSection(
+            t('profile.musicGenres.title'),
+            MUSIC_GENRES,
+            musicGenres,
+            'profile.musicGenres',
+            (v) => toggleArray(setMusicGenres, v),
+            musicGenresInclude,
+            setMusicGenresInclude
+          )}
+
+          {/* Religion */}
+          {renderFilterSection(
+            t('profile.religion.title'),
+            RELIGION_OPTIONS,
+            religion,
+            'profile.religion',
+            (v) => toggleArray(setReligion, v),
+            religionInclude,
+            setReligionInclude
+          )}
 
           {/* Smoking */}
           {renderFilterSection(
