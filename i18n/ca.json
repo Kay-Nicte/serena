@@ -531,7 +531,8 @@
     "redeemPlaceholder": "Introdueix el teu codi",
     "redeem": "Bescanviar",
     "codeSuccess": "Codi bescanviat! Benvinguda a Premium!",
-    "invalidCode": "Codi no vàlid. Revisa'l i torna-ho a provar."
+    "invalidCode": "Codi no vàlid. Revisa'l i torna-ho a provar.",
+    "completeProfileTeaserDiamond": "Omple tots els camps marcats amb ◆ per aconseguir 7 dies de Premium gratis."
   },
   "boost": {
     "title": "Boost de perfil",

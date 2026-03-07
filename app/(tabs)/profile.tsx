@@ -84,23 +84,36 @@ export default function ProfileScreen() {
   const remainingLikes = useDailyStatsStore((s) => s.remainingLikes);
   const totalLikes = useDailyStatsStore((s) => s.totalLikes);
 
-  // Profile is fully complete when ALL fields are filled (hogwarts_house excluded)
-  const isProfileFullyComplete = !!(
-    profile?.name?.trim() &&
-    profile?.birth_date &&
-    profile?.bio?.trim() &&
-    ensureArray(profile?.orientation).length > 0 &&
-    ensureArray(profile?.looking_for).length > 0 &&
-    ensureArray(profile?.interests).length > 0 &&
-    profile?.children &&
-    profile?.zodiac &&
-    profile?.zodiac_ascendant &&
-    ensureArray(profile?.pets).length > 0 &&
-    profile?.smoking &&
-    profile?.drinking &&
-    profile?.height_cm &&
-    photos.length > 0
-  );
+  // Profile completion: count filled required fields (diamond-marked + photos)
+  // Excluded from premium requirement: hogwarts_house, gender_identity, religion, pronouns
+  const profileRequiredChecks = [
+    !!profile?.name?.trim(),
+    !!profile?.birth_date,
+    !!profile?.bio?.trim(),
+    ensureArray(profile?.orientation).length > 0,
+    ensureArray(profile?.looking_for).length > 0,
+    ensureArray(profile?.interests).length > 0,
+    !!profile?.children,
+    !!profile?.zodiac,
+    !!profile?.zodiac_ascendant,
+    ensureArray(profile?.pets).length > 0,
+    !!profile?.smoking,
+    !!profile?.drinking,
+    !!profile?.height_cm,
+    !!profile?.relationship_type,
+    ensureArray(profile?.languages).length > 0,
+    !!profile?.profession?.trim(),
+    !!profile?.education,
+    !!profile?.exercise,
+    ensureArray(profile?.music_genres).length > 0,
+    photos.length > 0,
+  ];
+  const profileCompletedCount = profileRequiredChecks.filter(Boolean).length;
+  const profileCompletionPct = Math.round((profileCompletedCount / profileRequiredChecks.length) * 100);
+  const isProfileFullyComplete = profileCompletedCount === profileRequiredChecks.length;
+
+  // Whether to show premium diamond hints on fields
+  const showPremiumHints = !isPremium && !premiumUntil;
 
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
@@ -239,6 +252,13 @@ export default function ProfileScreen() {
   const togglePet = (p: string) => {
     setPets((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
   };
+  const PremiumLabel = ({ label }: { label: string }) => (
+    <View style={styles.premiumLabelRow}>
+      <Text style={styles.sectionLabel}>{label}</Text>
+      {showPremiumHints && <Ionicons name="diamond" size={14} color="#E0A800" />}
+    </View>
+  );
+
   const toggleLanguage = (l: string) => {
     setLanguages((prev) => prev.includes(l) ? prev.filter((x) => x !== l) : [...prev, l]);
   };
@@ -433,9 +453,14 @@ export default function ProfileScreen() {
                 onPress={() => setEditing(true)}
                 activeOpacity={0.7}
               >
-                <Ionicons name="diamond" size={20} color="#E0A800" />
-                <Text style={styles.premiumTeaserText}>{t('premium.completeProfileTeaser')}</Text>
-                <Ionicons name="chevron-forward" size={18} color="#9A7800" />
+                <View style={styles.premiumTeaserHeader}>
+                  <Ionicons name="diamond" size={20} color="#E0A800" />
+                  <Text style={styles.premiumTeaserPct}>{profileCompletionPct}%</Text>
+                </View>
+                <View style={styles.progressBarBg}>
+                  <View style={[styles.progressBarFill, { width: `${profileCompletionPct}%` }]} />
+                </View>
+                <Text style={styles.premiumTeaserText}>{t('premium.completeProfileTeaserDiamond')}</Text>
               </TouchableOpacity>
             )}
 
@@ -875,8 +900,8 @@ export default function ProfileScreen() {
           />
 
           {/* Name */}
+          <PremiumLabel label={t('profile.name')} />
           <Input
-            label={t('profile.name')}
             value={name}
             onChangeText={setName}
             placeholder={t('profile.namePlaceholder')}
@@ -948,7 +973,7 @@ export default function ProfileScreen() {
 
           {/* Birth Date */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.birthDate')}</Text>
+            <PremiumLabel label={t('profile.birthDate')} />
             <View style={styles.dateRow}>
               <View style={styles.dateField}>
                 <TextInput
@@ -992,8 +1017,8 @@ export default function ProfileScreen() {
           </View>
 
           {/* Bio */}
+          <PremiumLabel label={t('profile.bio')} />
           <Input
-            label={t('profile.bio')}
             value={bio}
             onChangeText={setBio}
             placeholder={t('profile.bioPlaceholder')}
@@ -1026,7 +1051,7 @@ export default function ProfileScreen() {
           {/* --- Dating --- */}
           {/* Orientation */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.orientation')}</Text>
+            <PremiumLabel label={t('profile.orientation')} />
             <View style={styles.tags}>
               {ORIENTATIONS.map((o) => (
                 <Tag key={o} label={t(`orientation.${o}`)} selected={orientations.includes(o)} onPress={() => toggleOrientation(o)} />
@@ -1036,7 +1061,7 @@ export default function ProfileScreen() {
 
           {/* Looking For */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.lookingFor')}</Text>
+            <PremiumLabel label={t('profile.lookingFor')} />
             <View style={styles.tags}>
               {LOOKING_FOR.map((lf) => (
                 <Tag key={lf} label={t(`lookingFor.${lf}`)} selected={lookingFor.includes(lf)} onPress={() => toggleLookingFor(lf)} />
@@ -1046,7 +1071,7 @@ export default function ProfileScreen() {
 
           {/* Relationship Type */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.relationshipType.title')}</Text>
+            <PremiumLabel label={t('profile.relationshipType.title')} />
             <View style={styles.tags}>
               {RELATIONSHIP_TYPE.map((r) => (
                 <Tag key={r} label={t(`profile.relationshipType.${r}`)} selected={relationshipType === r} onPress={() => toggleSingleSelect(relationshipType, r, setRelationshipType)} />
@@ -1057,7 +1082,7 @@ export default function ProfileScreen() {
           {/* --- Life --- */}
           {/* Languages */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.languages.title')}</Text>
+            <PremiumLabel label={t('profile.languages.title')} />
             <View style={styles.tags}>
               {LANGUAGES.map((l) => (
                 <Tag key={l} label={t(`profile.languages.${l}`)} selected={languages.includes(l)} onPress={() => toggleLanguage(l)} />
@@ -1066,8 +1091,8 @@ export default function ProfileScreen() {
           </View>
 
           {/* Profession */}
+          <PremiumLabel label={t('profile.profession.title')} />
           <Input
-            label={t('profile.profession.title')}
             value={profession}
             onChangeText={setProfession}
             placeholder={t('profile.profession.title')}
@@ -1076,7 +1101,7 @@ export default function ProfileScreen() {
 
           {/* Education */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.education.title')}</Text>
+            <PremiumLabel label={t('profile.education.title')} />
             <View style={styles.tags}>
               {EDUCATION_OPTIONS.map((e) => (
                 <Tag key={e} label={t(`profile.education.${e}`)} selected={education === e} onPress={() => toggleSingleSelect(education, e, setEducation)} />
@@ -1087,7 +1112,7 @@ export default function ProfileScreen() {
           {/* --- Hobbies --- */}
           {/* Interests */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.interests')}</Text>
+            <PremiumLabel label={t('profile.interests')} />
             <View style={styles.tags}>
               {INTERESTS.map((i) => (
                 <Tag key={i} label={t(`interests.${i}`)} selected={interests.includes(i)} onPress={() => toggleInterest(i)} />
@@ -1097,7 +1122,7 @@ export default function ProfileScreen() {
 
           {/* Music Genres */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.musicGenres.title')}</Text>
+            <PremiumLabel label={t('profile.musicGenres.title')} />
             <View style={styles.tags}>
               {MUSIC_GENRES.map((g) => (
                 <Tag key={g} label={t(`profile.musicGenres.${g}`)} selected={musicGenres.includes(g)} onPress={() => toggleMusicGenre(g)} />
@@ -1108,7 +1133,7 @@ export default function ProfileScreen() {
           {/* --- Physical --- */}
           {/* Exercise */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.exercise.title')}</Text>
+            <PremiumLabel label={t('profile.exercise.title')} />
             <View style={styles.tags}>
               {EXERCISE_OPTIONS.map((e) => (
                 <Tag key={e} label={t(`profile.exercise.${e}`)} selected={exercise === e} onPress={() => toggleSingleSelect(exercise, e, setExercise)} />
@@ -1118,7 +1143,7 @@ export default function ProfileScreen() {
 
           {/* Height */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.height')}</Text>
+            <PremiumLabel label={t('profile.height')} />
             <View style={styles.dateRow}>
               <View style={styles.dateField}>
                 <TextInput
@@ -1138,7 +1163,7 @@ export default function ProfileScreen() {
           {/* --- Lifestyle --- */}
           {/* Children */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.children')}</Text>
+            <PremiumLabel label={t('profile.children')} />
             <View style={styles.tags}>
               {CHILDREN_OPTIONS.map((c) => (
                 <Tag key={c} label={t(`children.${c}`)} selected={children === c} onPress={() => toggleSingleSelect(children, c, setChildren)} />
@@ -1148,7 +1173,7 @@ export default function ProfileScreen() {
 
           {/* Pets */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.pets')}</Text>
+            <PremiumLabel label={t('profile.pets')} />
             <View style={styles.tags}>
               {PET_OPTIONS.map((p) => (
                 <Tag key={p} label={t(`pets.${p}`)} selected={pets.includes(p)} onPress={() => togglePet(p)} />
@@ -1158,7 +1183,7 @@ export default function ProfileScreen() {
 
           {/* Smoking */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.smoking')}</Text>
+            <PremiumLabel label={t('profile.smoking')} />
             <View style={styles.tags}>
               {SMOKING_OPTIONS.map((s) => (
                 <Tag key={s} label={t(`smoking.${s}`)} selected={smokingVal === s} onPress={() => toggleSingleSelect(smokingVal, s, setSmokingVal)} />
@@ -1168,7 +1193,7 @@ export default function ProfileScreen() {
 
           {/* Drinking */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.drinking')}</Text>
+            <PremiumLabel label={t('profile.drinking')} />
             <View style={styles.tags}>
               {DRINKING_OPTIONS.map((d) => (
                 <Tag key={d} label={t(`drinking.${d}`)} selected={drinkingVal === d} onPress={() => toggleSingleSelect(drinkingVal, d, setDrinkingVal)} />
@@ -1179,7 +1204,7 @@ export default function ProfileScreen() {
           {/* --- Fun / Astrology --- */}
           {/* Zodiac */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.zodiac')}</Text>
+            <PremiumLabel label={t('profile.zodiac')} />
             <View style={styles.tags}>
               {ZODIAC_SIGNS.map((z) => (
                 <Tag key={z} label={t(`zodiac.${z}`)} selected={zodiac === z} onPress={() => toggleSingleSelect(zodiac, z, setZodiac)} />
@@ -1189,7 +1214,7 @@ export default function ProfileScreen() {
 
           {/* Zodiac Ascendant */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('profile.zodiacAscendant')}</Text>
+            <PremiumLabel label={t('profile.zodiacAscendant')} />
             <View style={styles.tags}>
               {ZODIAC_SIGNS.map((z) => (
                 <Tag key={z} label={t(`zodiac.${z}`)} selected={zodiacAscendant === z} onPress={() => toggleSingleSelect(zodiacAscendant, z, setZodiacAscendant)} />
@@ -1785,8 +1810,6 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       alignItems: 'center',
     },
     premiumTeaser: {
-      flexDirection: 'row',
-      alignItems: 'center',
       gap: 10,
       backgroundColor: '#FFF8E1',
       borderWidth: 1,
@@ -1794,12 +1817,37 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       borderRadius: 16,
       padding: 14,
     },
+    premiumTeaserHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    premiumTeaserPct: {
+      fontSize: 18,
+      fontFamily: Fonts.heading,
+      color: '#9A7800',
+    },
+    progressBarBg: {
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: '#FFE082',
+      overflow: 'hidden' as const,
+    },
+    progressBarFill: {
+      height: '100%' as const,
+      borderRadius: 4,
+      backgroundColor: '#E0A800',
+    },
     premiumTeaserText: {
       fontSize: 14,
       fontFamily: Fonts.bodyMedium,
       color: '#9A7800',
-      flex: 1,
       lineHeight: 20,
+    },
+    premiumLabelRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
     },
     verificationBanner: {
       flexDirection: 'row',

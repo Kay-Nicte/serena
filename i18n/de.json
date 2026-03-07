@@ -531,7 +531,8 @@
     "redeemPlaceholder": "Gib deinen Code ein",
     "redeem": "Einlösen",
     "codeSuccess": "Code eingelöst! Willkommen bei Premium!",
-    "invalidCode": "Ungültiger Code. Bitte überprüfe ihn und versuche es erneut."
+    "invalidCode": "Ungültiger Code. Bitte überprüfe ihn und versuche es erneut.",
+    "completeProfileTeaserDiamond": "Fülle alle mit ◆ markierten Felder aus und erhalte 7 Tage Premium gratis."
   },
   "boost": {
     "title": "Profil-Boost",

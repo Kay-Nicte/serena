@@ -531,7 +531,8 @@
     "redeemPlaceholder": "Introduce tu código",
     "redeem": "Canjear",
     "codeSuccess": "¡Código canjeado! ¡Bienvenida a Premium!",
-    "invalidCode": "Código no válido. Revísalo e inténtalo de nuevo."
+    "invalidCode": "Código no válido. Revísalo e inténtalo de nuevo.",
+    "completeProfileTeaserDiamond": "Rellena todos los campos marcados con ◆ para conseguir 7 días de Premium gratis."
   },
   "boost": {
     "title": "Boost de perfil",

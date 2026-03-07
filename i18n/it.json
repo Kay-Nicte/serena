@@ -531,7 +531,8 @@
     "redeemPlaceholder": "Inserisci il tuo codice",
     "redeem": "Riscatta",
     "codeSuccess": "Codice riscattato! Benvenuta in Premium!",
-    "invalidCode": "Codice non valido. Controlla e riprova."
+    "invalidCode": "Codice non valido. Controlla e riprova.",
+    "completeProfileTeaserDiamond": "Compila tutti i campi contrassegnati con ◆ per ottenere 7 giorni di Premium gratis."
   },
   "boost": {
     "title": "Boost del profilo",

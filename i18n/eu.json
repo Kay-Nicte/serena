@@ -531,7 +531,8 @@
     "redeemPlaceholder": "Sartu zure kodea",
     "redeem": "Trukatu",
     "codeSuccess": "Kodea trukatuta! Ongi etorri Premium-era!",
-    "invalidCode": "Kode baliogabea. Egiaztatu eta saiatu berriro."
+    "invalidCode": "Kode baliogabea. Egiaztatu eta saiatu berriro.",
+    "completeProfileTeaserDiamond": "◆ ikurrarekin markatutako eremu guztiak bete 7 eguneko Premium doan lortzeko."
   },
   "boost": {
     "title": "Profil Boosta",

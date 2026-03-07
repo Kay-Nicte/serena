@@ -16,13 +16,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     googleServicesFile: './GoogleService-Info.plist',
     infoPlist: {
       NSCameraUsageDescription:
-        'Serenade necesita acceso a tu cámara para tomar fotos de perfil.',
+        'Serenade needs access to your camera to take profile photos.',
       NSPhotoLibraryUsageDescription:
-        'Serenade necesita acceso a tu galería para seleccionar fotos de perfil.',
+        'Serenade needs access to your photo library to select profile photos.',
       NSLocationWhenInUseUsageDescription:
-        'Serenade necesita tu ubicación para compartirla en citas seguras y mostrar perfiles cercanos.',
+        'Serenade needs your location to share it on safe dates and show nearby profiles.',
       NSMicrophoneUsageDescription:
-        'Serenade necesita acceso a tu micrófono para enviar mensajes de audio.',
+        'Serenade needs access to your microphone to send audio messages.',
     },
   },
   android: {
@@ -65,9 +65,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-image-picker',
       {
         photosPermission:
-          'Serenade necesita acceso a tu galería para seleccionar fotos de perfil.',
+          'Serenade needs access to your photo library to select profile photos.',
         cameraPermission:
-          'Serenade necesita acceso a tu cámara para tomar fotos de perfil.',
+          'Serenade needs access to your camera to take profile photos.',
       },
     ],
     '@react-native-community/datetimepicker',
@@ -75,7 +75,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-location',
       {
         locationWhenInUsePermission:
-          'Serenade necesita tu ubicación para compartirla en citas seguras y mostrar perfiles cercanos.',
+          'Serenade needs your location to share it on safe dates and show nearby profiles.',
       },
     ],
     [
@@ -89,7 +89,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'expo-av',
       {
         microphonePermission:
-          'Serenade necesita acceso a tu micrófono para enviar mensajes de audio.',
+          'Serenade needs access to your microphone to send audio messages.',
       },
     ],
   ],
