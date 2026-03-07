@@ -4,6 +4,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { useFonts, PlayfairDisplay_700Bold, PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
 import { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import * as SplashScreen from 'expo-splash-screen';
+import * as Updates from 'expo-updates';
 import ExpoFullscreenSplash, { type SplashScreenRef } from 'expo-fullscreen-splash';
 import * as Linking from 'expo-linking';
 import { SplashContent } from '@/components/FullscreenSplash';
@@ -172,6 +173,20 @@ export default function RootLayout() {
       return () => clearTimeout(timer);
     }
   }, [fontsLoaded]);
+
+  // Check for OTA updates on launch
+  useEffect(() => {
+    if (__DEV__) return;
+    (async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch { /* silent */ }
+    })();
+  }, []);
 
   const { isConnected } = useNetworkStatus();
   const theme = useThemeStore((s) => s.theme);
