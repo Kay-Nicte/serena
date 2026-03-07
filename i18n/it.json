@@ -655,7 +655,7 @@
     "retakePhoto": "Ripeti",
     "submit": "Invia per la revisione",
     "submitting": "Invio in corso...",
-    "pendingTitle": "Verifica in attesa",
+    "pendingTitle": "Verifica in corso di revisione",
     "pendingMessage": "Il tuo selfie è in fase di revisione. Puoi usare l'app, ma non apparirai nelle ricerche delle altre finché non sarai approvata.",
     "rejectedTitle": "Verifica non approvata",
     "rejectedMessage": "Il tuo selfie di verifica non è stato approvato. Riprova.",

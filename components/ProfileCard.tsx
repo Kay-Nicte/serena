@@ -406,9 +406,9 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       lineHeight: 22,
     },
     superlikeBanner: {
-      backgroundColor: '#FFF8E1',
+      backgroundColor: c.goldBg,
       borderBottomWidth: 1,
-      borderBottomColor: '#FFE082',
+      borderBottomColor: c.goldBorder,
       paddingVertical: 8,
       paddingHorizontal: 16,
       alignItems: 'center',
@@ -416,7 +416,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
     superlikeBannerText: {
       fontSize: 14,
       fontFamily: Fonts.bodySemiBold,
-      color: '#E0A800',
+      color: c.goldAccent,
     },
   });
 }

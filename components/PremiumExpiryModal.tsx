@@ -57,13 +57,13 @@ export function PremiumExpiryModal() {
               <Text style={styles.description}>{t('premium.expiredMessage')}</Text>
               <View style={styles.benefits}>
                 <Benefit icon="heart" color={Colors.primary} text={t('premium.benefit10Likes')} />
-                <Benefit icon="star" color="#E0A800" text={t('premium.benefitSuperlike')} />
+                <Benefit icon="star" color={Colors.goldAccent} text={t('premium.benefitSuperlike')} />
                 <Benefit icon="chatbubble" color={Colors.primary} text={t('premium.benefitIceBreaker')} />
                 <Benefit icon="eye" color={Colors.primary} text={t('premium.benefitReadReceipts')} />
                 <Benefit icon="time" color={Colors.primary} text={t('premium.benefitLastSeen')} />
               </View>
               <TouchableOpacity style={styles.renewButton} onPress={handleRenew} activeOpacity={0.7}>
-                <Ionicons name="diamond" size={18} color="#FFFFFF" />
+                <Text style={{ fontSize: 16 }}>💎</Text>
                 <Text style={styles.renewButtonText}>{t('premium.renew')}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={handleDecline} hitSlop={8}>
@@ -152,7 +152,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 8,
-      backgroundColor: '#E0A800',
+      backgroundColor: c.goldAccent,
       paddingHorizontal: 32,
       paddingVertical: 14,
       borderRadius: 24,

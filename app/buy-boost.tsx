@@ -83,7 +83,7 @@ export default function BuyBoostScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Ionicons name="flash" size={48} color="#E0A800" />
+        <Ionicons name="flash" size={48} color={Colors.goldAccent} />
         <Text style={styles.title}>{t('boost.title')}</Text>
         <Text style={styles.subtitle}>{t('boost.subtitle')}</Text>
 
@@ -108,7 +108,7 @@ export default function BuyBoostScreen() {
                       <Text style={styles.bestBadgeText}>{t('premium.bestValue')}</Text>
                     </View>
                   )}
-                  <Text style={[styles.optionTitle, isBest && { color: '#E0A800' }]}>
+                  <Text style={[styles.optionTitle, isBest && { color: Colors.goldAccent }]}>
                     {t(pkg.identifier === 'boost_x1' ? 'boost.x1' : 'boost.x3')}
                   </Text>
                   <View style={styles.optionRight}>
@@ -116,11 +116,11 @@ export default function BuyBoostScreen() {
                     {isBest ? (
                       <View style={styles.flashRow}>
                         {[0, 1, 2].map((i) => (
-                          <Ionicons key={i} name="flash" size={20} color="#E0A800" />
+                          <Ionicons key={i} name="flash" size={20} color={Colors.goldAccent} />
                         ))}
                       </View>
                     ) : (
-                      <Ionicons name="flash" size={24} color="#E0A800" />
+                      <Ionicons name="flash" size={24} color={Colors.goldAccent} />
                     )}
                   </View>
                 </TouchableOpacity>
@@ -197,7 +197,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       paddingVertical: 20,
     },
     optionCardBest: {
-      borderColor: '#E0A800',
+      borderColor: c.goldAccent,
       borderWidth: 2,
       position: 'relative',
     },
@@ -223,7 +223,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       position: 'absolute',
       top: -12,
       right: 16,
-      backgroundColor: '#E0A800',
+      backgroundColor: c.goldAccent,
       borderRadius: 8,
       paddingHorizontal: 10,
       paddingVertical: 3,

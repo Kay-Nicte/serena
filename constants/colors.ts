@@ -23,6 +23,11 @@ export const lightColors = {
   error: '#E07070',
   warning: '#E0C070',
 
+  goldBg: '#FFF8E1',
+  goldBorder: '#FFE082',
+  goldText: '#9A7800',
+  goldAccent: '#E0A800',
+
   overlay: 'rgba(45, 31, 45, 0.5)',
 
   tabBar: '#FFFFFF',
@@ -54,6 +59,11 @@ export const darkColors = {
   success: '#7BC77B',
   error: '#E07070',
   warning: '#E0C070',
+
+  goldBg: '#3D2D1A',
+  goldBorder: '#6B5A2E',
+  goldText: '#F5D680',
+  goldAccent: '#F5D680',
 
   overlay: 'rgba(0,0,0,0.7)',
 

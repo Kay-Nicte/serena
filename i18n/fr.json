@@ -655,7 +655,7 @@
     "retakePhoto": "Reprendre",
     "submit": "Envoyer pour examen",
     "submitting": "Envoi en cours...",
-    "pendingTitle": "Vérification en attente",
+    "pendingTitle": "Vérification en cours d'examen",
     "pendingMessage": "Ton selfie est en cours d'examen. Tu peux utiliser l'appli, mais tu n'apparaîtras pas dans les recherches des autres tant que tu ne seras pas approuvée.",
     "rejectedTitle": "Vérification non approuvée",
     "rejectedMessage": "Ton selfie de vérification n'a pas été approuvé. Réessaie.",

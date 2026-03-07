@@ -545,7 +545,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       color: c.text,
     },
     rowPaused: {
-      backgroundColor: '#FFF8E1',
+      backgroundColor: c.goldBg,
       borderRadius: 12,
     },
     rowSubtitle: {

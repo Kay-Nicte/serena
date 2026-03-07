@@ -133,7 +133,7 @@ export default function WhoLikedMeScreen() {
                 )}
                 {item.action === 'superlike' && (
                   <View style={styles.superlikeBadge}>
-                    <Ionicons name="star" size={12} color="#E0A800" />
+                    <Ionicons name="star" size={12} color={Colors.goldAccent} />
                   </View>
                 )}
                 {item.is_verified && isPremium && (
@@ -241,7 +241,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       position: 'absolute',
       top: 6,
       right: 6,
-      backgroundColor: '#FFF8E1',
+      backgroundColor: c.goldBg,
       borderRadius: 10,
       width: 20,
       height: 20,

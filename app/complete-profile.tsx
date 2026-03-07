@@ -220,7 +220,7 @@ export default function CompleteProfileScreen() {
 
           {/* Premium teaser */}
           <View style={styles.premiumTeaser}>
-            <Ionicons name="diamond" size={20} color="#E0A800" />
+            <Text style={{ fontSize: 18 }}>💎</Text>
             <Text style={styles.premiumTeaserText}>{t('premium.completeProfileTeaser')}</Text>
           </View>
 
@@ -440,7 +440,7 @@ export default function CompleteProfileScreen() {
       <Modal visible={trialGranted} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Ionicons name="diamond" size={40} color="#E0A800" />
+            <Text style={{ fontSize: 36 }}>💎</Text>
             <Text style={styles.modalTitle}>{t('premium.trialTitle')}</Text>
             <Text style={styles.modalDescription}>{t('premium.trialDescription')}</Text>
             <View style={styles.modalBenefits}>
@@ -449,7 +449,7 @@ export default function CompleteProfileScreen() {
                 <Text style={styles.modalBenefitText}>{t('premium.benefit10Likes')}</Text>
               </View>
               <View style={styles.modalBenefit}>
-                <Ionicons name="star" size={18} color="#E0A800" />
+                <Ionicons name="star" size={18} color={Colors.goldAccent} />
                 <Text style={styles.modalBenefitText}>{t('premium.benefitSuperlike')}</Text>
               </View>
               <View style={styles.modalBenefit}>
@@ -590,16 +590,16 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 10,
-      backgroundColor: '#FFF8E1',
+      backgroundColor: c.goldBg,
       borderWidth: 1,
-      borderColor: '#FFE082',
+      borderColor: c.goldBorder,
       borderRadius: 16,
       padding: 14,
     },
     premiumTeaserText: {
       fontSize: 14,
       fontFamily: Fonts.bodyMedium,
-      color: '#9A7800',
+      color: c.goldText,
       flex: 1,
       lineHeight: 20,
     },

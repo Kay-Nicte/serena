@@ -95,7 +95,7 @@ export default function ProfileScreen() {
   const totalLikes = useDailyStatsStore((s) => s.totalLikes);
 
   // Profile completion: count filled required fields (diamond-marked + photos)
-  // Excluded from premium requirement: hogwarts_house, gender_identity, religion, pronouns
+  // Excluded from premium requirement: hogwarts_house, gender_identity, religion, pronouns, education
   const profileRequiredChecks = [
     !!profile?.name?.trim(),
     !!profile?.birth_date,
@@ -113,7 +113,6 @@ export default function ProfileScreen() {
     !!profile?.relationship_type,
     ensureArray(profile?.languages).length > 0,
     !!profile?.profession?.trim(),
-    !!profile?.education,
     !!profile?.exercise,
     ensureArray(profile?.music_genres).length > 0,
     photos.length > 0,
@@ -266,7 +265,7 @@ export default function ProfileScreen() {
   const PremiumLabel = ({ label }: { label: string }) => (
     <View style={styles.premiumLabelRow}>
       <Text style={styles.sectionLabel}>{label}</Text>
-      {showPremiumHints && <Ionicons name="diamond" size={14} color="#E0A800" />}
+      {showPremiumHints && <Text style={{ fontSize: 12 }}>💎</Text>}
     </View>
   );
 
@@ -443,7 +442,7 @@ export default function ProfileScreen() {
 
             {isPremium && (
               <View style={styles.premiumBadge}>
-                <Ionicons name="diamond" size={14} color="#E0A800" />
+                <Text style={{ fontSize: 12 }}>💎</Text>
                 <Text style={styles.premiumBadgeText}>{t('premium.badge')}</Text>
                 {premiumUntil && (
                   <Text style={styles.premiumExpiry}>
@@ -465,7 +464,7 @@ export default function ProfileScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.premiumTeaserHeader}>
-                  <Ionicons name="diamond" size={20} color="#E0A800" />
+                  <Text style={{ fontSize: 18 }}>💎</Text>
                   <Text style={styles.premiumTeaserPct}>{profileCompletionPct}%</Text>
                 </View>
                 <View style={styles.progressBarBg}>
@@ -714,12 +713,12 @@ export default function ProfileScreen() {
                 color={profile?.verification_status === 'pending' ? Colors.warning : Colors.primary}
               />
               <View style={styles.verificationBannerContent}>
-                <Text style={styles.verificationBannerTitle}>
+                <Text style={[styles.verificationBannerTitle, profile?.verification_status === 'pending' && { color: Colors.goldText }]}>
                   {profile?.verification_status === 'pending'
                     ? t('verification.pendingTitle')
                     : t('verification.promptTitle')}
                 </Text>
-                <Text style={styles.verificationBannerSubtitle}>
+                <Text style={[styles.verificationBannerSubtitle, profile?.verification_status === 'pending' && { color: Colors.goldText }]}>
                   {profile?.verification_status === 'pending'
                     ? t('verification.bannerPending')
                     : t('verification.banner')}
@@ -735,7 +734,7 @@ export default function ProfileScreen() {
           {(isPremium || availableBoosts > 0 || isBoostActive) && (
             <View style={[styles.streakCard, styles.boostCard]}>
               <View style={styles.streakHeader}>
-                <Ionicons name="flash" size={22} color="#E0A800" />
+                <Ionicons name="flash" size={22} color={Colors.goldAccent} />
                 <Text style={styles.streakTitle}>{t('profile.boostTitle')}</Text>
               </View>
               {isBoostActive ? (
@@ -772,7 +771,7 @@ export default function ProfileScreen() {
                       onPress={() => router.push('/buy-boost')}
                       activeOpacity={0.7}
                     >
-                      <Ionicons name="flash-outline" size={18} color="#E0A800" />
+                      <Ionicons name="flash-outline" size={18} color={Colors.goldAccent} />
                       <Text style={styles.boostBuyButtonText}>{t('profile.boostBuy')}</Text>
                     </TouchableOpacity>
                   )}
@@ -1112,7 +1111,7 @@ export default function ProfileScreen() {
 
           {/* Education */}
           <View style={styles.section}>
-            <PremiumLabel label={t('profile.education.title')} />
+            <Text style={styles.sectionLabel}>{t('profile.education.title')}</Text>
             <View style={styles.tags}>
               {EDUCATION_OPTIONS.map((e) => (
                 <Tag key={e} label={t(`profile.education.${e}`)} selected={education === e} onPress={() => toggleSingleSelect(education, e, setEducation)} />
@@ -1375,7 +1374,7 @@ export default function ProfileScreen() {
       <Modal visible={trialGranted} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Ionicons name="diamond" size={40} color="#E0A800" />
+            <Text style={{ fontSize: 36 }}>💎</Text>
             <Text style={styles.modalTitle}>{t('premium.trialTitle')}</Text>
             <Text style={styles.modalDescription}>{t('premium.trialDescription')}</Text>
             <View style={styles.modalBenefits}>
@@ -1384,7 +1383,7 @@ export default function ProfileScreen() {
                 <Text style={styles.modalBenefitText}>{t('premium.benefit10Likes')}</Text>
               </View>
               <View style={styles.modalBenefit}>
-                <Ionicons name="star" size={18} color="#E0A800" />
+                <Ionicons name="star" size={18} color={Colors.goldAccent} />
                 <Text style={styles.modalBenefitText}>{t('premium.benefitSuperlike')}</Text>
               </View>
               <View style={styles.modalBenefit}>
@@ -1496,17 +1495,17 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 4,
-      backgroundColor: '#FFF8E1',
+      backgroundColor: c.goldBg,
       paddingHorizontal: 10,
       paddingVertical: 4,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: '#FFE082',
+      borderColor: c.goldBorder,
     },
     premiumBadgeText: {
       fontSize: 13,
       fontFamily: Fonts.bodySemiBold,
-      color: '#E0A800',
+      color: c.goldAccent,
     },
     premiumExpiry: {
       fontSize: 11,
@@ -1664,9 +1663,9 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 8,
-      backgroundColor: '#FFF8E1',
+      backgroundColor: c.goldBg,
       borderWidth: 1,
-      borderColor: '#FFE082',
+      borderColor: c.goldBorder,
       borderRadius: 12,
       paddingHorizontal: 14,
       paddingVertical: 10,
@@ -1675,11 +1674,11 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       flex: 1,
       fontSize: 13,
       fontFamily: Fonts.bodyMedium,
-      color: '#9A7800',
+      color: c.goldText,
     },
     boostCard: {
       borderWidth: 1,
-      borderColor: '#FFE082',
+      borderColor: c.goldBorder,
     },
     boostActiveRow: {
       flexDirection: 'row',
@@ -1689,7 +1688,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
     boostCountdown: {
       fontSize: 32,
       fontFamily: Fonts.heading,
-      color: '#E0A800',
+      color: c.goldAccent,
     },
     boostActiveLabel: {
       fontSize: 14,
@@ -1703,7 +1702,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 8,
-      backgroundColor: '#E0A800',
+      backgroundColor: c.goldAccent,
       borderRadius: 24,
       paddingHorizontal: 20,
       paddingVertical: 10,
@@ -1732,7 +1731,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       alignItems: 'center',
       gap: 8,
       borderWidth: 1,
-      borderColor: '#E0A800',
+      borderColor: c.goldAccent,
       borderRadius: 24,
       paddingHorizontal: 20,
       paddingVertical: 10,
@@ -1740,7 +1739,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
     boostBuyButtonText: {
       fontSize: 15,
       fontFamily: Fonts.bodySemiBold,
-      color: '#E0A800',
+      color: c.goldAccent,
     },
     streakCard: {
       padding: 20,
@@ -1822,9 +1821,9 @@ function makeStyles(c: ReturnType<typeof useColors>) {
     },
     premiumTeaser: {
       gap: 10,
-      backgroundColor: '#FFF8E1',
+      backgroundColor: c.goldBg,
       borderWidth: 1,
-      borderColor: '#FFE082',
+      borderColor: c.goldBorder,
       borderRadius: 16,
       padding: 14,
     },
@@ -1836,23 +1835,23 @@ function makeStyles(c: ReturnType<typeof useColors>) {
     premiumTeaserPct: {
       fontSize: 18,
       fontFamily: Fonts.heading,
-      color: '#9A7800',
+      color: c.goldText,
     },
     progressBarBg: {
       height: 8,
       borderRadius: 4,
-      backgroundColor: '#FFE082',
+      backgroundColor: c.goldBorder,
       overflow: 'hidden' as const,
     },
     progressBarFill: {
       height: '100%' as const,
       borderRadius: 4,
-      backgroundColor: '#E0A800',
+      backgroundColor: c.goldAccent,
     },
     premiumTeaserText: {
       fontSize: 14,
       fontFamily: Fonts.bodyMedium,
-      color: '#9A7800',
+      color: c.goldText,
       lineHeight: 20,
     },
     premiumLabelRow: {
@@ -1871,8 +1870,8 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       padding: 16,
     },
     verificationBannerPending: {
-      backgroundColor: '#FFF8E1',
-      borderColor: '#FFE082',
+      backgroundColor: c.goldBg,
+      borderColor: c.goldBorder,
     },
     verificationBannerContent: {
       flex: 1,

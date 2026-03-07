@@ -158,17 +158,17 @@ export default function PremiumScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Ionicons name="diamond" size={48} color="#E0A800" />
+        <Text style={{ fontSize: 44 }}>💎</Text>
         <Text style={styles.title}>{t('premium.choosePlan')}</Text>
 
         {/* Benefits */}
         <View style={styles.benefits}>
           <Benefit icon="heart" color={Colors.primary} text={t('premium.benefit10Likes')} styles={styles} />
-          <Benefit icon="star" color="#E0A800" text={t('premium.benefitSuperlike')} styles={styles} />
+          <Benefit icon="star" color={Colors.goldAccent} text={t('premium.benefitSuperlike')} styles={styles} />
           <Benefit icon="chatbubble" color={Colors.primary} text={t('premium.benefitIceBreaker')} styles={styles} />
           <Benefit icon="eye" color={Colors.primary} text={t('premium.benefitReadReceipts')} styles={styles} />
           <Benefit icon="time" color={Colors.primary} text={t('premium.benefitLastSeen')} styles={styles} />
-          <Benefit icon="flash" color="#E0A800" text={t('premium.benefitBoost')} styles={styles} />
+          <Benefit icon="flash" color={Colors.goldAccent} text={t('premium.benefitBoost')} styles={styles} />
         </View>
 
         {/* Plans */}
@@ -221,7 +221,7 @@ export default function PremiumScreen() {
               <ActivityIndicator size="small" color="#fff" />
             ) : (
               <>
-                <Ionicons name="diamond" size={18} color="#fff" />
+                <Text style={{ fontSize: 16 }}>💎</Text>
                 <Text style={styles.subscribeText}>{t('premium.subscribe')}</Text>
               </>
             )}
@@ -344,8 +344,8 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       backgroundColor: c.surface,
     },
     planCardSelected: {
-      borderColor: '#E0A800',
-      backgroundColor: '#FFFBF0',
+      borderColor: c.goldAccent,
+      backgroundColor: c.goldBg,
     },
     planCardBest: {
       overflow: 'visible',
@@ -354,7 +354,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       position: 'absolute',
       top: -10,
       right: 16,
-      backgroundColor: '#E0A800',
+      backgroundColor: c.goldAccent,
       borderRadius: 8,
       paddingHorizontal: 10,
       paddingVertical: 3,
@@ -371,7 +371,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       color: c.text,
     },
     planNameSelected: {
-      color: '#9A7800',
+      color: c.goldText,
     },
     planPrice: {
       fontSize: 16,
@@ -379,7 +379,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       color: c.text,
     },
     planPriceSelected: {
-      color: '#E0A800',
+      color: c.goldAccent,
     },
     noPlans: {
       fontSize: 14,
@@ -393,7 +393,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       alignItems: 'center',
       justifyContent: 'center',
       gap: 8,
-      backgroundColor: '#E0A800',
+      backgroundColor: c.goldAccent,
       paddingVertical: 16,
       borderRadius: 24,
       width: '100%',
@@ -446,7 +446,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       backgroundColor: c.surface,
     },
     redeemButton: {
-      backgroundColor: '#E0A800',
+      backgroundColor: c.goldAccent,
       borderRadius: 12,
       paddingHorizontal: 20,
       justifyContent: 'center',

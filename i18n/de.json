@@ -655,7 +655,7 @@
     "retakePhoto": "Wiederholen",
     "submit": "Zur Überprüfung einreichen",
     "submitting": "Wird gesendet...",
-    "pendingTitle": "Verifizierung ausstehend",
+    "pendingTitle": "Verifizierung wird überprüft",
     "pendingMessage": "Dein Selfie wird gerade überprüft. Du kannst die App nutzen, aber du erscheinst nicht in den Suchergebnissen anderer, bis du genehmigt wirst.",
     "rejectedTitle": "Verifizierung nicht bestanden",
     "rejectedMessage": "Dein Verifizierungs-Selfie wurde nicht genehmigt. Bitte versuche es erneut.",

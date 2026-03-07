@@ -655,7 +655,7 @@
     "retakePhoto": "Retake",
     "submit": "Submit for review",
     "submitting": "Submitting...",
-    "pendingTitle": "Verification pending",
+    "pendingTitle": "Verification under review",
     "pendingMessage": "Your selfie is being reviewed. You can use the app, but you won't appear in others' feeds until approved.",
     "rejectedTitle": "Verification not approved",
     "rejectedMessage": "Your verification selfie wasn't approved. Please try again.",

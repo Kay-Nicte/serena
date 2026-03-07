@@ -182,7 +182,7 @@ export default function TodayScreen() {
             size={18}
             color={verificationStatus === 'pending' ? Colors.warning : Colors.primary}
           />
-          <Text style={styles.verificationBannerText}>
+          <Text style={[styles.verificationBannerText, verificationStatus === 'pending' && styles.verificationBannerTextPending]}>
             {verificationStatus === 'pending'
               ? t("verification.bannerPending")
               : t("verification.banner")}
@@ -271,7 +271,7 @@ export default function TodayScreen() {
                 activeOpacity={0.7}
               >
                 <View>
-                  <Ionicons name="star" size={32} color="#E0A800" />
+                  <Ionicons name="star" size={32} color={Colors.goldAccent} />
                   <View style={styles.superlikeBadge}>
                     <Text style={styles.superlikeBadgeText}>
                       {availableSuperlikes}
@@ -391,14 +391,17 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       paddingVertical: 10,
     },
     verificationBannerPending: {
-      backgroundColor: "#FFF8E1",
-      borderColor: "#FFE082",
+      backgroundColor: c.goldBg,
+      borderColor: c.goldBorder,
     },
     verificationBannerText: {
       flex: 1,
       fontSize: 13,
       fontFamily: Fonts.bodyMedium,
       color: c.text,
+    },
+    verificationBannerTextPending: {
+      color: c.goldText,
     },
     cardWrapper: {
       flex: 1,
@@ -520,15 +523,15 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       color: "#FFFFFF",
     },
     superlikeButton: {
-      backgroundColor: "#FFF8E1",
+      backgroundColor: c.goldBg,
       borderWidth: 1,
-      borderColor: "#FFE082",
+      borderColor: c.goldBorder,
     },
     superlikeBadge: {
       position: "absolute",
       top: -4,
       right: -8,
-      backgroundColor: "#E0A800",
+      backgroundColor: c.goldAccent,
       borderRadius: 8,
       minWidth: 16,
       height: 16,

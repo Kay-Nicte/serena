@@ -76,9 +76,11 @@ export function Toast({
         }),
       ]).start();
 
-      timerRef.current = setTimeout(() => {
-        dismiss();
-      }, duration);
+      if (duration > 0) {
+        timerRef.current = setTimeout(() => {
+          dismiss();
+        }, duration);
+      }
     }
 
     return () => {
