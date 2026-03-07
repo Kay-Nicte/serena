@@ -401,7 +401,9 @@
     "removeModeratorMessage": "{{name}} non avrà più accesso alla moderazione.",
     "moderatorAdded": "Moderatrice aggiunta con successo.",
     "moderatorRemoved": "Moderatrice rimossa con successo.",
-    "moderatorBadge": "Moderatrice"
+    "moderatorBadge": "Moderatrice",
+    "panelTitle": "Pannello Admin",
+    "reports": "Segnalazioni"
   },
   "discovery": {
     "title": "Scopri",

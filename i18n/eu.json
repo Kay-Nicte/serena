@@ -401,7 +401,9 @@
     "removeModeratorMessage": "{{name}}(e)k ez du moderazio-sarbiderik izango.",
     "moderatorAdded": "Moderatzailea ondo gehitu da.",
     "moderatorRemoved": "Moderatzailea ondo kendu da.",
-    "moderatorBadge": "Moderatzailea"
+    "moderatorBadge": "Moderatzailea",
+    "panelTitle": "Admin Panela",
+    "reports": "Txostenak"
   },
   "discovery": {
     "title": "Aurkikuntza",

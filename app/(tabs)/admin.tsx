@@ -316,35 +316,41 @@ export default function AdminScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.adminHeader}>
-        <Text style={styles.title}>{t('admin.title')}</Text>
-        <View style={styles.headerButtons}>
-          {isAdmin && (
-            <TouchableOpacity
-              style={[styles.verificationsLink, { backgroundColor: Colors.secondary }]}
-              onPress={() => router.push('/manage-moderators')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="people-outline" size={18} color={Colors.textOnPrimary} />
-              <Text style={styles.verificationsLinkText}>{t('admin.moderators')}</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={styles.verificationsLink}
-            onPress={() => router.push('/admin-verification')}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="shield-checkmark-outline" size={18} color={Colors.textOnPrimary} />
-            <Text style={styles.verificationsLinkText}>{t('admin.verifications')}</Text>
-            {pendingVerifications > 0 && (
-              <View style={styles.verificationsCountBadge}>
-                <Text style={styles.verificationsCountText}>{pendingVerifications}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.title}>{t('admin.panelTitle')}</Text>
       </View>
 
-      {/* Filter tabs */}
+      {/* Section navigation */}
+      <View style={styles.sectionNav}>
+        <View style={[styles.sectionNavTab, styles.sectionNavTabActive]}>
+          <Ionicons name="flag-outline" size={16} color={Colors.textOnPrimary} />
+          <Text style={[styles.sectionNavText, styles.sectionNavTextActive]}>{t('admin.reports')}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.sectionNavTab}
+          onPress={() => router.push('/admin-verification')}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="shield-checkmark-outline" size={16} color={Colors.text} />
+          <Text style={styles.sectionNavText}>{t('admin.verifications')}</Text>
+          {pendingVerifications > 0 && (
+            <View style={styles.sectionNavBadge}>
+              <Text style={styles.sectionNavBadgeText}>{pendingVerifications}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+        {isAdmin && (
+          <TouchableOpacity
+            style={styles.sectionNavTab}
+            onPress={() => router.push('/manage-moderators')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="people-outline" size={16} color={Colors.text} />
+            <Text style={styles.sectionNavText}>{t('admin.moderators')}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Report filter tabs */}
       <View style={styles.filters}>
         <TouchableOpacity
           style={[styles.filterTab, filter === 'all' && styles.filterTabActive]}
@@ -405,46 +411,56 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       backgroundColor: c.background,
     },
     adminHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
       paddingHorizontal: 24,
       paddingTop: 16,
-      paddingBottom: 8,
-    },
-    headerButtons: {
-      flexDirection: 'row',
-      gap: 8,
+      paddingBottom: 4,
     },
     title: {
-      fontSize: 28,
+      fontSize: 24,
       fontFamily: Fonts.heading,
       color: c.text,
     },
-    verificationsLink: {
+    sectionNav: {
+      flexDirection: 'row',
+      paddingHorizontal: 24,
+      paddingVertical: 10,
+      gap: 8,
+    },
+    sectionNavTab: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 6,
-      backgroundColor: c.primary,
       paddingHorizontal: 14,
       paddingVertical: 8,
-      borderRadius: 16,
+      borderRadius: 12,
+      backgroundColor: c.surfaceSecondary,
     },
-    verificationsLinkText: {
+    sectionNavTabActive: {
+      backgroundColor: c.primary,
+    },
+    sectionNavText: {
       fontSize: 13,
       fontFamily: Fonts.bodySemiBold,
+      color: c.text,
+    },
+    sectionNavTextActive: {
       color: c.textOnPrimary,
     },
-    verificationsCountBadge: {
-      backgroundColor: '#fff',
-      borderRadius: 10,
-      minWidth: 20,
-      height: 20,
+    sectionNavBadge: {
+      backgroundColor: c.error,
+      borderRadius: 8,
+      minWidth: 16,
+      height: 16,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 5,
-      marginLeft: 2,
+      paddingHorizontal: 4,
     },
+    sectionNavBadgeText: {
+      fontSize: 10,
+      fontFamily: Fonts.bodySemiBold,
+      color: '#fff',
+    },
+    // Legacy styles removed
     verificationsCountText: {
       fontSize: 11,
       fontFamily: Fonts.bodyBold,
