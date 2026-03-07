@@ -17,7 +17,7 @@ export function withPhotoUrls<T extends Photo>(photos: T[]): (T & { url: string 
 }
 
 export function usePhotos(userId: string | undefined) {
-  const { photos, isLoading, fetchPhotos, addPhoto, removePhoto } =
+  const { photos, isLoading, fetchPhotos, addPhoto, removePhoto, reorderPhotos } =
     usePhotoStore();
 
   useEffect(() => {
@@ -26,5 +26,5 @@ export function usePhotos(userId: string | undefined) {
     }
   }, [userId]);
 
-  return { photos, isLoading, addPhoto, removePhoto, fetchPhotos };
+  return { photos, isLoading, addPhoto, removePhoto, reorderPhotos, fetchPhotos };
 }

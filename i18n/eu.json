@@ -193,7 +193,8 @@
       "genderfluid": "Genero jariakorra",
       "prefer_not_say": "Nahiago dut ez esan",
       "other": "Bestea"
-    }
+    },
+    "reorderHint": "Luze sakatu argazki bat posizioa aldatzeko"
   },
   "orientation": {
     "lesbian": "Lesbiana",

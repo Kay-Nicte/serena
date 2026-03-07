@@ -19,6 +19,7 @@ interface PhotoStoreState {
   fetchPhotos: (userId: string) => Promise<void>;
   addPhoto: (userId: string, uri: string, position: number) => Promise<void>;
   removePhoto: (photo: Photo) => Promise<void>;
+  reorderPhotos: (userId: string, orderedPhotos: Photo[]) => Promise<void>;
   reset: () => void;
 }
 
@@ -100,6 +101,37 @@ export const usePhotoStore = create<PhotoStoreState>((set, get) => ({
       set({ photos: get().photos.filter((p) => p.id !== photo.id) });
     } catch (error) {
       reportError(error, { source: 'photoStore.removePhoto' });
+      throw error;
+    }
+  },
+
+  reorderPhotos: async (userId: string, orderedPhotos: Photo[]) => {
+    const previous = get().photos;
+    try {
+      // Optimistic update
+      const updated = orderedPhotos.map((p, i) => ({ ...p, position: i }));
+      set({ photos: updated });
+
+      // Update positions in DB
+      for (const photo of updated) {
+        await supabase
+          .from('photos')
+          .update({ position: photo.position })
+          .eq('id', photo.id);
+      }
+
+      // Update avatar_url to the new position 0 photo
+      const newFirst = updated.find((p) => p.position === 0);
+      if (newFirst) {
+        await supabase
+          .from('profiles')
+          .update({ avatar_url: getPhotoUrl(newFirst.storage_path) })
+          .eq('id', userId);
+      }
+    } catch (error) {
+      // Rollback on error
+      set({ photos: previous });
+      reportError(error, { source: 'photoStore.reorderPhotos' });
       throw error;
     }
   },

@@ -193,7 +193,8 @@
       "genderfluid": "Genre fluide",
       "prefer_not_say": "Je préfère ne pas dire",
       "other": "Autre"
-    }
+    },
+    "reorderHint": "Appuie longuement sur une photo pour changer sa position"
   },
   "orientation": {
     "lesbian": "Lesbienne",

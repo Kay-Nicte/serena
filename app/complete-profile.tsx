@@ -33,7 +33,7 @@ export default function CompleteProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user, updateProfile } = useAuthStore();
-  const { photos, addPhoto, removePhoto } = usePhotoStore();
+  const { photos, addPhoto, removePhoto, reorderPhotos } = usePhotoStore();
   const Colors = useColors();
   const styles = makeStyles(Colors);
 
@@ -229,6 +229,7 @@ export default function CompleteProfileScreen() {
             photos={photos}
             onAdd={handleAddPhoto}
             onRemove={handleRemovePhoto}
+            onReorder={(ordered) => user && reorderPhotos(user.id, ordered)}
             editable
           />
 

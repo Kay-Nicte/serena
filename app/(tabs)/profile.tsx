@@ -60,7 +60,7 @@ export default function ProfileScreen() {
   const styles = makeStyles(Colors);
   const router = useRouter();
   const { user, profile, updateProfile, fetchProfile } = useAuthStore();
-  const { photos, addPhoto, removePhoto } = usePhotos(user?.id);
+  const { photos, addPhoto, removePhoto, reorderPhotos } = usePhotos(user?.id);
   const { preferences } = useDiscoveryPreferences();
   const { isTablet, contentMaxWidth, horizontalPadding } = useResponsive();
   useStreak(); // triggers fetch on mount
@@ -906,6 +906,7 @@ export default function ProfileScreen() {
             photos={photos}
             onAdd={handleAddPhoto}
             onRemove={handleRemovePhoto}
+            onReorder={(ordered) => user && reorderPhotos(user.id, ordered)}
             editable
           />
 
