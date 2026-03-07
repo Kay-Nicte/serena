@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -37,23 +37,29 @@ export default function WhoLikedMeScreen() {
   const isPremium = useAuthStore((s) => s.profile?.is_premium ?? false);
   const [likes, setLikes] = useState<PendingLike[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const Colors = useColors();
   const styles = makeStyles(Colors);
 
-  useEffect(() => {
-    const fetchLikes = async () => {
-      try {
-        const { data, error } = await supabase.rpc('get_pending_likes');
-        if (error) throw error;
-        setLikes(data ?? []);
-      } catch {
-        // silently fail
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchLikes();
+  const fetchLikes = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_pending_likes');
+      if (error) throw error;
+      setLikes(data ?? []);
+    } catch {
+      // silently fail
+    }
   }, []);
+
+  useEffect(() => {
+    fetchLikes().finally(() => setIsLoading(false));
+  }, [fetchLikes]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchLikes();
+    setRefreshing(false);
+  }, [fetchLikes]);
 
   const handleProfilePress = (userId: string) => {
     if (isPremium) {
@@ -102,6 +108,8 @@ export default function WhoLikedMeScreen() {
             data={likes}
             keyExtractor={(item) => item.id}
             numColumns={3}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
             columnWrapperStyle={styles.row}
             contentContainerStyle={styles.grid}
             renderItem={({ item }) => (

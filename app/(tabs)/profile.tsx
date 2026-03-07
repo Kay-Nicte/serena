@@ -11,6 +11,7 @@ import {
   Platform,
   Modal,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -71,6 +72,15 @@ export default function ProfileScreen() {
       fetchBoosts();
     }, [fetchProfile, fetchBoosts])
   );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([fetchProfile(), fetchBoosts()]);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchProfile, fetchBoosts]);
 
   const isPremium = profile?.is_premium ?? false;
   const isTrial = profile?.is_trial ?? false;
@@ -148,6 +158,7 @@ export default function ProfileScreen() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const citySearchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [saving, setSaving] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
   const [trialGranted, setTrialGranted] = useState(false);
 
@@ -385,7 +396,7 @@ export default function ProfileScreen() {
   if (!editing) {
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={[styles.scrollContent, { paddingHorizontal: horizontalPadding }, isTablet && { maxWidth: contentMaxWidth, alignSelf: 'center', width: '100%' }]}>
+        <ScrollView contentContainerStyle={[styles.scrollContent, { paddingHorizontal: horizontalPadding }, isTablet && { maxWidth: contentMaxWidth, alignSelf: 'center', width: '100%' }]} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>{t('tabs.profile')}</Text>
             <View style={styles.headerIcons}>

@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  RefreshControl,
   ActivityIndicator,
   useWindowDimensions,
   TouchableOpacity,
@@ -58,10 +59,17 @@ export default function AdminProfileScreen() {
   const [reportedName, setReportedName] = useState<string>('');
   const [reportHistory, setReportHistory] = useState<{ id: string; reason: string; status: string; created_at: string; reporter_name: string | null }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (userId) fetchProfileData();
   }, [userId]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProfileData();
+    setRefreshing(false);
+  };
 
   const fetchProfileData = async () => {
     setIsLoading(true);
@@ -266,7 +274,10 @@ export default function AdminProfileScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         {/* Banned banner */}
         {isBanned && (
           <View style={styles.bannedBanner}>

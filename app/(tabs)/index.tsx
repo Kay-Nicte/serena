@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useFocusEffect } from "expo-router";
 import {
   ActivityIndicator,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -72,12 +73,22 @@ export default function TodayScreen() {
   const shownRewardRef = useRef<string | null>(null);
   const [iceBreakerModalVisible, setIceBreakerModalVisible] = useState(false);
   const [pendingLikesCount, setPendingLikesCount] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
   const refreshPendingLikes = useCallback(() => {
     supabase.rpc('get_pending_likes').then(({ data }) => {
       if (Array.isArray(data)) setPendingLikesCount(data.length);
     });
   }, []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([refresh(), refreshPendingLikes(), fetchProfile()]);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refresh, refreshPendingLikes, fetchProfile]);
 
   // Refresh on tab focus and when currentProfile changes (after like/pass/superlike)
   useFocusEffect(
@@ -209,6 +220,7 @@ export default function TodayScreen() {
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           >
             <ProfileCard
               profile={currentProfile}

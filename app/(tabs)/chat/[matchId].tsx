@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Keyboard,
   Share,
+  RefreshControl,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -80,7 +81,7 @@ export default function ChatScreen() {
   const styles = makeStyles(Colors);
   const isPremium = useAuthStore((s) => s.profile?.is_premium ?? false);
   const myProfile = useAuthStore((s) => s.profile);
-  const { messages, isLoading, sendMessage, markAsRead, toggleReaction } = useChat(matchId!);
+  const { messages, isLoading, isLoadingOlder, hasOlderMessages, fetchOlderMessages, sendMessage, markAsRead, toggleReaction } = useChat(matchId!);
   const { isTablet, chatMaxWidth } = useResponsive();
   const flatListRef = useRef<FlatList>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -542,6 +543,16 @@ export default function ChatScreen() {
                 )}
               </View>
             ) : null}
+            refreshControl={
+              hasOlderMessages ? (
+                <RefreshControl
+                  refreshing={isLoadingOlder}
+                  onRefresh={fetchOlderMessages}
+                  tintColor={Colors.primary}
+                  colors={[Colors.primary]}
+                />
+              ) : undefined
+            }
             contentContainerStyle={[
               styles.messagesList,
               messages.length === 0 && styles.messagesListEmpty,
