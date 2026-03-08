@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
 export function useAuth() {
-  const { initialize, isLoading, session, user, profile, isProfileComplete } =
+  const { initialize, isLoading, session, user, profile, isProfileComplete, isProfileFetched } =
     useAuthStore();
 
   useEffect(() => {
@@ -16,5 +16,6 @@ export function useAuth() {
     user,
     profile,
     isProfileComplete,
+    isProfileFetched,
   };
 }

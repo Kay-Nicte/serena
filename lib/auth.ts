@@ -102,54 +102,45 @@ export async function signInWithGoogle() {
   if (error) throw error;
   if (!data.url) throw new Error('No OAuth URL returned');
 
-  console.log('[GoogleAuth] Opening browser with URL:', data.url.substring(0, 120));
-  console.log('[GoogleAuth] Expected redirectTo:', redirectTo);
+  console.log('[GoogleAuth] Opening browser...');
   const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
   console.log('[GoogleAuth] Browser result type:', result.type);
-  if (result.type === 'success') {
-    console.log('[GoogleAuth] Result URL (full):', (result as any).url);
-  } else {
-    console.log('[GoogleAuth] Browser result (non-success):', JSON.stringify(result));
+
+  // Check if the deep link handler already set the session (common on Android
+  // where the redirect causes the deep link handler to fire before openAuthSessionAsync returns)
+  const { data: existingSession } = await supabase.auth.getSession();
+  if (existingSession.session) {
+    console.log('[GoogleAuth] Session already set by deep link handler');
+    return;
   }
 
   // Path 1: openAuthSessionAsync returned the redirect URL with tokens
   if (result.type === 'success' && result.url) {
-    const url = new URL(result.url);
-    const fragment = url.hash.substring(1);
-    console.log('[GoogleAuth] Hash fragment:', fragment.substring(0, 200));
-    console.log('[GoogleAuth] Search params:', url.search);
+    const fragment = result.url.split('#')[1] ?? '';
     const params = new URLSearchParams(fragment);
     const access_token = params.get('access_token');
     const refresh_token = params.get('refresh_token');
 
     if (access_token && refresh_token) {
       console.log('[GoogleAuth] Path 1: tokens found, setting session...');
-      const { data: sessionResult, error: sessionError } = await supabase.auth.setSession({
+      const { error: sessionError } = await supabase.auth.setSession({
         access_token,
         refresh_token,
       });
-      if (sessionError) {
-        console.log('[GoogleAuth] setSession error:', sessionError.message);
-        throw sessionError;
-      }
-      console.log('[GoogleAuth] Session set successfully, user:', sessionResult.user?.id);
+      if (sessionError) throw sessionError;
+      console.log('[GoogleAuth] Session set successfully');
       return;
     }
-    console.log('[GoogleAuth] Path 1: no tokens found. access_token?', !!access_token, 'refresh_token?', !!refresh_token);
   }
 
-  // Path 2: Browser was dismissed but the deep link handler or
-  // google-auth screen may have already set the session.
-  console.log('[GoogleAuth] Path 2: waiting 2s then checking session...');
+  // Path 2: Wait briefly for deep link handler to set the session
+  console.log('[GoogleAuth] Path 2: waiting for deep link handler...');
   await new Promise((r) => setTimeout(r, 2000));
   const { data: sessionData } = await supabase.auth.getSession();
-  console.log('[GoogleAuth] Path 2: session exists?', !!sessionData.session, 'user?', sessionData.session?.user?.id);
-  if (sessionData.session) return;
-
-  // Path 3: Check store directly (deep link handler might have set it)
-  const storeSession = (await import('@/stores/authStore')).useAuthStore.getState().session;
-  console.log('[GoogleAuth] Path 3: store session exists?', !!storeSession);
-  if (storeSession) return;
+  if (sessionData.session) {
+    console.log('[GoogleAuth] Path 2: session found');
+    return;
+  }
 
   throw new Error('Google sign-in was cancelled');
 }

@@ -125,7 +125,7 @@ export default function LoginScreen() {
               setGoogleLoading(true);
               try {
                 await signInWithGoogle();
-                await fetchProfile();
+                // onAuthStateChange handles fetchProfile and AuthGuard handles navigation
               } catch (e: unknown) {
                 const msg = e instanceof Error ? e.message : '';
                 if (!msg.includes('cancelled')) {

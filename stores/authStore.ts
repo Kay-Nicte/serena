@@ -142,10 +142,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ isPasswordRecovery: true });
       }
       if (session?.user) {
-        await get().fetchProfile();
-        if (event === 'USER_UPDATED' && session.user.email_confirmed_at) {
-          showToast(i18n.t('auth.emailVerified'), 'success', 5000);
-        }
+        // Defer fetchProfile to avoid deadlock when called from within setSession
+        setTimeout(async () => {
+          await get().fetchProfile();
+          if (event === 'USER_UPDATED' && session!.user.email_confirmed_at) {
+            showToast(i18n.t('auth.emailVerified'), 'success', 5000);
+          }
+        }, 0);
       } else {
         set({ profile: null, isProfileComplete: false, isProfileFetched: true });
       }
@@ -154,31 +157,39 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   fetchProfile: async () => {
     const user = get().user;
-    if (!user) return;
+    console.log('[Auth] fetchProfile called, user:', user?.id);
+    if (!user) { set({ isProfileFetched: true }); return; }
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-    if (error) {
-      reportError(error, { source: 'authStore.fetchProfile' });
+      console.log('[Auth] fetchProfile result:', error?.message ?? 'success', 'complete:', data?.is_profile_complete);
+
+      if (error) {
+        reportError(error, { source: 'authStore.fetchProfile' });
+        set({ isProfileFetched: true });
+        return;
+      }
+
+      if (data?.language_preference) {
+        const i18n = (await import('@/i18n')).default;
+        await i18n.changeLanguage(data.language_preference);
+      }
+
+      set({
+        profile: normalizeProfile(data),
+        isProfileComplete: data?.is_profile_complete ?? false,
+        isVerified: data?.is_verified ?? false,
+        isProfileFetched: true,
+      });
+    } catch (e) {
+      console.log('[Auth] fetchProfile EXCEPTION:', e);
       set({ isProfileFetched: true });
-      return;
     }
-
-    if (data?.language_preference) {
-      const i18n = (await import('@/i18n')).default;
-      await i18n.changeLanguage(data.language_preference);
-    }
-
-    set({
-      profile: normalizeProfile(data),
-      isProfileComplete: data?.is_profile_complete ?? false,
-      isVerified: data?.is_verified ?? false,
-      isProfileFetched: true,
-    });
   },
 
   updateProfile: async (updates) => {
