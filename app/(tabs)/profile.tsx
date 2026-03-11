@@ -408,6 +408,48 @@ export default function ProfileScreen() {
             </View>
           </View>
 
+          {/* Verification banner — top of profile so users see the promo */}
+          {!profile?.is_verified && (
+            <TouchableOpacity
+              style={[
+                styles.verificationBanner,
+                profile?.verification_status === 'pending' && styles.verificationBannerPending,
+              ]}
+              onPress={() => {
+                if (profile?.verification_status !== 'pending') {
+                  router.push('/verify-identity');
+                }
+              }}
+              activeOpacity={profile?.verification_status === 'pending' ? 1 : 0.7}
+            >
+              <Ionicons
+                name={profile?.verification_status === 'pending' ? 'time-outline' : 'shield-checkmark-outline'}
+                size={20}
+                color={profile?.verification_status === 'pending' ? Colors.warning : Colors.primary}
+              />
+              <View style={styles.verificationBannerContent}>
+                <Text style={[styles.verificationBannerTitle, profile?.verification_status === 'pending' && { color: Colors.goldText }]}>
+                  {profile?.verification_status === 'pending'
+                    ? t('verification.pendingTitle')
+                    : t('verification.promptTitle')}
+                </Text>
+                <Text style={[styles.verificationBannerSubtitle, profile?.verification_status === 'pending' && { color: Colors.goldText }]}>
+                  {profile?.verification_status === 'pending'
+                    ? t('verification.bannerPending')
+                    : t('verification.banner')}
+                </Text>
+                {profile?.verification_status !== 'pending' && (
+                  <Text style={{ fontSize: 11, fontFamily: Fonts.bodySemiBold, color: Colors.goldText, marginTop: 2 }}>
+                    {t('verification.promoLaunch')}
+                  </Text>
+                )}
+              </View>
+              {profile?.verification_status !== 'pending' && (
+                <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
+          )}
+
           {/* Pause banner */}
           {isPaused && (
             <TouchableOpacity
@@ -692,48 +734,6 @@ export default function ProfileScreen() {
               </View>
             )}
           </View>
-
-          {/* Verification banner */}
-          {!profile?.is_verified && (
-            <TouchableOpacity
-              style={[
-                styles.verificationBanner,
-                profile?.verification_status === 'pending' && styles.verificationBannerPending,
-              ]}
-              onPress={() => {
-                if (profile?.verification_status !== 'pending') {
-                  router.push('/verify-identity');
-                }
-              }}
-              activeOpacity={profile?.verification_status === 'pending' ? 1 : 0.7}
-            >
-              <Ionicons
-                name={profile?.verification_status === 'pending' ? 'time-outline' : 'shield-checkmark-outline'}
-                size={20}
-                color={profile?.verification_status === 'pending' ? Colors.warning : Colors.primary}
-              />
-              <View style={styles.verificationBannerContent}>
-                <Text style={[styles.verificationBannerTitle, profile?.verification_status === 'pending' && { color: Colors.goldText }]}>
-                  {profile?.verification_status === 'pending'
-                    ? t('verification.pendingTitle')
-                    : t('verification.promptTitle')}
-                </Text>
-                <Text style={[styles.verificationBannerSubtitle, profile?.verification_status === 'pending' && { color: Colors.goldText }]}>
-                  {profile?.verification_status === 'pending'
-                    ? t('verification.bannerPending')
-                    : t('verification.banner')}
-                </Text>
-                {profile?.verification_status !== 'pending' && (
-                  <Text style={[styles.verificationBannerSubtitle, { color: Colors.goldText, marginTop: 2 }]}>
-                    {t('verification.promoLaunch')}
-                  </Text>
-                )}
-              </View>
-              {profile?.verification_status !== 'pending' && (
-                <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
-              )}
-            </TouchableOpacity>
-          )}
 
           {/* Boost Card */}
           {(isPremium || availableBoosts > 0 || isBoostActive) && (

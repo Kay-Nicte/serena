@@ -184,14 +184,14 @@ export default function TodayScreen() {
             size={18}
             color={verificationStatus === 'pending' ? Colors.warning : Colors.primary}
           />
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.verificationBannerText, verificationStatus === 'pending' && styles.verificationBannerTextPending]}>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={[styles.verificationBannerText, verificationStatus === 'pending' && styles.verificationBannerTextPending]} numberOfLines={2}>
               {verificationStatus === 'pending'
                 ? t("verification.bannerPending")
                 : t("verification.banner")}
             </Text>
             {verificationStatus !== 'pending' && (
-              <Text style={[styles.verificationBannerText, { color: Colors.goldText, marginTop: 2 }]}>
+              <Text style={{ fontSize: 11, fontFamily: Fonts.bodySemiBold, color: Colors.goldText }} numberOfLines={2}>
                 {t("verification.promoLaunch")}
               </Text>
             )}
