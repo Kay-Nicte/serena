@@ -398,7 +398,7 @@ export default function SettingsScreen() {
             <View style={styles.row}>
               <Ionicons name="information-circle-outline" size={20} color={Colors.text} />
               <Text style={styles.rowLabel}>{t('settings.version')}</Text>
-              <Text style={styles.rowValue}>{appVersion}</Text>
+              <Text style={styles.rowValue}>{appVersion} (OTA-7)</Text>
             </View>
           </View>
         </View>

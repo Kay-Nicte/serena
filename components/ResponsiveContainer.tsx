@@ -1,8 +1,9 @@
+import { type ReactNode } from 'react';
 import { View, type ViewStyle } from 'react-native';
 import { useResponsive } from '@/hooks/useResponsive';
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
   style?: ViewStyle;
 }
 
