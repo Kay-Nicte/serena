@@ -20,7 +20,6 @@ import { supabase } from '@/lib/supabase';
 import { Config } from '@/constants/config';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import type { Profile } from '@/stores/authStore';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 
 function ensureArray(val: unknown): string[] {
   if (val == null) return [];
@@ -242,11 +241,11 @@ export default function AdminProfileScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ResponsiveContainer>
+        <>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={Colors.primary} />
         </View>
-        </ResponsiveContainer>
+        </>
       </SafeAreaView>
     );
   }
@@ -254,11 +253,11 @@ export default function AdminProfileScreen() {
   if (!profile) {
     return (
       <SafeAreaView style={styles.container}>
-        <ResponsiveContainer>
+        <>
         <View style={styles.centered}>
           <Text style={styles.errorText}>{t('common.error')}</Text>
         </View>
-        </ResponsiveContainer>
+        </>
       </SafeAreaView>
     );
   }
@@ -270,7 +269,7 @@ export default function AdminProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -456,7 +455,7 @@ export default function AdminProfileScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

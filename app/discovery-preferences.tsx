@@ -39,7 +39,6 @@ import { useProfileStore } from '@/stores/profileStore';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { showToast } from '@/stores/toastStore';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 
 export default function DiscoveryPreferencesScreen() {
   const { t } = useTranslation();
@@ -262,7 +261,7 @@ export default function DiscoveryPreferencesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -582,7 +581,7 @@ export default function DiscoveryPreferencesScreen() {
           />
         </ScrollView>
       </KeyboardAvoidingView>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

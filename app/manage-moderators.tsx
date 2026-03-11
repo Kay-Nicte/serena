@@ -18,7 +18,6 @@ import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { showConfirm } from '@/components/ConfirmDialog';
 import { showToast } from '@/stores/toastStore';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 
 interface UserRow {
   id: string;
@@ -154,7 +153,7 @@ export default function ManageModeratorsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={Colors.text} />
@@ -210,7 +209,7 @@ export default function ManageModeratorsScreen() {
           />
         )}
       </View>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

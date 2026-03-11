@@ -19,7 +19,6 @@ import { Button } from '@/components/ui/Button';
 import { Tag } from '@/components/ui/Tag';
 import { PhotoGrid } from '@/components/PhotoGrid';
 import { useColors } from '@/hooks/useColors';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { Fonts } from '@/constants/fonts';
 import { Config, ORIENTATIONS, LOOKING_FOR_OPTIONS, INTERESTS, CHILDREN_OPTIONS, ZODIAC_SIGNS, PET_OPTIONS, SMOKING_OPTIONS, DRINKING_OPTIONS, HOGWARTS_HOUSES } from '@/constants/config';
 import { useAuthStore } from '@/stores/authStore';
@@ -208,7 +207,7 @@ export default function CompleteProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -504,7 +503,7 @@ export default function CompleteProfileScreen() {
           </View>
         </View>
       </Modal>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

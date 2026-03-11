@@ -6,7 +6,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { useColors } from '@/hooks/useColors';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { Fonts } from '@/constants/fonts';
 import { signInWithGoogle } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -37,7 +36,7 @@ export default function WelcomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.content}>
         <View style={styles.hero}>
           <Text style={styles.title}>{t('welcome.title')}</Text>
@@ -78,7 +77,7 @@ export default function WelcomeScreen() {
           </TouchableOpacity>
         </View>
       </View>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

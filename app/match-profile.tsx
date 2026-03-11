@@ -15,7 +15,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '@/hooks/useColors';
 import { useResponsive } from '@/hooks/useResponsive';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { getPhotoUrl } from '@/lib/storage';
@@ -166,7 +165,7 @@ export default function MatchProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -392,7 +391,7 @@ export default function MatchProfileScreen() {
           )}
         </View>
       </ScrollView>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

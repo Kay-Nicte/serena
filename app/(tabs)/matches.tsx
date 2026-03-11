@@ -16,7 +16,6 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { useResponsive } from '@/hooks/useResponsive';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { Fonts } from '@/constants/fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useMatches } from '@/hooks/useMatches';
@@ -256,7 +255,7 @@ export default function MatchesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <Text style={styles.title}>{t('matches.title')}</Text>
 
       {isLoading && ibLoading && !hasContent ? (
@@ -291,7 +290,7 @@ export default function MatchesScreen() {
         options={actionSheetOptions}
         onClose={() => setActionSheetMatch(null)}
       />
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

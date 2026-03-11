@@ -16,7 +16,6 @@ import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/authStore';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 
 type ActionFilter = 'all' | 'verification_approved' | 'verification_rejected' | 'ban' | 'unban';
 
@@ -155,7 +154,7 @@ export default function AdminAuditLogScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.header}>
         <Text style={styles.title}>{t('admin.panelTitle')}</Text>
       </View>
@@ -224,7 +223,7 @@ export default function AdminAuditLogScreen() {
           refreshing={isLoading}
         />
       )}
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

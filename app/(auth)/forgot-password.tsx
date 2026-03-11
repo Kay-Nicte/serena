@@ -14,7 +14,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useColors } from '@/hooks/useColors';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { showToast } from '@/stores/toastStore';
@@ -100,7 +99,7 @@ export default function ForgotPasswordScreen() {
   if (step === 'code') {
     return (
       <SafeAreaView style={styles.container}>
-        <ResponsiveContainer>
+        <>
         <KeyboardAvoidingView
           style={styles.content}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -162,14 +161,14 @@ export default function ForgotPasswordScreen() {
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
-        </ResponsiveContainer>
+        </>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <KeyboardAvoidingView
         style={styles.content}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -206,7 +205,7 @@ export default function ForgotPasswordScreen() {
           />
         </View>
       </KeyboardAvoidingView>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

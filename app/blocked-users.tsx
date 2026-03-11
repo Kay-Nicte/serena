@@ -18,7 +18,6 @@ import { useMatchStore } from '@/stores/matchStore';
 import type { BlockedUser } from '@/stores/blockStore';
 import { showToast } from '@/stores/toastStore';
 import { showConfirm } from '@/components/ConfirmDialog';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 
 export default function BlockedUsersScreen() {
   const { t } = useTranslation();
@@ -73,7 +72,7 @@ export default function BlockedUsersScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -102,7 +101,7 @@ export default function BlockedUsersScreen() {
           contentContainerStyle={styles.list}
         />
       )}
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

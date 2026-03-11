@@ -15,7 +15,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useColors } from '@/hooks/useColors';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { Fonts } from '@/constants/fonts';
 import { signIn, signInWithGoogle } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
@@ -62,18 +61,18 @@ export default function LoginScreen() {
   if (googleLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <ResponsiveContainer>
+        <>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color={Colors.primary} />
         </View>
-        </ResponsiveContainer>
+        </>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <KeyboardAvoidingView
         style={styles.content}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -162,7 +161,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { useColors } from '@/hooks/useColors';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { Fonts } from '@/constants/fonts';
 import { supabase } from '@/lib/supabase';
 import { showToast } from '@/stores/toastStore';
@@ -38,7 +37,7 @@ export default function VerifyEmailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
           <Ionicons name="mail-outline" size={64} color={Colors.primary} />
@@ -62,7 +61,7 @@ export default function VerifyEmailScreen() {
           />
         </View>
       </View>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

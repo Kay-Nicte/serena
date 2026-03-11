@@ -19,7 +19,6 @@ import { Fonts } from '@/constants/fonts';
 import { reauthenticate, changePassword } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { showToast } from '@/stores/toastStore';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -76,7 +75,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -131,7 +130,7 @@ export default function ChangePasswordScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

@@ -17,7 +17,6 @@ import { Fonts } from '@/constants/fonts';
 import { getBoostOffering, purchaseBoostPackage } from '@/lib/purchases';
 import { useBoostStore } from '@/stores/boostStore';
 import { showToast } from '@/stores/toastStore';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 
 // Map package identifier → boost count granted
 const BOOST_COUNTS: Record<string, number> = {
@@ -77,7 +76,7 @@ export default function BuyBoostScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
           <Ionicons name="close" size={24} color={Colors.text} />
@@ -135,7 +134,7 @@ export default function BuyBoostScreen() {
           <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 24 }} />
         )}
       </ScrollView>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }

@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useColors } from '@/hooks/useColors';
-import { ResponsiveContainer } from '@/components/ResponsiveContainer';
 import { useThemeStore, type ThemePreference } from '@/stores/themeStore';
 import { Fonts } from '@/constants/fonts';
 import { useAuthStore } from '@/stores/authStore';
@@ -178,7 +177,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ResponsiveContainer>
+      <>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -492,7 +491,7 @@ export default function SettingsScreen() {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      </ResponsiveContainer>
+      </>
     </SafeAreaView>
   );
 }
