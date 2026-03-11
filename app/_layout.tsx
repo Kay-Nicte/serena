@@ -268,7 +268,7 @@ export default function RootLayout() {
           // Update will apply automatically on next cold start.
           // Show a non-intrusive toast so the user can restart when they want.
           showToast(
-            t('common.updateReady'),
+            '✨ Nueva versión lista. ¡Toca para actualizar!',
             'success',
             6000,
             () => Updates.reloadAsync(),
