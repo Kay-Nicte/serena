@@ -35,10 +35,14 @@ export function PhotoGrid({ photos, onAdd, onRemove, onReorder, editable = true 
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const dragAnim = useRef(new Animated.ValueXY()).current;
-  const dragStartPos = useRef({ x: 0, y: 0 });
 
-  // Build sorted photos array (only existing photos, by position)
+  // Use refs so PanResponder always sees the latest values
+  const draggingRef = useRef<number | null>(null);
+  const hoverRef = useRef<number | null>(null);
+  const sortedRef = useRef<Photo[]>([]);
+
   const sortedPhotos = [...photos].sort((a, b) => a.position - b.position);
+  sortedRef.current = sortedPhotos;
 
   const getSlotPosition = useCallback((index: number) => {
     const col = index % GRID_COLUMNS;
@@ -60,36 +64,41 @@ export function PhotoGrid({ photos, onAdd, onRemove, onReorder, editable = true 
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gesture) =>
-        editable && !!onReorder && (Math.abs(gesture.dx) > 8 || Math.abs(gesture.dy) > 8),
+        draggingRef.current !== null && (Math.abs(gesture.dx) > 5 || Math.abs(gesture.dy) > 5),
       onPanResponderGrant: () => {},
       onPanResponderMove: (_, gesture) => {
-        if (draggingIndex === null) return;
-        dragAnim.setValue({
-          x: gesture.dx,
-          y: gesture.dy,
-        });
-        const startSlot = getSlotPosition(draggingIndex);
+        const di = draggingRef.current;
+        if (di === null) return;
+        dragAnim.setValue({ x: gesture.dx, y: gesture.dy });
+        const startSlot = getSlotPosition(di);
         const newIndex = getIndexFromPosition(
           startSlot.x + gesture.dx,
           startSlot.y + gesture.dy,
         );
-        if (newIndex !== hoverIndex && newIndex < sortedPhotos.length) {
+        if (newIndex !== hoverRef.current && newIndex < sortedRef.current.length) {
+          hoverRef.current = newIndex;
           setHoverIndex(newIndex);
         }
       },
       onPanResponderRelease: () => {
-        if (draggingIndex !== null && hoverIndex !== null && draggingIndex !== hoverIndex && onReorder) {
-          const newOrder = [...sortedPhotos];
-          const [moved] = newOrder.splice(draggingIndex, 1);
-          newOrder.splice(hoverIndex, 0, moved);
+        const di = draggingRef.current;
+        const hi = hoverRef.current;
+        if (di !== null && hi !== null && di !== hi && onReorder) {
+          const newOrder = [...sortedRef.current];
+          const [moved] = newOrder.splice(di, 1);
+          newOrder.splice(hi, 0, moved);
           onReorder(newOrder);
         }
         dragAnim.setValue({ x: 0, y: 0 });
+        draggingRef.current = null;
+        hoverRef.current = null;
         setDraggingIndex(null);
         setHoverIndex(null);
       },
       onPanResponderTerminate: () => {
         dragAnim.setValue({ x: 0, y: 0 });
+        draggingRef.current = null;
+        hoverRef.current = null;
         setDraggingIndex(null);
         setHoverIndex(null);
       },
@@ -107,16 +116,14 @@ export function PhotoGrid({ photos, onAdd, onRemove, onReorder, editable = true 
 
   const handleLongPress = (index: number) => {
     if (!editable || !onReorder || sortedPhotos.length < 2) return;
+    draggingRef.current = index;
+    hoverRef.current = index;
+    dragAnim.setValue({ x: 0, y: 0 });
     setDraggingIndex(index);
     setHoverIndex(index);
-    const pos = getSlotPosition(index);
-    dragStartPos.current = pos;
   };
 
-  const photoByPosition = new Map(photos.map((p) => [p.position, p]));
-  const slots = Array.from({ length: Config.maxPhotos }, (_, i) => i);
-
-  // Build visual order: if dragging, show the reordered preview
+  // Build visual order: if dragging, show the reordered preview (without the dragged photo in its original slot)
   const getVisualPhotos = () => {
     if (draggingIndex === null || hoverIndex === null) return sortedPhotos;
     const preview = [...sortedPhotos];
@@ -126,26 +133,29 @@ export function PhotoGrid({ photos, onAdd, onRemove, onReorder, editable = true 
   };
 
   const visualPhotos = getVisualPhotos();
+  const draggedPhoto = draggingIndex !== null ? sortedPhotos[draggingIndex] : null;
+  const dragSlotPos = draggingIndex !== null ? getSlotPosition(draggingIndex) : null;
 
   return (
     <View>
       <View style={styles.grid} {...panResponder.panHandlers}>
         {slots.map((slotIndex) => {
           const photo = slotIndex < visualPhotos.length ? visualPhotos[slotIndex] : null;
-          const isDragging = draggingIndex !== null && slotIndex === (hoverIndex ?? draggingIndex);
-          const isBeingDragged = draggingIndex !== null && photo === sortedPhotos[draggingIndex];
+          const isDropTarget = draggingIndex !== null && slotIndex === hoverIndex;
 
           if (photo) {
-            const slotStyle = [styles.slot, { width: itemWidth, height: itemHeight }];
-            if (isDragging) slotStyle.push(styles.slotHighlight as any);
-            if (isBeingDragged && draggingIndex !== null) {
-              slotStyle.push({ opacity: 0.5 } as any);
-            }
+            // Hide the photo that is being dragged (it's shown as the floating overlay instead)
+            const isBeingDragged = draggingIndex !== null && photo === sortedPhotos[draggingIndex];
 
             return (
               <TouchableOpacity
                 key={`photo-${slotIndex}`}
-                style={slotStyle}
+                style={[
+                  styles.slot,
+                  { width: itemWidth, height: itemHeight },
+                  isDropTarget && styles.slotHighlight,
+                  isBeingDragged && { opacity: 0.3 },
+                ]}
                 onLongPress={() => handleLongPress(slotIndex)}
                 delayLongPress={200}
                 activeOpacity={0.8}
@@ -189,6 +199,41 @@ export function PhotoGrid({ photos, onAdd, onRemove, onReorder, editable = true 
             </TouchableOpacity>
           );
         })}
+
+        {/* Floating overlay: the photo being dragged follows the finger */}
+        {draggedPhoto && dragSlotPos && (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.slot,
+              {
+                width: itemWidth,
+                height: itemHeight,
+                position: 'absolute',
+                left: dragSlotPos.x,
+                top: dragSlotPos.y,
+                zIndex: 10,
+                elevation: 10,
+                opacity: 0.85,
+                transform: [
+                  { translateX: dragAnim.x },
+                  { translateY: dragAnim.y },
+                  { scale: 1.08 },
+                ],
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.25,
+                shadowRadius: 8,
+              },
+            ]}
+          >
+            <Image
+              source={{ uri: getPhotoUrl(draggedPhoto.storage_path) }}
+              style={styles.image}
+              contentFit="cover"
+            />
+          </Animated.View>
+        )}
       </View>
       {editable && photos.length >= 2 && (
         <Text style={styles.reorderHint}>{t('profile.reorderHint')}</Text>
@@ -196,6 +241,8 @@ export function PhotoGrid({ photos, onAdd, onRemove, onReorder, editable = true 
     </View>
   );
 }
+
+const slots = Array.from({ length: Config.maxPhotos }, (_, i) => i);
 
 function makeStyles(c: ReturnType<typeof useColors>) {
   return StyleSheet.create({
