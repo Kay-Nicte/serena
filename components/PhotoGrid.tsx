@@ -137,7 +137,7 @@ export function PhotoGrid({ photos, onAdd, onRemove, onReorder, editable = true 
   const dragSlotPos = draggingIndex !== null ? getSlotPosition(draggingIndex) : null;
 
   return (
-    <View>
+    <View style={{ position: 'relative' }}>
       <View style={styles.grid} {...panResponder.panHandlers}>
         {slots.map((slotIndex) => {
           const photo = slotIndex < visualPhotos.length ? visualPhotos[slotIndex] : null;
@@ -200,41 +200,40 @@ export function PhotoGrid({ photos, onAdd, onRemove, onReorder, editable = true 
           );
         })}
 
-        {/* Floating overlay: the photo being dragged follows the finger */}
-        {draggedPhoto && dragSlotPos && (
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              styles.slot,
-              {
-                width: itemWidth,
-                height: itemHeight,
-                position: 'absolute',
-                left: dragSlotPos.x,
-                top: dragSlotPos.y,
-                zIndex: 10,
-                elevation: 10,
-                opacity: 0.85,
-                transform: [
-                  { translateX: dragAnim.x },
-                  { translateY: dragAnim.y },
-                  { scale: 1.08 },
-                ],
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.25,
-                shadowRadius: 8,
-              },
-            ]}
-          >
-            <Image
-              source={{ uri: getPhotoUrl(draggedPhoto.storage_path) }}
-              style={styles.image}
-              contentFit="cover"
-            />
-          </Animated.View>
-        )}
       </View>
+      {/* Floating overlay: the photo being dragged follows the finger — outside grid to avoid overflow:hidden */}
+      {draggedPhoto && dragSlotPos && (
+        <Animated.View
+          pointerEvents="none"
+          style={{
+            width: itemWidth,
+            height: itemHeight,
+            position: 'absolute',
+            left: dragSlotPos.x,
+            top: dragSlotPos.y,
+            zIndex: 10,
+            elevation: 10,
+            opacity: 0.85,
+            borderRadius: 12,
+            overflow: 'hidden',
+            transform: [
+              { translateX: dragAnim.x },
+              { translateY: dragAnim.y },
+              { scale: 1.08 },
+            ],
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.25,
+            shadowRadius: 8,
+          }}
+        >
+          <Image
+            source={{ uri: getPhotoUrl(draggedPhoto.storage_path) }}
+            style={styles.image}
+            contentFit="cover"
+          />
+        </Animated.View>
+      )}
       {editable && photos.length >= 2 && (
         <Text style={styles.reorderHint}>{t('profile.reorderHint')}</Text>
       )}
@@ -250,6 +249,7 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: GRID_GAP,
+      position: 'relative',
     },
     slot: {
       borderRadius: 12,
