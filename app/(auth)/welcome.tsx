@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/ui/Button';
 import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
-import { signInWithGoogle } from '@/lib/auth';
+import { signInWithGoogle, signInWithApple, isAppleAuthAvailable } from '@/lib/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { showToast } from '@/stores/toastStore';
 import { ResponsiveContainer } from '@/components/ResponsiveContainer';
@@ -17,6 +17,7 @@ export default function WelcomeScreen() {
   const { t } = useTranslation();
   const fetchProfile = useAuthStore((s) => s.fetchProfile);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const Colors = useColors();
   const styles = makeStyles(Colors);
 
@@ -76,6 +77,37 @@ export default function WelcomeScreen() {
               </>
             )}
           </TouchableOpacity>
+
+          {isAppleAuthAvailable() && (
+            <TouchableOpacity
+              style={styles.appleButton}
+              onPress={async () => {
+                setAppleLoading(true);
+                try {
+                  await signInWithApple();
+                  await fetchProfile();
+                } catch (e: unknown) {
+                  const msg = e instanceof Error ? e.message : '';
+                  if (!msg.includes('cancelled') && !msg.includes('ERR_CANCELED')) {
+                    showToast(t('auth.errorGeneric'), 'error');
+                  }
+                } finally {
+                  setAppleLoading(false);
+                }
+              }}
+              activeOpacity={0.7}
+              disabled={appleLoading}
+            >
+              {appleLoading ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <>
+                  <Ionicons name="logo-apple" size={20} color="#FFFFFF" />
+                  <Text style={styles.appleButtonText}>{t('auth.continueWithApple')}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       </ResponsiveContainer>
@@ -149,6 +181,20 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       fontSize: 15,
       fontFamily: Fonts.bodySemiBold,
       color: c.primaryDark,
+    },
+    appleButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 10,
+      backgroundColor: '#000000',
+      borderRadius: 12,
+      paddingVertical: 14,
+    },
+    appleButtonText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: '#FFFFFF',
     },
   });
 }
