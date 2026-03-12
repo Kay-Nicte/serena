@@ -12,6 +12,7 @@ import { useBlockStore } from './blockStore';
 import { useDailyStatsStore } from './dailyStatsStore';
 import { useVerificationStore } from './verificationStore';
 import { usePromptStore } from './promptStore';
+import { usePlansStore } from './plansStore';
 import { showToast } from './toastStore';
 import i18n from '@/i18n';
 import type { Orientation, LookingFor } from '@/constants/config';
@@ -236,6 +237,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     useDailyStatsStore.getState().reset();
     useVerificationStore.getState().reset();
     usePromptStore.getState().reset();
+    usePlansStore.getState().reset();
     // Reset language to device default
     const { getLocales } = require('expo-localization');
     const deviceLang = getLocales()[0]?.languageCode ?? 'en';

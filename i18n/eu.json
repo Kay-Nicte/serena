@@ -218,7 +218,8 @@
     "matches": "Match-ak",
     "chat": "Txat",
     "profile": "Profila",
-    "admin": "Admin"
+    "admin": "Admin",
+    "plans": "Planak"
   },
   "today": {
     "title": "Gaur",
@@ -751,5 +752,42 @@
     "empty": "Inork ez dizu oraindik like eman. Mantendu zure profila eguneratuta!",
     "premiumCta": "Egin zaitez Premium nork eman dizun like ikusteko",
     "count": "{{count}} like"
+  },
+  "plans": {
+    "title": "Planak",
+    "empty": "Oraindik ez dago planik. Sortu lehena!",
+    "create": "Plana sortu",
+    "join": "Batu",
+    "leave": "Irten",
+    "joined": "Batu zara!",
+    "left": "Planetik irten zara",
+    "full": "Plana beteta",
+    "attendees": "{{count}} izena emanda",
+    "createdBy": "{{name}}(e)k sortua",
+    "categoryAll": "Denak",
+    "categoryNearby": "Gertuan",
+    "categoryTravel": "Bidaiak",
+    "categoryLeisure": "Aisia",
+    "categoryCulture": "Kultura",
+    "titleLabel": "Izenburua",
+    "titlePlaceholder": "Planaren izena",
+    "descriptionLabel": "Deskribapena",
+    "descriptionPlaceholder": "Kontatu zer egin nahi duzuen",
+    "locationLabel": "Kokapena",
+    "locationPlaceholder": "Non izango da?",
+    "dateLabel": "Data eta ordua",
+    "categoryLabel": "Kategoria",
+    "maxAttendeesLabel": "Gehienezko pertsonak",
+    "maxAttendeesPlaceholder": "Mugarik gabe",
+    "planCreated": "Plana sortuta!",
+    "planDeleted": "Plana ezabatuta",
+    "errorCreating": "Ezin izan da plana sortu",
+    "errorJoining": "Ezin izan da planera batu",
+    "errorLeaving": "Ezin izan da planetik irten",
+    "deleteConfirm": "Plan hau ezabatu?",
+    "yourPlan": "Zure plana",
+    "when": "Noiz",
+    "where": "Non",
+    "delete": "Ezabatu"
   }
 }

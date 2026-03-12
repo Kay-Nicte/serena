@@ -218,7 +218,8 @@
     "matches": "Matches",
     "chat": "Xat",
     "profile": "Perfil",
-    "admin": "Admin"
+    "admin": "Admin",
+    "plans": "Plans"
   },
   "today": {
     "title": "Avui",
@@ -751,5 +752,42 @@
     "empty": "Ningú t'ha donat like encara. Mantén el teu perfil actualitzat!",
     "premiumCta": "Fes-te Premium per veure qui t'ha donat like",
     "count": "{{count}} likes"
+  },
+  "plans": {
+    "title": "Plans",
+    "empty": "Encara no hi ha plans. Crea el primer!",
+    "create": "Crear pla",
+    "join": "Unir-me",
+    "leave": "Sortir",
+    "joined": "T'hi has unit!",
+    "left": "Has sortit del pla",
+    "full": "Pla complet",
+    "attendees": "{{count}} apuntades",
+    "createdBy": "Per {{name}}",
+    "categoryAll": "Tots",
+    "categoryNearby": "A prop",
+    "categoryTravel": "Viatges",
+    "categoryLeisure": "Oci",
+    "categoryCulture": "Cultura",
+    "titleLabel": "Títol",
+    "titlePlaceholder": "Nom del pla",
+    "descriptionLabel": "Descripció",
+    "descriptionPlaceholder": "Explica què teniu pensat fer",
+    "locationLabel": "Ubicació",
+    "locationPlaceholder": "On serà?",
+    "dateLabel": "Data i hora",
+    "categoryLabel": "Categoria",
+    "maxAttendeesLabel": "Màxim de persones",
+    "maxAttendeesPlaceholder": "Sense límit",
+    "planCreated": "Pla creat!",
+    "planDeleted": "Pla eliminat",
+    "errorCreating": "No s'ha pogut crear el pla",
+    "errorJoining": "No s'ha pogut unir al pla",
+    "errorLeaving": "No s'ha pogut sortir del pla",
+    "deleteConfirm": "Eliminar aquest pla?",
+    "yourPlan": "El teu pla",
+    "when": "Quan",
+    "where": "On",
+    "delete": "Eliminar"
   }
 }

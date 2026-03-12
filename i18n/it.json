@@ -218,7 +218,8 @@
     "matches": "Matches",
     "chat": "Chat",
     "profile": "Profilo",
-    "admin": "Admin"
+    "admin": "Admin",
+    "plans": "Piani"
   },
   "today": {
     "title": "Oggi",
@@ -751,5 +752,42 @@
     "empty": "Nessuno ti ha ancora messo like. Tieni aggiornato il tuo profilo!",
     "premiumCta": "Diventa Premium per vedere chi ti ha messo like",
     "count": "{{count}} like"
+  },
+  "plans": {
+    "title": "Piani",
+    "empty": "Non ci sono ancora piani. Crea il primo!",
+    "create": "Crea piano",
+    "join": "Partecipa",
+    "leave": "Esci",
+    "joined": "Ti sei unita!",
+    "left": "Sei uscita dal piano",
+    "full": "Piano completo",
+    "attendees": "{{count}} iscritte",
+    "createdBy": "Da {{name}}",
+    "categoryAll": "Tutti",
+    "categoryNearby": "Vicino",
+    "categoryTravel": "Viaggi",
+    "categoryLeisure": "Svago",
+    "categoryCulture": "Cultura",
+    "titleLabel": "Titolo",
+    "titlePlaceholder": "Nome del piano",
+    "descriptionLabel": "Descrizione",
+    "descriptionPlaceholder": "Racconta cosa avete in mente",
+    "locationLabel": "Luogo",
+    "locationPlaceholder": "Dove sarà?",
+    "dateLabel": "Data e ora",
+    "categoryLabel": "Categoria",
+    "maxAttendeesLabel": "Massimo di persone",
+    "maxAttendeesPlaceholder": "Senza limite",
+    "planCreated": "Piano creato!",
+    "planDeleted": "Piano eliminato",
+    "errorCreating": "Impossibile creare il piano",
+    "errorJoining": "Impossibile unirsi al piano",
+    "errorLeaving": "Impossibile uscire dal piano",
+    "deleteConfirm": "Eliminare questo piano?",
+    "yourPlan": "Il tuo piano",
+    "when": "Quando",
+    "where": "Dove",
+    "delete": "Elimina"
   }
 }

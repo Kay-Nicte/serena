@@ -218,7 +218,8 @@
     "matches": "Matches",
     "chat": "Chat",
     "profile": "Profile",
-    "admin": "Admin"
+    "admin": "Admin",
+    "plans": "Plans"
   },
   "today": {
     "title": "Today",
@@ -751,5 +752,42 @@
     "empty": "No one has liked you yet. Keep your profile updated!",
     "premiumCta": "Go Premium to see who liked you",
     "count": "{{count}} likes"
+  },
+  "plans": {
+    "title": "Plans",
+    "empty": "No plans yet. Create the first one!",
+    "create": "Create plan",
+    "join": "Join",
+    "leave": "Leave",
+    "joined": "You've joined!",
+    "left": "You left the plan",
+    "full": "Plan full",
+    "attendees": "{{count}} attending",
+    "createdBy": "By {{name}}",
+    "categoryAll": "All",
+    "categoryNearby": "Nearby",
+    "categoryTravel": "Travel",
+    "categoryLeisure": "Leisure",
+    "categoryCulture": "Culture",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Plan name",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Tell us what you have in mind",
+    "locationLabel": "Location",
+    "locationPlaceholder": "Where will it be?",
+    "dateLabel": "Date and time",
+    "categoryLabel": "Category",
+    "maxAttendeesLabel": "Maximum people",
+    "maxAttendeesPlaceholder": "No limit",
+    "planCreated": "Plan created!",
+    "planDeleted": "Plan deleted",
+    "errorCreating": "Could not create the plan",
+    "errorJoining": "Could not join the plan",
+    "errorLeaving": "Could not leave the plan",
+    "deleteConfirm": "Delete this plan?",
+    "yourPlan": "Your plan",
+    "when": "When",
+    "where": "Where",
+    "delete": "Delete"
   }
 }

@@ -218,7 +218,8 @@
     "matches": "Matches",
     "chat": "Chat",
     "profile": "Perfil",
-    "admin": "Admin"
+    "admin": "Admin",
+    "plans": "Planes"
   },
   "today": {
     "title": "Hoy",
@@ -751,5 +752,42 @@
     "empty": "Nadie te ha dado like aún. ¡Mantén tu perfil actualizado!",
     "premiumCta": "Hazte Premium para ver quién te ha dado like",
     "count": "{{count}} likes"
+  },
+  "plans": {
+    "title": "Planes",
+    "empty": "No hay planes todavía. ¡Crea el primero!",
+    "create": "Crear plan",
+    "join": "Unirme",
+    "leave": "Salir",
+    "joined": "¡Te has unido!",
+    "left": "Has salido del plan",
+    "full": "Plan completo",
+    "attendees": "{{count}} apuntadas",
+    "createdBy": "Por {{name}}",
+    "categoryAll": "Todos",
+    "categoryNearby": "Cerca",
+    "categoryTravel": "Viajes",
+    "categoryLeisure": "Ocio",
+    "categoryCulture": "Cultura",
+    "titleLabel": "Título",
+    "titlePlaceholder": "Nombre del plan",
+    "descriptionLabel": "Descripción",
+    "descriptionPlaceholder": "Cuenta qué tenéis pensado hacer",
+    "locationLabel": "Ubicación",
+    "locationPlaceholder": "¿Dónde será?",
+    "dateLabel": "Fecha y hora",
+    "categoryLabel": "Categoría",
+    "maxAttendeesLabel": "Máximo de personas",
+    "maxAttendeesPlaceholder": "Sin límite",
+    "planCreated": "¡Plan creado!",
+    "planDeleted": "Plan eliminado",
+    "errorCreating": "No se pudo crear el plan",
+    "errorJoining": "No se pudo unir al plan",
+    "errorLeaving": "No se pudo salir del plan",
+    "deleteConfirm": "¿Eliminar este plan?",
+    "yourPlan": "Tu plan",
+    "when": "Cuándo",
+    "where": "Dónde",
+    "delete": "Eliminar"
   }
 }
