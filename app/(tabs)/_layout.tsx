@@ -7,6 +7,7 @@ import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { useAuthStore } from '@/stores/authStore';
 import { useIceBreakerStore } from '@/stores/iceBreakerStore';
+import { useTriviaStore } from '@/stores/triviaStore';
 import { PremiumExpiryModal } from '@/components/PremiumExpiryModal';
 import { supabase } from '@/lib/supabase';
 
@@ -32,7 +33,6 @@ function useAdminPendingCount(isStaff: boolean) {
     }
   }, [isStaff]);
 
-  // Refresh on tab focus
   useFocusEffect(
     useCallback(() => {
       fetchCounts();
@@ -56,8 +56,16 @@ export default function TabLayout() {
   const isModerator = profile?.is_moderator === true;
   const isStaff = isAdmin || isModerator;
   const pendingCount = useIceBreakerStore((s) => s.pendingIceBreakers.length);
+  const triviaInviteCount = useTriviaStore((s) => s.pendingInvites.length);
+  const fetchPendingInvites = useTriviaStore((s) => s.fetchPendingInvites);
   const adminPendingCount = useAdminPendingCount(isStaff);
   const tabStyles = makeStyles(Colors);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPendingInvites();
+    }, [fetchPendingInvites])
+  );
 
   return (
     <>
@@ -87,12 +95,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="matches"
+        name="conexiones"
         options={{
-          title: t('tabs.matches'),
+          title: t('tabs.conexiones'),
           tabBarIcon: ({ color, size }) => (
             <View>
-              <Ionicons name="sparkles-outline" size={size} color={color} />
+              <Ionicons name="chatbubble-ellipses-outline" size={size} color={color} />
               {pendingCount > 0 && (
                 <View style={tabStyles.badge}>
                   <Text style={tabStyles.badgeText}>
@@ -105,31 +113,54 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat"
+        name="comunidad"
         options={{
-          title: t('tabs.chat'),
+          title: t('tabs.comunidad'),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbubble-outline" size={size} color={color} />
+            <Ionicons name="people-outline" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="plans"
+        name="juegos"
         options={{
-          title: t('tabs.plans'),
+          title: t('games.title'),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-outline" size={size} color={color} />
+            <View>
+              <Ionicons name="game-controller-outline" size={size} color={color} />
+              {triviaInviteCount > 0 && (
+                <View style={tabStyles.badge}>
+                  <Text style={tabStyles.badgeText}>
+                    {triviaInviteCount > 9 ? '9+' : triviaInviteCount}
+                  </Text>
+                </View>
+              )}
+            </View>
           ),
         }}
       />
+      {/* Hidden tabs - still accessible via router.push but not in tab bar */}
       <Tabs.Screen
         name="profile"
         options={{
+          href: null,
           title: t('tabs.profile'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),
         }}
+      />
+      <Tabs.Screen
+        name="matches"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="plans"
+        options={{ href: null }}
       />
       <Tabs.Screen
         name="admin"

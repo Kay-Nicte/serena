@@ -15,7 +15,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
+import i18n from '@/i18n';
 import { supabase } from '@/lib/supabase';
+import { useWyrStore, type WyrProfileAnswer } from '@/stores/wyrStore';
+import { useProfileStore } from '@/stores/profileStore';
+import { useDailyStatsStore } from '@/stores/dailyStatsStore';
+import { useIceBreakerStore } from '@/stores/iceBreakerStore';
+import { useAuthStore } from '@/stores/authStore';
+import { IceBreakerModal } from '@/components/IceBreakerModal';
 import { getPhotoUrl } from '@/lib/storage';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { ResponsiveContainer } from '@/components/ResponsiveContainer';
@@ -94,7 +101,20 @@ export default function MatchProfileScreen() {
   const styles = makeStyles(Colors);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [photos, setPhotos] = useState<{ uri: string }[]>([]);
+  const [wyrAnswers, setWyrAnswers] = useState<WyrProfileAnswer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMatch, setIsMatch] = useState<boolean | null>(null);
+  const [actionDone, setActionDone] = useState(false);
+  const [iceBreakerVisible, setIceBreakerVisible] = useState(false);
+  const lang = i18n.language?.split('-')[0] || 'es';
+
+  const myUserId = useAuthStore((s) => s.user?.id);
+  const likeProfile = useProfileStore((s) => s.likeProfile);
+  const superlikeProfile = useProfileStore((s) => s.superlikeProfile);
+  const availableSuperlikes = useDailyStatsStore((s) => s.availableSuperlikes);
+  const availableIceBreakers = useDailyStatsStore((s) => s.availableIceBreakers);
+  const remainingLikes = useDailyStatsStore((s) => s.remainingLikes);
+  const sendIceBreaker = useIceBreakerStore((s) => s.sendIceBreaker);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -122,6 +142,22 @@ export default function MatchProfileScreen() {
             uri: getPhotoUrl(p.storage_path),
           }));
           setPhotos(photoUrls);
+        }
+
+        // Fetch WYR answers
+        const wyr = await useWyrStore.getState().fetchUserAnswers(userId);
+        setWyrAnswers(wyr);
+
+        // Check if already matched
+        if (myUserId && myUserId !== userId) {
+          const { data: matchData } = await supabase
+            .from('matches')
+            .select('id')
+            .or(`and(user1_id.eq.${myUserId},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${myUserId})`)
+            .limit(1);
+          setIsMatch((matchData?.length ?? 0) > 0);
+        } else {
+          setIsMatch(true); // own profile, don't show actions
         }
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -203,6 +239,24 @@ export default function MatchProfileScreen() {
               <Text style={styles.bio}>{profile.bio}</Text>
             </View>
           ) : null}
+
+          {wyrAnswers.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>{t('games.wouldYouRather')}</Text>
+              {wyrAnswers.map((wa, i) => {
+                const qText = wa.question[lang] || wa.question['es'] || '';
+                const chosenText = wa.answer === 'a'
+                  ? (wa.option_a[lang] || wa.option_a['es'] || 'A')
+                  : (wa.option_b[lang] || wa.option_b['es'] || 'B');
+                return (
+                  <View key={i} style={styles.wyrItem}>
+                    <Text style={styles.wyrQuestion}>{qText}</Text>
+                    <Text style={styles.wyrAnswer}>{chosenText}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
 
           <View style={styles.tags}>
             {ensureArray(profile.orientation).map((o, i) => (
@@ -392,6 +446,60 @@ export default function MatchProfileScreen() {
           )}
         </View>
       </ScrollView>
+
+      {isMatch === false && !actionDone && (
+        <View style={styles.actionBar}>
+          {availableIceBreakers > 0 && (
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: '#6C63FF18' }]}
+              onPress={() => setIceBreakerVisible(true)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chatbubble-outline" size={26} color="#6C63FF" />
+            </TouchableOpacity>
+          )}
+          {availableSuperlikes > 0 && (
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: '#FFD60A18' }]}
+              onPress={async () => {
+                await superlikeProfile(userId!);
+                setActionDone(true);
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="star" size={26} color={Colors.goldAccent} />
+            </TouchableOpacity>
+          )}
+          {remainingLikes > 0 && (
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: Colors.primaryPastel }]}
+              onPress={async () => {
+                await likeProfile(userId!);
+                setActionDone(true);
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="heart" size={26} color={Colors.primary} />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
+      {actionDone && (
+        <View style={styles.actionBar}>
+          <Text style={styles.actionDoneText}>{t('games.compatLikeSent')}</Text>
+        </View>
+      )}
+
+      <IceBreakerModal
+        visible={iceBreakerVisible}
+        onClose={() => setIceBreakerVisible(false)}
+        onSend={async (message: string) => {
+          setIceBreakerVisible(false);
+          await sendIceBreaker(userId!, message);
+          setActionDone(true);
+        }}
+      />
       </ResponsiveContainer>
     </SafeAreaView>
   );
@@ -509,6 +617,23 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       fontFamily: Fonts.bodyMedium,
       color: '#2E7D32',
     },
+    wyrItem: {
+      backgroundColor: c.surfaceSecondary,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    wyrQuestion: {
+      fontSize: 12,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textSecondary,
+      marginBottom: 3,
+    },
+    wyrAnswer: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
+    },
     detailRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -525,6 +650,29 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       color: c.text,
       flexShrink: 1,
       textAlign: 'right',
+    },
+    actionBar: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 16,
+      paddingVertical: 12,
+      paddingHorizontal: 24,
+      borderTopWidth: 1,
+      borderTopColor: c.borderLight,
+      backgroundColor: c.surface,
+    },
+    actionButton: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    actionDoneText: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
     },
   });
 }

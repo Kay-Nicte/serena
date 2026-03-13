@@ -123,7 +123,7 @@ function handleNotificationNavigation(data: Record<string, unknown>): void {
     case 'new_match':
     case 'new_message':
       if (data.match_id) {
-        router.push(`/(tabs)/chat/${data.match_id}`);
+        router.push(`/(tabs)/conexiones/${data.match_id}`);
       }
       break;
     case 'superlike':

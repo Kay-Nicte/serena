@@ -29,6 +29,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ResponsiveContainer } from '@/components/ResponsiveContainer';
+import { ProfileAvatarButton } from '@/components/ProfileAvatarButton';
 
 export default function TodayScreen() {
   const { t } = useTranslation();
@@ -116,7 +117,7 @@ export default function TodayScreen() {
   const handleChat = () => {
     if (matchResult?.match_id) {
       clearMatchResult();
-      router.push(`/(tabs)/chat/${matchResult.match_id}`);
+      router.push(`/(tabs)/conexiones/${matchResult.match_id}`);
     }
   };
 
@@ -151,6 +152,7 @@ export default function TodayScreen() {
       <ResponsiveContainer>
       <View style={styles.header}>
         <Text style={styles.title}>{t("today.title")}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         {pendingLikesCount > 0 && (
           <TouchableOpacity
             style={styles.whoLikedButton}
@@ -163,6 +165,8 @@ export default function TodayScreen() {
             </Text>
           </TouchableOpacity>
         )}
+        <ProfileAvatarButton />
+        </View>
       </View>
 
       {/* Verification banner */}

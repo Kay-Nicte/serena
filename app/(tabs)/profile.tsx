@@ -12,6 +12,7 @@ import {
   Modal,
   ActivityIndicator,
   RefreshControl,
+  Switch,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -151,6 +152,7 @@ export default function ProfileScreen() {
   const [profession, setProfession] = useState('');
   const [religion, setReligion] = useState<string | null>(null);
   const [musicGenres, setMusicGenres] = useState<string[]>([]);
+  const [showQuizScore, setShowQuizScore] = useState(false);
   const [citySuggestions, setCitySuggestions] = useState<CitySuggestion[]>([]);
   const [citySearching, setCitySearching] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
@@ -216,6 +218,7 @@ export default function ProfileScreen() {
       setProfession(profile.profession ?? '');
       setReligion(profile.religion ?? null);
       setMusicGenres(profile.music_genres ?? []);
+      setShowQuizScore(profile.show_quiz_score ?? false);
       if (profile.birth_date) {
         const [y, m, d] = profile.birth_date.split('-');
         setYear(y);
@@ -1366,6 +1369,22 @@ export default function ProfileScreen() {
             )}
           </View>
 
+          {/* Quiz score toggle */}
+          <View style={styles.quizToggleRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.quizToggleLabel}>{t('games.quizShowOnProfile')}</Text>
+            </View>
+            <Switch
+              value={showQuizScore}
+              onValueChange={async (val) => {
+                setShowQuizScore(val);
+                await supabase.from('profiles').update({ show_quiz_score: val }).eq('id', profile?.id);
+              }}
+              trackColor={{ false: Colors.borderLight, true: Colors.primaryLight }}
+              thumbColor={showQuizScore ? Colors.primary : Colors.textSecondary}
+            />
+          </View>
+
           <Button
             title={t('common.save')}
             onPress={handleSave}
@@ -1608,6 +1627,19 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: 8,
+    },
+    quizToggleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 12,
+      paddingHorizontal: 4,
+      marginBottom: 8,
+    },
+    quizToggleLabel: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.text,
     },
     saveButton: {
       marginTop: 4,

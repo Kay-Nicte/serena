@@ -1,12 +1,14 @@
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 import { useAuthStore, type Profile } from '@/stores/authStore';
 import { usePromptStore, type ProfilePrompt } from '@/stores/promptStore';
+import { useWyrStore, type WyrProfileAnswer } from '@/stores/wyrStore';
 
 // Ensure orientation/looking_for are always clean string arrays
 function ensureArray(val: unknown): string[] {
@@ -97,8 +99,10 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
   const myProfile = useAuthStore((s) => s.profile);
   const compatibility = showCompatibility ? computeCompatibility(myProfile, profile) : null;
   const [prompts, setPrompts] = useState<ProfilePrompt[]>([]);
+  const [wyrAnswers, setWyrAnswers] = useState<WyrProfileAnswer[]>([]);
   const Colors = useColors();
   const styles = makeStyles(Colors);
+  const lang = i18n.language?.split('-')[0] || 'es';
 
   const ACTIVITY_CONFIG: Record<ActivityLevel, { color: string; i18nKey: string }> = {
     today: { color: Colors.success, i18nKey: 'today.activityToday' },
@@ -110,6 +114,7 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
   useEffect(() => {
     if (profile.id && profile.id !== myProfile?.id) {
       usePromptStore.getState().fetchPromptsForUser(profile.id).then(setPrompts);
+      useWyrStore.getState().fetchUserAnswers(profile.id).then(setWyrAnswers);
     }
   }, [profile.id]);
 
@@ -193,6 +198,23 @@ export function ProfileCard({ profile, photos, activityLevel, lastSeen, showActi
                 <Text style={styles.promptAnswer}>{p.answer}</Text>
               </View>
             ))}
+          </View>
+        )}
+
+        {wyrAnswers.length > 0 && (
+          <View style={styles.wyrSection}>
+            {wyrAnswers.map((wa, i) => {
+              const qText = wa.question[lang] || wa.question['es'] || '';
+              const chosenText = wa.answer === 'a'
+                ? (wa.option_a[lang] || wa.option_a['es'] || 'A')
+                : (wa.option_b[lang] || wa.option_b['es'] || 'B');
+              return (
+                <View key={i} style={styles.wyrItem}>
+                  <Text style={styles.wyrQuestion}>{qText}</Text>
+                  <Text style={styles.wyrAnswer}>{chosenText}</Text>
+                </View>
+              );
+            })}
           </View>
         )}
 
@@ -404,6 +426,26 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       fontFamily: Fonts.body,
       color: c.text,
       lineHeight: 22,
+    },
+    wyrSection: {
+      gap: 8,
+    },
+    wyrItem: {
+      backgroundColor: c.surfaceSecondary,
+      borderRadius: 12,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    wyrQuestion: {
+      fontSize: 12,
+      fontFamily: Fonts.bodyMedium,
+      color: c.textTertiary,
+      marginBottom: 3,
+    },
+    wyrAnswer: {
+      fontSize: 15,
+      fontFamily: Fonts.bodySemiBold,
+      color: c.primary,
     },
     superlikeBanner: {
       backgroundColor: c.goldBg,

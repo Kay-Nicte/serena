@@ -317,6 +317,11 @@ export default function RootLayout() {
               <Stack.Screen name="admin-audit-log" />
               <Stack.Screen name="premium" options={{ presentation: 'modal' }} />
               <Stack.Screen name="buy-boost" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="group-detail" />
+              <Stack.Screen name="trivia-invite" />
+              <Stack.Screen name="trivia-play" />
+              <Stack.Screen name="trivia-results" />
+              <Stack.Screen name="compatibility-play" />
             </Stack>
             <StatusBar style={statusBarStyle} />
           </AuthGuard>
