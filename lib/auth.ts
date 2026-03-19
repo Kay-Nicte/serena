@@ -147,7 +147,7 @@ export async function signInWithGoogle() {
   throw new Error('Google sign-in was cancelled');
 }
 
-export async function signInWithApple() {
+export async function signInWithApple(): Promise<{ fullName?: string }> {
   const credential = await AppleAuthentication.signInAsync({
     requestedScopes: [
       AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -165,6 +165,11 @@ export async function signInWithApple() {
   });
 
   if (error) throw error;
+
+  // Apple only provides the name on the FIRST sign-in — capture it now
+  const parts = [credential.fullName?.givenName, credential.fullName?.familyName].filter(Boolean);
+  const fullName = parts.length > 0 ? parts.join(' ') : undefined;
+  return { fullName };
 }
 
 export function isAppleAuthAvailable(): boolean {

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
@@ -16,16 +15,11 @@ import { type PurchasesPackage } from 'react-native-purchases';
 import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { getOfferings, purchasePackage, restorePurchases } from '@/lib/purchases';
-import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/authStore';
 import { useDailyStatsStore } from '@/stores/dailyStatsStore';
 import { useBoostStore } from '@/stores/boostStore';
 import { showToast } from '@/stores/toastStore';
 import { ResponsiveContainer } from '@/components/ResponsiveContainer';
-
-const PROMO_CODES: Record<string, number> = {
-  SERENADEVIP: 365,
-};
 
 const PLAN_ORDER = ['$rc_monthly', '$rc_three_month', '$rc_annual'];
 
@@ -50,8 +44,6 @@ export default function PremiumScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
-  const [promoCode, setPromoCode] = useState('');
-  const [isRedeeming, setIsRedeeming] = useState(false);
   const Colors = useColors();
   const styles = makeStyles(Colors);
 
@@ -122,34 +114,6 @@ export default function PremiumScreen() {
     }
   };
 
-  const handleRedeem = async () => {
-    const code = promoCode.trim().toUpperCase();
-    const days = PROMO_CODES[code];
-    if (!days) {
-      showToast(t('premium.invalidCode'), 'error');
-      return;
-    }
-    setIsRedeeming(true);
-    try {
-      const premiumUntil = new Date();
-      premiumUntil.setDate(premiumUntil.getDate() + days);
-      const { data, error } = await supabase.rpc('activate_premium_purchase', {
-        premium_until_ts: premiumUntil.toISOString(),
-      });
-      if (error) throw new Error(error.message);
-      if (data?.error) throw new Error(data.error);
-      fetchProfile(); // fire-and-forget, don't block navigation
-      useDailyStatsStore.getState().fetch();
-      useBoostStore.getState().grantWeeklyIfNeeded();
-      showToast(t('premium.codeSuccess'), 'success');
-      router.back();
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : t('premium.purchaseError');
-      showToast(msg, 'error');
-    } finally {
-      setIsRedeeming(false);
-    }
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -255,30 +219,16 @@ export default function PremiumScreen() {
           )}
         </TouchableOpacity>
 
-        {/* Redeem code */}
-        <View style={styles.redeemSection}>
-          <Text style={styles.redeemTitle}>{t('premium.redeemTitle')}</Text>
-          <View style={styles.redeemRow}>
-            <TextInput
-              style={styles.redeemInput}
-              value={promoCode}
-              onChangeText={setPromoCode}
-              placeholder={t('premium.redeemPlaceholder')}
-              placeholderTextColor={Colors.textTertiary}
-              autoCapitalize="characters"
-              autoCorrect={false}
-            />
-            <TouchableOpacity
-              style={[styles.redeemButton, isRedeeming && styles.subscribeButtonDisabled]}
-              onPress={handleRedeem}
-              disabled={isRedeeming || !promoCode.trim()}
-              activeOpacity={0.7}
-            >
-              {isRedeeming ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.redeemButtonText}>{t('premium.redeem')}</Text>
-              )}
+        {/* Legal links */}
+        <View style={styles.legalSection}>
+          <Text style={styles.legalText}>{t('premium.autoRenewNotice')}</Text>
+          <View style={styles.legalLinks}>
+            <TouchableOpacity onPress={() => router.push('/terms-of-service')}>
+              <Text style={styles.legalLink}>{t('settings.termsOfService')}</Text>
+            </TouchableOpacity>
+            <Text style={styles.legalSeparator}>|</Text>
+            <TouchableOpacity onPress={() => router.push('/privacy-policy')}>
+              <Text style={styles.legalLink}>{t('settings.privacyPolicy')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -435,46 +385,35 @@ function makeStyles(c: ReturnType<typeof useColors>) {
       color: c.textTertiary,
       textDecorationLine: 'underline',
     },
-    redeemSection: {
+    legalSection: {
       width: '100%',
       borderTopWidth: 1,
       borderTopColor: c.border,
-      paddingTop: 20,
-      gap: 10,
-    },
-    redeemTitle: {
-      fontSize: 15,
-      fontFamily: Fonts.bodySemiBold,
-      color: c.text,
-      textAlign: 'center',
-    },
-    redeemRow: {
-      flexDirection: 'row',
-      gap: 10,
-    },
-    redeemInput: {
-      flex: 1,
-      borderWidth: 1,
-      borderColor: c.border,
-      borderRadius: 12,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      fontSize: 15,
-      fontFamily: Fonts.bodyMedium,
-      color: c.text,
-      backgroundColor: c.surface,
-    },
-    redeemButton: {
-      backgroundColor: c.goldAccent,
-      borderRadius: 12,
-      paddingHorizontal: 20,
-      justifyContent: 'center',
+      paddingTop: 16,
+      gap: 8,
       alignItems: 'center',
     },
-    redeemButtonText: {
-      fontSize: 15,
-      fontFamily: Fonts.bodySemiBold,
-      color: '#fff',
+    legalText: {
+      fontSize: 11,
+      fontFamily: Fonts.body,
+      color: c.textTertiary,
+      textAlign: 'center',
+      lineHeight: 16,
+    },
+    legalLinks: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    legalLink: {
+      fontSize: 12,
+      fontFamily: Fonts.bodyMedium,
+      color: c.primary,
+      textDecorationLine: 'underline',
+    },
+    legalSeparator: {
+      fontSize: 12,
+      color: c.textTertiary,
     },
   });
 }

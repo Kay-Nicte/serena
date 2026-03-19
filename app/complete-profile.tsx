@@ -38,7 +38,8 @@ export default function CompleteProfileScreen() {
   const Colors = useColors();
   const styles = makeStyles(Colors);
 
-  const [name, setName] = useState('');
+  const profile = useAuthStore((s) => s.profile);
+  const [name, setName] = useState(profile?.name ?? '');
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
   const [year, setYear] = useState('');

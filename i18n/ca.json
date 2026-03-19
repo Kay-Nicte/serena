@@ -651,7 +651,8 @@
     "codeSuccess": "Codi bescanviat! Benvinguda a Premium!",
     "invalidCode": "Codi no vàlid. Revisa'l i torna-ho a provar.",
     "completeProfileTeaserDiamond": "Omple tots els camps marcats amb 💎 per aconseguir 7 dies de Premium gratis.",
-    "verifyPromo": "Verifica la teva identitat i aconsegueix 1 mes de Premium gratis"
+    "verifyPromo": "Verifica la teva identitat i aconsegueix 1 mes de Premium gratis",
+    "autoRenewNotice": "La subscripcio es renova automaticament. Pots cancel\u00b7lar-la en qualsevol moment des dels ajustos del teu compte d'Apple."
   },
   "boost": {
     "title": "Boost de perfil",

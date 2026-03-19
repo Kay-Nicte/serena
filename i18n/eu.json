@@ -651,7 +651,8 @@
     "codeSuccess": "Kodea trukatuta! Ongi etorri Premium-era!",
     "invalidCode": "Kode baliogabea. Egiaztatu eta saiatu berriro.",
     "completeProfileTeaserDiamond": "💎 ikurrarekin markatutako eremu guztiak bete 7 eguneko Premium doan lortzeko.",
-    "verifyPromo": "Egiaztatu zure identitatea eta lortu Premium-aren hilabete bat doan"
+    "verifyPromo": "Egiaztatu zure identitatea eta lortu Premium-aren hilabete bat doan",
+    "autoRenewNotice": "Harpidetza automatikoki berritzen da. Edozein unetan ezeztatu dezakezu zure Apple kontuaren ezarpenetatik."
   },
   "boost": {
     "title": "Profil Boosta",

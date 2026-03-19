@@ -651,7 +651,8 @@
     "codeSuccess": "Código canxeado! Benvida a Premium!",
     "invalidCode": "Código non válido. Revísao e téntao de novo.",
     "completeProfileTeaserDiamond": "Enche todos os campos marcados con 💎 para conseguir 7 días de Premium gratis.",
-    "verifyPromo": "Verifica a túa identidade e consegue 1 mes de Premium gratis"
+    "verifyPromo": "Verifica a túa identidade e consegue 1 mes de Premium gratis",
+    "autoRenewNotice": "A subscricion renovase automaticamente. Podes cancelala en calquera momento desde os axustes da tua conta de Apple."
   },
   "boost": {
     "title": "Boost de perfil",

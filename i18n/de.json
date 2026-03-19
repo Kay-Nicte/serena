@@ -651,7 +651,8 @@
     "codeSuccess": "Code eingelöst! Willkommen bei Premium!",
     "invalidCode": "Ungültiger Code. Bitte überprüfe ihn und versuche es erneut.",
     "completeProfileTeaserDiamond": "Fülle alle mit 💎 markierten Felder aus und erhalte 7 Tage Premium gratis.",
-    "verifyPromo": "Verifiziere deine Identität und erhalte 1 Monat Premium gratis"
+    "verifyPromo": "Verifiziere deine Identität und erhalte 1 Monat Premium gratis",
+    "autoRenewNotice": "Das Abonnement verlangert sich automatisch. Du kannst es jederzeit in deinen Apple-Kontoeinstellungen kundigen."
   },
   "boost": {
     "title": "Profil-Boost",

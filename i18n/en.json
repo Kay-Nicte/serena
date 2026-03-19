@@ -651,7 +651,8 @@
     "codeSuccess": "Code redeemed! Welcome to Premium!",
     "invalidCode": "Invalid code. Please check and try again.",
     "completeProfileTeaserDiamond": "Fill in all fields marked with 💎 to get 7 days of Premium for free.",
-    "verifyPromo": "Verify your identity and get 1 free month of Premium"
+    "verifyPromo": "Verify your identity and get 1 free month of Premium",
+    "autoRenewNotice": "The subscription renews automatically. You can cancel anytime from your Apple account settings."
   },
   "boost": {
     "title": "Profile Boost",

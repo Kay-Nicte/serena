@@ -651,7 +651,8 @@
     "codeSuccess": "Codice riscattato! Benvenuta in Premium!",
     "invalidCode": "Codice non valido. Controlla e riprova.",
     "completeProfileTeaserDiamond": "Compila tutti i campi contrassegnati con 💎 per ottenere 7 giorni di Premium gratis.",
-    "verifyPromo": "Verifica la tua identità e ottieni 1 mese di Premium gratis"
+    "verifyPromo": "Verifica la tua identità e ottieni 1 mese di Premium gratis",
+    "autoRenewNotice": "L'abbonamento si rinnova automaticamente. Puoi cancellarlo in qualsiasi momento dalle impostazioni del tuo account Apple."
   },
   "boost": {
     "title": "Boost del profilo",

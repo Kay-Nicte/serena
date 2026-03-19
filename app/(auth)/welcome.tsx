@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { useColors } from '@/hooks/useColors';
 import { Fonts } from '@/constants/fonts';
 import { signInWithGoogle, signInWithApple, isAppleAuthAvailable } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/authStore';
 import { showToast } from '@/stores/toastStore';
 import { ResponsiveContainer } from '@/components/ResponsiveContainer';
@@ -84,8 +85,18 @@ export default function WelcomeScreen() {
               onPress={async () => {
                 setAppleLoading(true);
                 try {
-                  await signInWithApple();
+                  const { fullName } = await signInWithApple();
                   await fetchProfile();
+                  // Pre-fill name from Apple if available (only provided on first sign-in)
+                  if (fullName) {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                      await supabase
+                        .from('profiles')
+                        .update({ name: fullName })
+                        .eq('id', user.id);
+                    }
+                  }
                 } catch (e: unknown) {
                   const msg = e instanceof Error ? e.message : '';
                   if (!msg.includes('cancelled') && !msg.includes('ERR_CANCELED')) {
